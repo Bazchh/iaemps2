@@ -1,0 +1,24 @@
+# Copie para config.toml e ajuste. Nenhuma chave de serviço aqui: ela vai só no .env.
+
+[canal]
+host = "127.0.0.1"
+porta = 28011           # slot do canal oficial nas configurações avançadas do emulador
+tempo_limite_s = 3.0
+espera_jogo_s = 90.0    # quanto esperar o status "rodando" depois de abrir o emulador
+
+[sessoes]
+pasta = ""              # vazio = ~/IAEmPS2/sessoes; fora do repositório e de sincronização em nuvem
+
+[slots_reservados]
+inicio = 90             # DC-15: slots do mestre, nunca entre 1 e 10
+fim = 99
+
+[captura]
+largura_px = 640
+qualidade_jpeg = 80
+limiar_diferenca = 0.04 # fração da imagem que precisa mudar para enviar (B03)
+intervalo_ms = 2000     # ciclo de observação
+
+[servico]
+ativo = "falso"         # nome do adaptador; os reais entram no card S2-03
+teto_custo_sessao = 0.0 # 0 = sem teto; na moeda da tabela de preço do adaptador
