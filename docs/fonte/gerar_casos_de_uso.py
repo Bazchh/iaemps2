@@ -117,12 +117,12 @@ CSS = """
   .res .lbl { margin:0; white-space:nowrap; } .res .txt { flex:1; }
   .seq { background:var(--bg-soft); border:1px solid var(--line); border-radius:10px; padding:8px 12px; margin:-6px 0 14px; break-inside:avoid; }
   .seq .cap-txt { font-size:8.8pt; color:var(--muted); margin-top:2px; }
-  .phase { border:1px solid var(--line); border-left:4px solid var(--line); border-radius:8px; padding:7px 11px; margin-bottom:6px; break-inside:avoid; }
+  .phase { border:1px solid var(--line); border-left:4px solid var(--line); border-radius:8px; padding:6px 11px; margin-bottom:6px; break-inside:avoid; }
   .phase.p1 { border-left-color:var(--f1); } .phase.p2 { border-left-color:var(--f2); } .phase.p3 { border-left-color:var(--f3); }
   .phase h3 { display:flex; justify-content:space-between; }
   .phase h3 span { font-family:Consolas, monospace; font-size:8pt; color:var(--accent); font-weight:normal; }
   .phase p { font-size:9.2pt; margin:2px 0 4px; }
-  .chip { display:inline-block; font-size:7.8pt; border:1px solid var(--line); border-radius:10px; padding:0 7px; margin:1px 2px 0 0; background:#fff; }
+  .chip { display:inline-block; font-size:7.5pt; border:1px solid var(--line); border-radius:10px; padding:0 6px; margin:1px 2px 0 0; background:#fff; }
   .chip .mono { color:var(--accent); font-size:7.6pt; }
   .callout { background:var(--ink); color:#fff; border-radius:8px; padding:12px 14px; font-size:9.6pt; break-inside:avoid; }
   .note { background:var(--bg-soft); border-radius:8px; padding:10px 12px; font-size:9.2pt; break-inside:avoid; }
@@ -455,7 +455,10 @@ def fechamento():
     return f'''<section class="cap"><div class="kicker">Fechamento</div><h2>O que entra em cada fase</h2>
 <p class="lead">{e(D["fechamento_lead"])}</p>
 {"".join(blocos)}
-<div class="kicker" style="margin-top:14px">Lacunas e decisões tocadas por esta entrega</div>
+</section><section class="cap">
+<div class="kicker">Lacunas e decisões tocadas por esta entrega</div>
+<h2>O que esta entrega resolveu, abriu ou deixou em aberto</h2>
+<p class="lead">Decisões detalhadas pelas fichas, candidatas novas para o blueprint e lacunas que seguem abertas. Item detalhado sai da lista na entrega seguinte; o histórico fica no repositório.</p>
 {pend}
 <div class="callout" style="margin-top:14px"><b>Como usar este documento no dia a dia.</b> Cada caso de uso vira um item do backlog, com o código como identificador permanente. O critério de aceite de um item é o fluxo principal funcionando de ponta a ponta, mais cada exceção listada tratada e testada. Quando surgir uma necessidade nova, ela entra como um caso de uso novo, com código próprio, em vez de crescer dentro de um existente: assim o escopo continua visível e negociável.</div>
 </section>'''
