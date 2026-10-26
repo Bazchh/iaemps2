@@ -1,0 +1,1091 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Blueprint Técnico · IAEmPS2</title>
+<style>
+  :root { --ink:#0f1b33; --text:#222a38; --muted:#5b6577; --line:#d7dde8; --accent:#1f4fd1; --bg-soft:#f3f5f9;
+    --f1:#1f4fd1; --f2:#e08a1e; --f3:#1f9d55; --red:#c53030; --amber:#c77d0a; --green:#1f9d55; --purple:#6b3fd1; --gray:#5b6577; }
+  * { box-sizing:border-box; }
+  html, body { margin:0; padding:0; background:#fff; color:var(--text); font-family:"Segoe UI", Arial, sans-serif; font-size:10pt; line-height:1.42; }
+  h1,h2,h3,.big { font-weight:700; color:var(--ink); margin:0; letter-spacing:-0.02em; }
+  h1 { font-size:38pt; line-height:1; margin:2px 0 10px; }
+  h2 { font-size:21pt; line-height:1.1; margin:0 0 6px; }
+  h3 { font-size:12pt; margin:0 0 3px; }
+  h4 { font-size:12.5pt; color:var(--ink); margin:14px 0 6px; }
+  p { margin:0 0 6px; }
+  .mono, code { font-family:Consolas, "Cascadia Mono", monospace; }
+  code { background:#eef1f6; padding:0 4px; border-radius:3px; font-size:8.8pt; }
+  .cap { break-before:page; }
+  .kicker { font-family:Consolas, monospace; font-size:8.5pt; letter-spacing:0.14em; color:var(--accent); text-transform:uppercase; margin-bottom:6px; }
+  .lead { font-size:11pt; max-width:150mm; margin-bottom:12px; }
+  .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:10px 0; }
+  .stat { background:#fff; border:1px solid var(--line); border-radius:8px; padding:8px 12px; }
+  .stat .big { font-size:24pt; line-height:1; }
+  .stat .stl { font-size:9pt; color:var(--muted); margin-top:4px; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:8px; padding:10px 12px; border-top:3px solid var(--line); break-inside:avoid; }
+  .card .code { font-family:Consolas, monospace; font-size:8pt; letter-spacing:0.12em; color:var(--muted); text-transform:uppercase; }
+  .card p { font-size:9.2pt; margin:0; }
+  .card ul { margin:4px 0 0 14px; padding:0; font-size:9pt; } .card li { margin:1px 0; }
+  .f1 { border-top-color:var(--f1); } .f2 { border-top-color:var(--f2); } .f3 { border-top-color:var(--f3); }
+  .note { background:var(--bg-soft); border-radius:8px; padding:10px 12px; font-size:9.2pt; break-inside:avoid; margin:8px 0; }
+  .note b, .callout b { color:var(--ink); }
+  .callout { background:var(--ink); color:#fff; border-radius:8px; padding:12px 14px; font-size:9.6pt; break-inside:avoid; margin:8px 0; }
+  .callout b { color:#fff; }
+  .warn { background:#fff6e0; border-left:4px solid var(--amber); border-radius:8px; padding:10px 12px; font-size:9.2pt; break-inside:avoid; margin:8px 0; }
+  .ok { background:#e8f7ee; border-left:4px solid var(--green); border-radius:8px; padding:10px 12px; font-size:9.2pt; break-inside:avoid; margin:8px 0; }
+  .bad { background:#fdecec; border-left:4px solid var(--red); border-radius:8px; padding:10px 12px; font-size:9.2pt; break-inside:avoid; margin:8px 0; }
+  .lbl { font-family:Consolas, monospace; font-size:7.5pt; letter-spacing:0.12em; color:var(--muted); text-transform:uppercase; margin:8px 0 3px; }
+  table { width:100%; border-collapse:collapse; font-size:9pt; }
+  th { text-align:left; font-family:Consolas, monospace; font-size:7.5pt; letter-spacing:0.1em; color:var(--muted); text-transform:uppercase; background:#e9edf4; padding:5px 8px; }
+  td { padding:5px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+  tr { break-inside:avoid; }
+  td.code, td .mono { font-family:Consolas, monospace; color:var(--accent); }
+  pre { background:#0f1b33; color:#e6edf7; border-radius:8px; padding:10px 12px; font-family:Consolas, "Cascadia Mono", monospace; font-size:8.3pt; line-height:1.38; margin:6px 0 10px; white-space:pre-wrap; break-inside:avoid; }
+  pre .c { color:#8ea0bd; } pre .k { color:#7fc8ff; } pre .s { color:#ffd27f; } pre .n { color:#c7f0a8; }
+  .arch { display:grid; grid-template-columns:120px 1fr 1fr 1fr; gap:6px 8px; align-items:stretch; }
+  .arch .rl { font-family:Consolas, monospace; font-size:7.5pt; letter-spacing:0.1em; color:var(--muted); text-transform:uppercase; align-self:center; }
+  .arch .bx { border:1px solid var(--line); border-radius:6px; padding:6px 8px; font-size:8.8pt; background:#fff; text-align:center; }
+  .arch .bx b { display:block; font-size:9.4pt; color:var(--ink); }
+  .arch .bx.ext { background:#fff4e5; border-color:var(--f2); } .arch .bx.out { background:#e8f7ee; border-color:var(--f3); } .arch .bx.me { background:#eaf0ff; border-color:var(--f1); }
+  .arch .dn { text-align:center; color:var(--muted); font-size:12pt; line-height:1; }
+  .st { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .st .s { border:1px solid var(--line); border-radius:6px; padding:6px 8px; font-size:8.6pt; text-align:center; background:#fff; }
+  .st .s b { display:block; font-size:9.4pt; color:var(--ink); }
+  .st .s.g { background:#e8f7ee; border-color:var(--green); } .st .s.a { background:#fff6e0; border-color:var(--amber); } .st .s.r { background:#fdecec; border-color:var(--red); } .st .s.b { background:#eaf0ff; border-color:var(--accent); }
+  .etapa { border:1px solid var(--line); border-radius:10px; margin:10px 0 14px; overflow:hidden; break-inside:avoid; }
+  .etapa .eh { background:var(--ink); color:#fff; padding:7px 12px; display:flex; justify-content:space-between; align-items:center; }
+  .etapa .eh .k { font-family:Consolas, monospace; font-size:8pt; letter-spacing:0.12em; opacity:.8; margin-right:8px; }
+  .etapa .eh b { font-size:12.5pt; }
+  .etapa .eh span { font-family:Consolas, monospace; font-size:8pt; opacity:.85; }
+  .etapa .ed { background:var(--bg-soft); padding:7px 12px; font-size:9.2pt; border-bottom:1px solid var(--line); }
+  .cardi { display:grid; grid-template-columns:1fr 240px; gap:12px; padding:9px 12px; border-bottom:1px solid var(--line); break-inside:avoid; }
+  .cardi:last-child { border-bottom:none; }
+  .cardi .t { display:flex; align-items:center; gap:8px; margin-bottom:3px; }
+  .cardi .id { font-family:Consolas, monospace; font-size:8.5pt; background:var(--accent); color:#fff; padding:1px 7px; border-radius:3px; white-space:nowrap; }
+  .cardi .t b { font-size:10.8pt; color:var(--ink); }
+  .cardi .pill { font-family:Consolas, monospace; font-size:7.3pt; border:1px solid var(--line); border-radius:10px; padding:0 6px; color:var(--muted); white-space:nowrap; }
+  .cardi .pill.uc { color:var(--green); border-color:var(--green); background:#e8f7ee; }
+  .cardi .why { font-size:9pt; margin:0 0 3px; }
+  .cardi ul { margin:2px 0 0 14px; padding:0; font-size:8.8pt; } .cardi li { margin:1px 0; }
+  .cardi .ac { background:#e8f7ee; border:1px solid #bfe5cd; border-radius:6px; padding:7px 9px; font-size:8.6pt; }
+  .cardi .ac .lbl { margin:0 0 3px; color:var(--green); }
+  .cardi .ac b { color:var(--ink); }
+  .seq { background:var(--bg-soft); border:1px solid var(--line); border-radius:10px; padding:8px 12px; margin:6px 0 12px; break-inside:avoid; }
+  .seq .cap-txt { font-size:8.8pt; color:var(--muted); margin-top:4px; }
+  ul.clean { margin:4px 0 0 16px; padding:0; } ul.clean li { margin:2px 0; }
+  .two { columns:2; column-gap:14px; }
+</style>
+</head>
+<body>
+
+<!-- ============ CAPA ============ -->
+<section>
+  <div class="kicker">IAEmPS2 · documento de implementação · outubro de 2026</div>
+  <h1>Blueprint Técnico</h1>
+  <p class="lead">Este documento entrega a quem vai abrir o repositório tudo o que é preciso para colocar a fase 1 no ar: a arquitetura, o formato da sessão viva, a máquina de estados do mestre, os contratos com o emulador e com o serviço de linguagem, a extensão do canal do emulador e o roadmap em cards, na ordem em que devem ser executados.</p>
+
+  <div class="stats">
+    <div class="stat"><div class="big">34</div><div class="stl">casos de uso da fase 1 cobertos</div></div>
+    <div class="stat"><div class="big">12</div><div class="stl">tabelas na sessão viva</div></div>
+    <div class="stat"><div class="big">26</div><div class="stl">cards na ordem de execução</div></div>
+    <div class="stat"><div class="big">2</div><div class="stl">provas executadas no emulador do cliente</div></div>
+  </div>
+
+  <div class="note"><b>Para quem escrevemos isto.</b> Para a pessoa que vai criar o repositório e precisa saber exatamente o que construir primeiro. Cada capítulo responde a uma pergunta prática: qual é o escopo real, como a sessão é guardada, como o mestre muda de estado, qual é o contrato de cada mensagem, o que muda no emulador e qual card pegar em seguida. Nada aqui é sugestão de arquitetura para discutir depois: é o que vamos construir.</div>
+
+  <div class="callout"><b>A regra que organiza todo o documento.</b> O serviço de linguagem devolve intenção; só a plataforma aciona o emulador. Toda ação passa pelo catálogo antes e pelo registro depois. A sessão viva é só de acréscimo: nada é editado ou apagado. Se um card contrariar isso, o card está errado.</div>
+
+  <div class="grid2" style="margin-top:10px">
+    <div class="card f3"><div class="code">Provado no emulador do cliente, antes de escrever</div>
+      <ul>
+        <li><b>Slot reservado.</b> Pelo canal oficial, salvar estado no slot 90 respondeu na hora; o arquivo apareceu em 0,3 s e ficou estável em 0,9 s, com 4,4 MB; recarregar o slot 90 funcionou e o jogo seguiu rodando. O emulador não valida número de slot e sua rotina de limpeza só varre os slots de 1 a 10: os slots 90 a 99 ficam fora do alcance do jogador.</li>
+        <li><b>Captura.</b> A captura por região de tela trouxe a janela que estava por cima do jogo. A captura pela janela, com conteúdo completo, trouxe o jogo mesmo coberto, com a renderização D3D12, em 21 ms. Reduzida a 640 pixels de largura e comprimida, a imagem ficou em 46 KB.</li>
+      </ul>
+    </div>
+    <div class="card f1"><div class="code">O que já existe na máquina do cliente</div>
+      <ul>
+        <li>Emulador 2.8.2 portátil, com canal oficial ligado na porta 28011, BIOS e o jogo de abertura instalados e identificados pelo canal.</li>
+        <li>Python 3.13 com tkinter, pillow, numpy, pydantic, httpx; captura e acesso a janelas instalados nesta rodada.</li>
+        <li>Build Tools 2022 com a carga de trabalho C++, MSVC 14.44, SDK 10.0.26100, MSBuild, CMake e Ninja.</li>
+        <li>Dependências do emulador para Windows publicadas pelo projeto em pacote pré-compilado de 164 MB.</li>
+        <li>Disco: 87 GB livres após limpeza feita pelo cliente; a compilação do emulador cabe com folga.</li>
+      </ul>
+    </div>
+  </div>
+
+  <p style="font-size:8.8pt;color:var(--muted);margin-top:12px;border-top:1px solid var(--line);padding-top:8px">Versão 1.0 · outubro de 2026 · emulador PCSX2 2.8.2 · Resident Evil 4 (SLUS-21134, versão 1.01) · acompanha o Mapa do Projeto (revisão 3) e os Casos de Uso (entrega 5, fase 1 completa)</p>
+</section>
+
+<!-- ============ CAP 1 ESCOPO ============ -->
+<section class="cap">
+  <div class="kicker">Capítulo 1</div>
+  <h2>O escopo real da primeira entrega</h2>
+  <p class="lead">A fase 1 tem 34 casos de uso em sete módulos. Nenhum deles funciona sozinho: o mestre só existe com a ponte, o olho, o catálogo, o overlay e o registro juntos. Vamos tratar isso como uma entrega só, em duas metades: primeiro o esqueleto jogável em modo reduzido, depois a versão própria do emulador e a robustez.</p>
+
+  <div class="arch" style="grid-template-columns:120px 1fr 1fr 1fr">
+    <div class="rl">O que o jogador sente</div>
+    <div class="bx me" style="grid-column:2 / span 3"><b>Módulos C, D, E · 15 casos</b>mestre decide, alavancas agem, overlay mostra, jogador reverte ou pausa</div>
+    <div class="rl">O que sustenta</div>
+    <div class="bx"><b>Módulo A · 7 casos na fase 1</b>canal oficial, identificação, slots reservados, pausa e velocidade</div>
+    <div class="bx"><b>Módulo B · 4 casos</b>captura pela janela, situação em formato fechado, só o que mudou</div>
+    <div class="bx"><b>Módulos F, G · 8 casos</b>sessão viva, custo, falhas, bancada</div>
+  </div>
+
+  <div class="note"><b>Como chegamos ao número.</b> Dos 46 casos do índice, 34 são da fase 1. O caso A08, ler e escrever memória, é fase 2 e fica de fora junto com H, I e J. A primeira metade entregável, o esqueleto, cobre 21 casos em modo reduzido: tudo menos pausa e velocidade (A03, A04, parte de D01) e a robustez de G.</div>
+
+  <table>
+    <thead><tr><th>Metade</th><th>O que o cliente joga no fim</th><th>Casos cobertos</th><th>Precisa da versão própria do emulador?</th></tr></thead>
+    <tbody>
+      <tr><td><b>1 · Esqueleto</b></td><td>Uma sessão inteira com o mestre vendo a tela, decidindo, salvando e recarregando estado em slots reservados, com overlay, reversão, pausa do mestre e registro completo.</td><td class="code">A01 A02 A05 A06 A07 · B01 B02 B03 B04 · C01 C02 C03 C04 C05 · D01 D02 D03 D04 D05 · E01 E02 E03 E04 · F01 F02</td><td>Não. Roda no emulador original, em modo reduzido, como a ficha A07 prevê.</td></tr>
+      <tr><td><b>2 · Versão própria e robustez</b></td><td>As mesmas sessões com pausa dramática e câmera lenta, retomada após queda, custo com teto, exportação e a bancada no CI.</td><td class="code">A03 A04 · E05 · F03 F04 · G01 G02 G03 G04</td><td>Sim, para A03 e A04. O resto não.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warn" style="margin-top:12px"><b>O que fica de fora, de propósito.</b> Perfil de memória, ações de mundo, fontes públicas de mapas, perfis compartilháveis, entidades e controle virtual. Tudo isso está desenhado nos módulos H, I e J e entra depois que o cliente jogar a fase 1. A sessão viva e o catálogo deste documento já foram modelados para receber ações de mundo sem migração destrutiva: uma ação de mundo é uma alavanca com parâmetros, igual às universais.</div>
+</section>
+
+<!-- ============ CAP 2 ARQUITETURA ============ -->
+<section class="cap">
+  <div class="kicker">Capítulo 2</div>
+  <h2>A arquitetura que vamos construir</h2>
+  <p class="lead">São três processos e um lugar onde o dado mora. O mestre é um programa só, em Python, que fala com o emulador por um socket local e com o serviço de linguagem pela rede. O emulador é a versão própria do PCSX2, que só estende o servidor do canal oficial. Nada conversa com o emulador sem passar pelo catálogo.</p>
+
+  <div class="arch">
+    <div class="rl">Quem usa</div>
+    <div class="bx"><b>Jogador</b>joga no emulador, vê o overlay, reverte, pausa, encerra</div>
+    <div class="bx ext"><b>Emulador (versão própria)</b>PCSX2 2.8.2 com o canal oficial estendido</div>
+    <div class="bx ext"><b>Serviço de linguagem</b>lê a captura e decide; trocável por adaptador</div>
+    <div class="rl"></div><div class="dn">&#8595;</div><div class="dn">&#8597;</div><div class="dn">&#8597;</div>
+    <div class="rl">Portas de entrada</div>
+    <div class="bx"><b>overlay</b>painel Tk sobre a janela, teclas globais</div>
+    <div class="bx"><b>ponte</b>cliente do canal: socket TCP 127.0.0.1:28011, protocolo binário do PINE</div>
+    <div class="bx"><b>servico</b>adaptador HTTP com pedido e resposta em JSON fechado</div>
+    <div class="rl"></div><div class="dn">&#8595;</div><div class="dn">&#8595;</div><div class="dn">&#8595;</div>
+    <div class="rl">Onde mora a regra</div>
+    <div class="bx me" style="grid-column:2 / span 3"><b>mestre · catalogo · ciclo</b>máquina de estados da sessão, validação dupla, intervalo mínimo, reversão, memória curta. Sem rede e sem emulador: é onde moram os testes que não podem falhar</div>
+    <div class="rl"></div><div class="dn" style="grid-column:2 / span 3">&#8595;</div>
+    <div class="rl">Onde fica o dado</div>
+    <div class="bx out"><b>sessão viva</b>SQLite só de acréscimo, uma pasta por sessão</div>
+    <div class="bx out"><b>capturas</b>arquivos JPEG na pasta da sessão, nunca no repositório</div>
+    <div class="bx out"><b>estados reservados</b>slots 90 a 99 do emulador, na pasta dele</div>
+  </div>
+
+  <h4>Os pacotes do repositório do mestre</h4>
+  <div class="grid3">
+    <div class="card f1"><div class="code">ponte</div><p>Cliente do canal oficial: conectar, sondar status, identificar, ler memória, salvar e recarregar slot, e os comandos estendidos quando existirem. Confirma salvamento pelo arquivo. Nenhuma regra de negócio.</p></div>
+    <div class="card f1"><div class="code">olho</div><p>Captura pela janela, recorte do overlay, redução, diferença entre capturas, pedido de situação ao serviço e validação do formato fechado.</p></div>
+    <div class="card f1"><div class="code">mestre</div><p>O pedido de decisão, a memória curta, a validação dupla, o "nada" como decisão e o motivo em uma frase. Testável com respostas gravadas.</p></div>
+    <div class="card f1"><div class="code">catalogo</div><p>Alavancas, faixas, disponibilidade, tons e intensidades, versão do catálogo, intervalo mínimo e a execução pelo caso de uso de cada alavanca.</p></div>
+    <div class="card f1"><div class="code">sessao</div><p>O ciclo observar, decidir, executar; a máquina de estados; o overlay; abrir, retomar, encerrar; teclas globais.</p></div>
+    <div class="card f1"><div class="code">registro</div><p>A sessão viva em SQLite, só de acréscimo; métricas; exportação; reprodução.</p></div>
+    <div class="card f2"><div class="code">servicos</div><p>Adaptadores do serviço de linguagem, um por provedor, atrás de uma interface única: descrever(captura, estado) e decidir(situação, estado, catálogo, memória).</p></div>
+    <div class="card f2"><div class="code">simulador</div><p>Um servidor falso do canal oficial, em Python, que responde aos mesmos comandos com um jogo de mentira. É o que roda no CI e no notebook sem emulador.</p></div>
+    <div class="card f3"><div class="code">bancada</div><p>Os casos sintéticos, o corredor que roda cada caso contra o serviço ou contra respostas gravadas, e o relatório comparável entre rodadas.</p></div>
+  </div>
+
+  <table style="margin-top:12px">
+    <thead><tr><th>Escolha</th><th>O que usamos</th><th>Por quê</th></tr></thead>
+    <tbody>
+      <tr><td>Linguagem</td><td>Python 3.13, já instalado na máquina do cliente</td><td>O protótipo é em Python; captura, janelas e overlay têm biblioteca madura; o esqueleto nasce rápido. O mestre é programa separado do emulador, com licença própria (DC-14).</td></tr>
+      <tr><td>Ponte</td><td>Socket TCP local com o protocolo binário do canal oficial, cliente próprio de 80 linhas</td><td>Sem dependência externa; o protocolo tem 16 comandos e cabe num arquivo. O simulador implementa o mesmo protocolo do outro lado.</td></tr>
+      <tr><td>Captura</td><td>Captura pela janela com conteúdo completo, pela API do sistema, recortando a área do cliente</td><td>Provado: pega o jogo mesmo com outra janela por cima, em 21 ms, com D3D12. Captura por região de tela foi reprovada na prova.</td></tr>
+      <tr><td>Overlay</td><td>Tkinter, janela sem borda, sempre por cima, arrastável, fora da área capturada</td><td>Já provado no protótipo; vem com o Python; sem dependência nova. Teclas globais por gancho do sistema.</td></tr>
+      <tr><td>Sessão viva</td><td>SQLite em modo WAL, um arquivo por sessão, mais a pasta de capturas</td><td>Transação, consulta e reprodução sem servidor; só de acréscimo por convenção e por gatilho que recusa UPDATE e DELETE.</td></tr>
+      <tr><td>Serviço de linguagem</td><td>Interface única com adaptador por provedor; o primeiro adaptador é o do provedor cujo acesso o cliente já tem</td><td>A escolha final é da bancada (G04), por custo, latência e aprovação por regra, nunca por preferência. Um decisor tipado entra como segundo adaptador para comparação.</td></tr>
+      <tr><td>Versão própria do emulador</td><td>Repositório derivado do PCSX2 2.8.2, mudanças só em PINE.cpp e no cabeçalho dele; compilação com MSBuild e as dependências pré-compiladas do projeto</td><td>Mantém o diff pequeno para acompanhar o original e para propor de volta (DC-13). A medição do custo de compilar é o primeiro card da etapa S4.</td></tr>
+      <tr><td>Testes</td><td>pytest; integração contínua no GitHub com o simulador; sem emulador e sem serviço no CI</td><td>O CI prova plataforma e catálogo; o serviço é provado pela bancada, sob demanda, com custo informado.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note"><b>Por que o mestre é um processo e não um plugin do emulador.</b> O emulador é C++ sob GPL e lança versão toda semana; o mestre muda todo dia e tem licença própria. Separados por um socket local, cada um evolui no seu ritmo, o emulador pode ser trocado pela versão original sem o mestre saber (modo reduzido), e o simulador substitui o emulador nos testes sem nenhuma condição especial no código.</div>
+</section>
+
+<!-- ============ CAP 3 DADOS ============ -->
+<section class="cap">
+  <div class="kicker">Capítulo 3</div>
+  <h2>A sessão viva, tabela por tabela</h2>
+  <p class="lead">São 12 tabelas num arquivo SQLite por sessão: três de contexto, seis de registro do ciclo, duas de apoio e uma de aceite. Antes do primeiro CREATE TABLE, cinco decisões que valem para todas elas.</p>
+
+  <div class="grid2">
+    <div class="card"><div class="code">Só acréscimo</div><p>Nenhuma linha é alterada ou apagada depois de gravada. Correção entra como linha nova apontando para a anterior. Gatilhos recusam UPDATE e DELETE nas tabelas de registro.</p></div>
+    <div class="card"><div class="code">Tempo é duplo</div><p>Toda linha tem o relógio do sistema em UTC, para ler, e o contador monotônico da sessão em milissegundos, para medir. Intervalos e latências usam só o contador; o relógio nunca entra em conta (D04).</p></div>
+    <div class="card"><div class="code">Estado é enumeração no banco</div><p>Fase da cena, alavanca, classe de falha e origem da decisão têm lista fechada conferida por CHECK. Gravar valor fora da lista é erro, não um defeito que se descobre depois.</p></div>
+    <div class="card"><div class="code">A captura é arquivo, a linha é referência</div><p>A imagem fica em JPEG na pasta da sessão, nomeada pelo número do ciclo; a tabela guarda caminho, tamanho e impressão digital. O banco fica pequeno e a pasta pode ser apagada sem corromper o registro.</p></div>
+  </div>
+  <div class="callout"><b>Quinta decisão: toda intervenção aponta para a decisão que a originou, e toda decisão para o ciclo.</b> A cadeia ciclo, captura, situação, decisão, intervenção é o que a reprodução (F03) percorre e o que a regra RN-01 exige. Uma intervenção sem decisão é impossível de gravar: a chave estrangeira recusa.</div>
+
+  <div class="lbl">Esquema completo, pronto para rodar · migração 0001</div>
+<pre><span class="c">-- Roda uma vez por sessão, ao criar o arquivo. PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON.</span>
+<span class="k">create table</span> sessoes (
+  id              <span class="k">text primary key</span>,            <span class="c">-- identificador ordenável pelo tempo</span>
+  aberta_em_utc   <span class="k">text not null</span>,
+  fechada_em_utc  <span class="k">text</span>,                        <span class="c">-- nulo = sessão sem fim (E05 retoma)</span>
+  jogo_titulo     <span class="k">text not null</span>,
+  jogo_serial     <span class="k">text not null</span>,               <span class="c">-- SLUS-21134</span>
+  jogo_crc        <span class="k">text not null</span>,               <span class="c">-- 013e349d</span>
+  jogo_versao     <span class="k">text</span>,
+  emulador_versao <span class="k">text not null</span>,
+  modo            <span class="k">text not null check</span> (modo <span class="k">in</span> (<span class="s">'completo'</span>,<span class="s">'reduzido'</span>)),
+  tom             <span class="k">text not null</span>,
+  intensidade     <span class="k">text not null</span>,
+  servico         <span class="k">text not null</span>,               <span class="c">-- nome do adaptador em uso</span>
+  aceite_versao   <span class="k">text not null</span>,               <span class="c">-- versão do texto do aviso aceito (E02)</span>
+  config_json     <span class="k">text not null</span>
+);</pre>
+<pre><span class="k">create table</span> catalogo_versoes (
+  id          <span class="k">integer primary key</span>,
+  sessao_id   <span class="k">text not null references</span> sessoes (id),
+  versao      <span class="k">integer not null</span>,
+  criado_ms   <span class="k">integer not null</span>,                <span class="c">-- contador da sessão</span>
+  motivo      <span class="k">text not null</span>,                   <span class="c">-- abertura, alavanca indisponível, emulador reiniciado</span>
+  catalogo_json <span class="k">text not null</span>,                 <span class="c">-- alavancas, faixas, disponibilidade, motivos padrão</span>
+  <span class="k">unique</span> (sessao_id, versao)
+);</pre>
+<pre><span class="k">create table</span> ciclos (
+  id            <span class="k">integer primary key</span>,
+  sessao_id     <span class="k">text not null references</span> sessoes (id),
+  numero        <span class="k">integer not null</span>,
+  inicio_ms     <span class="k">integer not null</span>,
+  fim_ms        <span class="k">integer</span>,
+  status_emu    <span class="k">text not null check</span> (status_emu <span class="k">in</span> (<span class="s">'rodando'</span>,<span class="s">'pausado'</span>,<span class="s">'desligado'</span>,<span class="s">'sem_canal'</span>)),
+  estado_mestre <span class="k">text not null</span>,                 <span class="c">-- estado da máquina do capítulo 4 no início do ciclo</span>
+  lacuna        <span class="k">text</span>,                           <span class="c">-- nulo, ou o motivo de não haver observação</span>
+  <span class="k">unique</span> (sessao_id, numero)
+);</pre>
+
+<pre><span class="k">create table</span> capturas (
+  id          <span class="k">integer primary key</span>,
+  ciclo_id    <span class="k">integer not null references</span> ciclos (id),
+  arquivo     <span class="k">text not null</span>,                     <span class="c">-- capturas/000123.jpg, relativo à pasta da sessão</span>
+  largura     <span class="k">integer not null</span>,
+  altura      <span class="k">integer not null</span>,
+  bytes       <span class="k">integer not null</span>,
+  digest      <span class="k">text not null</span>,                     <span class="c">-- impressão digital da imagem reduzida</span>
+  diferenca   <span class="k">real</span>,                              <span class="c">-- medida contra a última enviada (B03)</span>
+  enviada     <span class="k">integer not null check</span> (enviada <span class="k">in</span> (0,1)),
+  motivo_envio <span class="k">text</span>                              <span class="c">-- mudança, intervalo vencido, releitura</span>
+);</pre>
+<pre><span class="k">create table</span> situacoes (
+  id          <span class="k">integer primary key</span>,
+  captura_id  <span class="k">integer not null references</span> capturas (id),
+  descricao   <span class="k">text not null</span>,
+  fase        <span class="k">text not null check</span> (fase <span class="k">in</span> (<span class="s">'exploracao'</span>,<span class="s">'combate'</span>,<span class="s">'menu'</span>,<span class="s">'video'</span>,<span class="s">'carregamento'</span>,<span class="s">'morte'</span>,<span class="s">'sistema'</span>)),
+  aperto      <span class="k">integer not null check</span> (aperto <span class="k">between</span> 0 <span class="k">and</span> 4),
+  confianca   <span class="k">real not null check</span> (confianca <span class="k">between</span> 0 <span class="k">and</span> 1),
+  suspeita    <span class="k">text</span>,                              <span class="c">-- nulo, ou por que contradiz o estado do emulador (B02 E3)</span>
+  latencia_ms <span class="k">integer not null</span>,
+  resposta_bruta <span class="k">text not null</span>                   <span class="c">-- o JSON como veio, para a bancada</span>
+);</pre>
+<pre><span class="k">create table</span> decisoes (
+  id          <span class="k">integer primary key</span>,
+  ciclo_id    <span class="k">integer not null references</span> ciclos (id),
+  situacao_id <span class="k">integer references</span> situacoes (id),  <span class="c">-- nulo quando a decisão é "nada" por falta de situação</span>
+  catalogo_versao <span class="k">integer not null</span>,
+  alavanca    <span class="k">text not null</span>,                     <span class="c">-- 'nada' ou uma do catálogo</span>
+  parametros_json <span class="k">text not null</span>,
+  motivo      <span class="k">text not null</span>,
+  motivo_origem <span class="k">text not null check</span> (motivo_origem <span class="k">in</span> (<span class="s">'servico'</span>,<span class="s">'padrao'</span>,<span class="s">'ausente'</span>)),
+  origem      <span class="k">text not null check</span> (origem <span class="k">in</span> (<span class="s">'servico'</span>,<span class="s">'descarte'</span>,<span class="s">'ritmo'</span>,<span class="s">'bloqueio'</span>,<span class="s">'falha'</span>)),
+  descarte_motivo <span class="k">text</span>,                          <span class="c">-- fora do catálogo, fora da faixa, regra de mesa, situação velha</span>
+  pedido_bruto    <span class="k">text not null</span>,
+  resposta_bruta  <span class="k">text</span>,
+  latencia_ms <span class="k">integer</span>
+);</pre>
+
+<pre><span class="k">create table</span> intervencoes (
+  id            <span class="k">integer primary key</span>,
+  decisao_id    <span class="k">integer not null references</span> decisoes (id),
+  alavanca      <span class="k">text not null</span>,
+  parametros_json <span class="k">text not null</span>,
+  origem        <span class="k">text not null check</span> (origem <span class="k">in</span> (<span class="s">'mestre'</span>,<span class="s">'reversao_jogador'</span>,<span class="s">'encerramento'</span>)),
+  estado_antes_json  <span class="k">text not null</span>,            <span class="c">-- status, velocidade, slot mais recente, situação</span>
+  comando_ms    <span class="k">integer not null</span>,
+  confirmado_ms <span class="k">integer</span>,                        <span class="c">-- nulo = não confirmado</span>
+  estado_depois_json <span class="k">text</span>,
+  resultado     <span class="k">text not null check</span> (resultado <span class="k">in</span> (<span class="s">'confirmada'</span>,<span class="s">'falhou'</span>,<span class="s">'descartada'</span>,<span class="s">'cancelada_jogador'</span>)),
+  fim_ms        <span class="k">integer</span>,                        <span class="c">-- para ações com duração: quando voltou ao normal</span>
+  reversivel    <span class="k">integer not null check</span> (reversivel <span class="k">in</span> (0,1)),
+  revertida_por <span class="k">integer references</span> intervencoes (id),
+  caminho_volta_json <span class="k">text</span>                       <span class="c">-- ex.: slot de volta da recarga (A06)</span>
+);</pre>
+<pre><span class="k">create table</span> estados_reservados (
+  id          <span class="k">integer primary key</span>,
+  sessao_id   <span class="k">text not null references</span> sessoes (id),
+  slot        <span class="k">integer not null check</span> (slot <span class="k">between</span> 90 <span class="k">and</span> 99),
+  salvo_ms    <span class="k">integer not null</span>,
+  confirmado_ms <span class="k">integer</span>,                        <span class="c">-- tamanho estável em duas leituras (LC-11)</span>
+  arquivo     <span class="k">text not null</span>,
+  bytes       <span class="k">integer</span>,
+  situacao_id <span class="k">integer references</span> situacoes (id), <span class="c">-- contexto para a recarga</span>
+  motivo      <span class="k">text not null</span>,                    <span class="c">-- periodico, antes_recarga, fim_sessao</span>
+  sobrescrito_ms <span class="k">integer</span>,                       <span class="c">-- quando a fila avançou por cima dele</span>
+  suspeito    <span class="k">integer not null default</span> 0
+);</pre>
+<pre><span class="k">create table</span> falhas (
+  id          <span class="k">integer primary key</span>,
+  ciclo_id    <span class="k">integer references</span> ciclos (id),
+  ocorrido_ms <span class="k">integer not null</span>,
+  origem      <span class="k">text not null check</span> (origem <span class="k">in</span> (<span class="s">'servico'</span>,<span class="s">'emulador'</span>,<span class="s">'captura'</span>,<span class="s">'registro'</span>)),
+  classe      <span class="k">text not null</span>,                    <span class="c">-- lista fechada do capítulo 5</span>
+  detalhe     <span class="k">text not null</span>,
+  visivel     <span class="k">integer not null check</span> (visivel <span class="k">in</span> (0,1)),  <span class="c">-- apareceu no overlay (RN-10)</span>
+  resolvida_ms <span class="k">integer</span>
+);</pre>
+<pre><span class="k">create table</span> metricas (
+  id          <span class="k">integer primary key</span>,
+  ciclo_id    <span class="k">integer not null references</span> ciclos (id),
+  etapa       <span class="k">text not null check</span> (etapa <span class="k">in</span> (<span class="s">'captura'</span>,<span class="s">'descrever'</span>,<span class="s">'decidir'</span>,<span class="s">'executar'</span>,<span class="s">'confirmar'</span>)),
+  latencia_ms <span class="k">integer not null</span>,
+  tokens_entrada <span class="k">integer</span>,
+  tokens_saida   <span class="k">integer</span>,
+  custo_estimado <span class="k">real</span>                           <span class="c">-- na moeda da tabela de preço configurada</span>
+);</pre>
+<pre><span class="k">create table</span> marcos (
+  id          <span class="k">integer primary key</span>,
+  ciclo_id    <span class="k">integer not null references</span> ciclos (id),
+  tipo        <span class="k">text not null check</span> (tipo <span class="k">in</span> (<span class="s">'morte'</span>,<span class="s">'mudanca_fase'</span>,<span class="s">'reversao'</span>,<span class="s">'pausa_mestre'</span>,<span class="s">'retomada'</span>,<span class="s">'lacuna'</span>)),
+  detalhe     <span class="k">text</span>
+);</pre>
+<pre><span class="k">create table</span> aceites (
+  id          <span class="k">integer primary key</span>,
+  aceito_em_utc <span class="k">text not null</span>,
+  aviso_versao <span class="k">text not null</span>,
+  servico     <span class="k">text not null</span>,
+  aceito      <span class="k">integer not null check</span> (aceito <span class="k">in</span> (0,1))
+);</pre>
+
+  <div class="lbl">Os gatilhos que seguram a regra de só acréscimo</div>
+<pre><span class="c">-- Um por tabela de registro. Tentar alterar ou apagar devolve erro e nada muda.</span>
+<span class="k">create trigger</span> ciclos_sem_update <span class="k">before update on</span> ciclos
+  <span class="k">when</span> old.fim_ms <span class="k">is not null begin select raise</span>(ABORT, <span class="s">'registro só de acréscimo'</span>); <span class="k">end</span>;
+<span class="k">create trigger</span> ciclos_sem_delete <span class="k">before delete on</span> ciclos <span class="k">begin select raise</span>(ABORT, <span class="s">'registro só de acréscimo'</span>); <span class="k">end</span>;
+<span class="c">-- O mesmo par para capturas, situacoes, decisoes, intervencoes, falhas, metricas e marcos.</span>
+<span class="c">-- Exceção explícita: ciclos.fim_ms, intervencoes.confirmado_ms/estado_depois/resultado/fim_ms/revertida_por</span>
+<span class="c">-- e estados_reservados.confirmado_ms/sobrescrito_ms/suspeito são preenchidos uma única vez, de nulo para valor.</span>
+<span class="c">-- O gatilho de cada uma dessas tabelas permite UPDATE só quando o valor antigo da coluna é nulo.</span></pre>
+
+  <h4>Retenção: o que apagamos e quando</h4>
+  <table>
+    <thead><tr><th>O quê</th><th>Retenção</th><th>Por quê</th></tr></thead>
+    <tbody>
+      <tr><td>Arquivo da sessão (SQLite)</td><td>Permanente, na pasta do jogador</td><td>É a prova de tudo e a matéria da bancada. Pequeno: texto e números.</td></tr>
+      <tr><td>Pasta de capturas</td><td>Configurável; padrão 30 dias; o jogador pode apagar a qualquer hora</td><td>São imagens do jogo dele. O registro continua íntegro sem elas: a reprodução mostra "captura apagada".</td></tr>
+      <tr><td>Estados reservados (slots 90 a 99)</td><td>Fila de 10 por jogo; o mais antigo é sobrescrito; apagados ao encerrar se o jogador pedir</td><td>4,4 MB cada no jogo de abertura; 10 slots são o teto do que a reversão precisa.</td></tr>
+      <tr><td>Respostas brutas do serviço</td><td>Junto com a sessão</td><td>Sem elas a bancada não reproduz decisões antigas.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="ok"><b>Este esquema foi executado, não só escrito.</b> Todo o SQL acima roda num SQLite limpo antes de entrar no repositório, como primeiro passo do card S0-02, e os gatilhos são provados com as três tentativas que o card lista: alterar um ciclo fechado, apagar uma decisão, gravar fase fora da lista. As três têm de falhar.</div>
+</section>
+
+<!-- ============ CAP 4 MÁQUINA DE ESTADOS ============ -->
+<section class="cap">
+  <div class="kicker">Capítulo 4</div>
+  <h2>A máquina de estados da sessão</h2>
+  <p class="lead">Esta é a peça central do mestre. Uma função pura recebe o estado atual e um evento, e devolve o novo estado e os efeitos. Nenhum outro lugar do código muda o estado da sessão. Se alguém precisar mudar, muda aqui, com teste.</p>
+
+  <div class="st">
+    <div class="s b"><b>abrindo</b>conectando, identificando, aviso, catálogo</div>
+    <div class="s g"><b>observando</b>captura, diferença, situação</div>
+    <div class="s g"><b>decidindo</b>pedido ao serviço, validação dupla</div>
+    <div class="s g"><b>executando</b>alavanca pelo caso de uso dela, confirmação</div>
+    <div class="s a"><b>bloqueada</b>tela fora de jogo (B04); observa, não decide</div>
+    <div class="s a"><b>pausada_jogador</b>D05: ciclo suspenso, captura opcional</div>
+    <div class="s r"><b>silenciada</b>falha visível (G02, G03); observa, não age</div>
+    <div class="s b"><b>encerrada</b>resumo montado, arquivo fechado</div>
+  </div>
+  <p style="font-size:9pt;margin-top:8px"><b>Os oito estados.</b> Verde é o ciclo normal, que gira observando, decidindo, executando, observando. Âmbar são as paradas que o jogo ou o jogador impõem. Vermelho é a falha, que silencia o mestre sem parar o registro. A regra de ouro: só de <b>executando</b> sai um comando para o emulador, e só se o evento foi <b>decisao_validada</b>.</p>
+
+  <div class="lbl">A assinatura, no pacote sessao</div>
+<pre><span class="k">Estado</span> = <span class="s">'abrindo'</span> | <span class="s">'observando'</span> | <span class="s">'decidindo'</span> | <span class="s">'executando'</span> | <span class="s">'bloqueada'</span> | <span class="s">'pausada_jogador'</span> | <span class="s">'silenciada'</span> | <span class="s">'encerrada'</span>
+
+<span class="k">Evento</span> = <span class="s">'pronto'</span> | <span class="s">'captura_sem_mudanca'</span> | <span class="s">'situacao_ok'</span> | <span class="s">'situacao_fora_de_jogo'</span> | <span class="s">'situacao_invalida'</span>
+       | <span class="s">'decisao_validada'</span> | <span class="s">'decisao_nada'</span> | <span class="s">'decisao_descartada'</span> | <span class="s">'intervalo_nao_venceu'</span>
+       | <span class="s">'execucao_confirmada'</span> | <span class="s">'execucao_falhou'</span> | <span class="s">'situacao_mudou'</span>
+       | <span class="s">'jogador_pausou'</span> | <span class="s">'jogador_retomou'</span> | <span class="s">'jogador_reverteu'</span> | <span class="s">'jogador_encerrou'</span>
+       | <span class="s">'falha_servico'</span> | <span class="s">'falha_emulador'</span> | <span class="s">'falha_registro'</span> | <span class="s">'recuperou'</span> | <span class="s">'cena_voltou'</span>
+
+<span class="c"># Sem rede, sem emulador, sem relógio: só estado e evento. Por isso é testável.</span>
+<span class="k">def</span> transicao(atual: Estado, evento: Evento) -> Resultado:
+    <span class="c"># Resultado = (proximo: Estado, efeitos: list[Efeito]) ou erro 'transicao_invalida'</span></pre>
+
+  <h4>A tabela de transições, inteira</h4>
+  <p style="font-size:9pt">Qualquer par que não esteja nesta tabela é recusado com <code>transicao_invalida</code>, e nada é gravado. Esta tabela é o teste unitário: cada linha vira um caso, e cada par ausente vira um caso negativo.</p>
+  <table style="font-size:8.6pt">
+    <thead><tr><th>Estado atual</th><th>Evento</th><th>Novo estado</th><th>O que acontece junto</th></tr></thead>
+    <tbody>
+      <tr><td class="code">abrindo</td><td class="code">pronto</td><td class="code">observando</td><td>Grava sessão e catálogo versão 1; abre overlay; inicia o ciclo.</td></tr>
+      <tr><td class="code">observando</td><td class="code">captura_sem_mudanca</td><td class="code">observando</td><td>Grava ciclo com captura poupada; mantém situação anterior.</td></tr>
+      <tr><td class="code">observando</td><td class="code">situacao_ok</td><td class="code">decidindo</td><td>Grava situação; monta o pedido de decisão com memória curta.</td></tr>
+      <tr><td class="code">observando</td><td class="code">situacao_fora_de_jogo</td><td class="code">bloqueada</td><td>Grava situação e, se morte, o marco; congela o contador de intervalo.</td></tr>
+      <tr><td class="code">observando</td><td class="code">situacao_invalida</td><td class="code">observando</td><td>Grava ciclo sem situação; segunda vez seguida vira <i>falha_servico</i>.</td></tr>
+      <tr><td class="code">decidindo</td><td class="code">decisao_nada</td><td class="code">observando</td><td>Grava decisão "nada" com motivo e origem; overlay discreto.</td></tr>
+      <tr><td class="code">decidindo</td><td class="code">decisao_descartada</td><td class="code">observando</td><td>Grava decisão com origem descarte e o motivo; trata como "nada".</td></tr>
+      <tr><td class="code">decidindo</td><td class="code">intervalo_nao_venceu</td><td class="code">observando</td><td>Grava decisão com origem ritmo; informa ao serviço a próxima janela.</td></tr>
+      <tr><td class="code">decidindo</td><td class="code">decisao_validada</td><td class="code">executando</td><td>Relê situação e estado; grava estado antes.</td></tr>
+      <tr><td class="code">executando</td><td class="code">situacao_mudou</td><td class="code">observando</td><td>Grava intervenção descartada por situação velha (RN-08).</td></tr>
+      <tr><td class="code">executando</td><td class="code">execucao_confirmada</td><td class="code">observando</td><td>Grava estado depois; mostra ação e motivo; marca reversível; zera intervalo.</td></tr>
+      <tr><td class="code">executando</td><td class="code">execucao_falhou</td><td class="code">observando</td><td>Grava falha da alavanca; conta para tirá-la do catálogo.</td></tr>
+      <tr><td class="code">bloqueada</td><td class="code">cena_voltou</td><td class="code">observando</td><td>Descongela o contador; grava marco de mudança de fase.</td></tr>
+      <tr><td class="code">bloqueada</td><td class="code">captura_sem_mudanca</td><td class="code">bloqueada</td><td>Grava ciclo; segue esperando.</td></tr>
+      <tr><td class="code">observando, decidindo, bloqueada</td><td class="code">jogador_pausou</td><td class="code">pausada_jogador</td><td>Encerra ações com duração; grava marco; overlay "mestre pausado".</td></tr>
+      <tr><td class="code">executando</td><td class="code">jogador_pausou</td><td class="code">pausada_jogador</td><td>Cancela a execução antes do comando; grava intervenção cancelada pelo jogador.</td></tr>
+      <tr><td class="code">pausada_jogador</td><td class="code">jogador_retomou</td><td class="code">observando</td><td>Reconstrói memória curta e catálogo; reinicia intervalo; grava marco.</td></tr>
+      <tr><td class="code">observando, bloqueada, pausada_jogador, silenciada</td><td class="code">jogador_reverteu</td><td class="code">mesmo estado</td><td>Executa a reversão própria da última intervenção; grava; conta como intervenção para o intervalo.</td></tr>
+      <tr><td class="code">observando, decidindo, bloqueada</td><td class="code">falha_servico</td><td class="code">silenciada</td><td>Grava falha visível; overlay com destaque; nenhuma ação.</td></tr>
+      <tr><td class="code">qualquer ativo</td><td class="code">falha_emulador</td><td class="code">silenciada</td><td>Grava falha; distingue fechado, travado, canal caído; tenta reconectar.</td></tr>
+      <tr><td class="code">qualquer ativo</td><td class="code">falha_registro</td><td class="code">pausada_jogador</td><td>Sem como registrar, pausa o mestre e avisa (F01 E1).</td></tr>
+      <tr><td class="code">silenciada</td><td class="code">recuperou</td><td class="code">observando</td><td>Grava a volta; retoma o ciclo; intervalo tratado como vencido.</td></tr>
+      <tr><td class="code">silenciada</td><td class="code">falha_emulador</td><td class="code">encerrada</td><td>Só quando o emulador fechou: encerra com resumo marcando a queda (G03).</td></tr>
+      <tr><td class="code">qualquer, exceto encerrada</td><td class="code">jogador_encerrou</td><td class="code">encerrada</td><td>Encerra ações com duração; estado final em slot reservado; resumo; fecha o arquivo.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warn"><b>Concorrência: quem chega junto.</b> Três coisas acontecem ao mesmo tempo: o serviço demora a responder enquanto o jogador aperta reverter, a captura seguinte chega enquanto a execução espera confirmação, a tecla de pausa chega no meio de uma decisão. A proteção é um só laço: a máquina de estados roda numa fila de eventos única, em ordem de chegada, e cada evento é processado até o fim antes do próximo. Serviço, captura e teclas só enfileiram. Nunca resolvemos isso com trava fina nem com dois laços.</div>
+</section>
+
+<!-- ============ CAP 5 CONTRATOS ============ -->
+<section class="cap">
+  <div class="kicker">Capítulo 5</div>
+  <h2>Os contratos: o que entra e o que sai de cada porta</h2>
+  <p class="lead">Quatro contratos fechados. Dois com o serviço de linguagem, em JSON com lista fechada em todo campo que o mestre decide por cima. Um é o catálogo. O último é a lista de falhas, igual em todo lugar.</p>
+
+  <h4>Contrato 1 · descrever: o pedido de situação (B02, decisão DC-16)</h4>
+  <div class="grid2">
+<pre><span class="c">// pedido ao serviço</span>
+{
+  <span class="k">"tarefa"</span>: <span class="s">"descrever"</span>,
+  <span class="k">"jogo"</span>: { <span class="k">"titulo"</span>: <span class="s">"Resident Evil 4"</span>, <span class="k">"serial"</span>: <span class="s">"SLUS-21134"</span> },
+  <span class="k">"estado"</span>: { <span class="k">"status"</span>: <span class="s">"rodando"</span>, <span class="k">"velocidade"</span>: <span class="n">1.0</span>,
+              <span class="k">"ultima_alavanca"</span>: <span class="s">"recarregar"</span>, <span class="k">"ha_ms"</span>: <span class="n">41200</span> },
+  <span class="k">"situacao_anterior"</span>: { <span class="k">"fase"</span>: <span class="s">"combate"</span>, <span class="k">"aperto"</span>: <span class="n">3</span> },
+  <span class="k">"captura"</span>: <span class="s">"&lt;imagem jpeg, 640 px de largura&gt;"</span>,
+  <span class="k">"fases_permitidas"</span>: [<span class="s">"exploracao"</span>,<span class="s">"combate"</span>,<span class="s">"menu"</span>,<span class="s">"video"</span>,
+                       <span class="s">"carregamento"</span>,<span class="s">"morte"</span>,<span class="s">"sistema"</span>],
+  <span class="k">"escala_aperto"</span>: <span class="s">"0 tranquilo … 4 prestes a morrer"</span>
+}</pre>
+<pre><span class="c">// resposta aceita (qualquer desvio = inválida)</span>
+{
+  <span class="k">"descricao"</span>: <span class="s">"Leon cercado por quatro aldeões numa casa, pouca vida"</span>,
+  <span class="k">"fase"</span>: <span class="s">"combate"</span>,
+  <span class="k">"aperto"</span>: <span class="n">3</span>,
+  <span class="k">"confianca"</span>: <span class="n">0.8</span>
+}
+
+<span class="c">// regras de validação, na plataforma:</span>
+<span class="c">// descricao: 1 linha, até 160 caracteres, em português</span>
+<span class="c">// fase: exatamente uma da lista; aperto: inteiro 0..4</span>
+<span class="c">// confianca: 0..1; campo a mais ou a menos = inválida</span>
+<span class="c">// fase 'combate' com status 'pausado' = suspeita (B02 E3)</span></pre>
+  </div>
+
+  <h4>Contrato 2 · decidir: o pedido de intervenção (C02)</h4>
+  <div class="grid2">
+<pre><span class="c">// pedido ao serviço</span>
+{
+  <span class="k">"tarefa"</span>: <span class="s">"decidir"</span>,
+  <span class="k">"tom"</span>: <span class="s">"imprevisivel"</span>, <span class="k">"intensidade"</span>: <span class="s">"media"</span>,
+  <span class="k">"situacao"</span>: { <span class="k">"descricao"</span>: <span class="s">"…"</span>, <span class="k">"fase"</span>: <span class="s">"combate"</span>, <span class="k">"aperto"</span>: <span class="n">3</span> },
+  <span class="k">"estado"</span>: { <span class="k">"status"</span>: <span class="s">"rodando"</span>, <span class="k">"velocidade"</span>: <span class="n">1.0</span> },
+  <span class="k">"catalogo"</span>: [
+    { <span class="k">"alavanca"</span>: <span class="s">"camera_lenta"</span>, <span class="k">"disponivel"</span>: <span class="n">true</span>,
+      <span class="k">"parametros"</span>: { <span class="k">"escalar"</span>: [<span class="n">0.5</span>, <span class="n">0.7</span>], <span class="k">"duracao_s"</span>: [<span class="n">3</span>, <span class="n">8</span>] } },
+    { <span class="k">"alavanca"</span>: <span class="s">"recarregar"</span>, <span class="k">"disponivel"</span>: <span class="n">true</span>,
+      <span class="k">"parametros"</span>: { <span class="k">"slot"</span>: [<span class="n">93</span>, <span class="n">94</span>, <span class="n">95</span>] } },
+    { <span class="k">"alavanca"</span>: <span class="s">"pausa"</span>, <span class="k">"disponivel"</span>: <span class="n">false</span> }
+  ],
+  <span class="k">"memoria"</span>: { <span class="k">"ultimas_intervencoes"</span>: [ … ], <span class="k">"ciclos_sem_agir"</span>: <span class="n">6</span>,
+               <span class="k">"marcos"</span>: [ { <span class="k">"tipo"</span>: <span class="s">"morte"</span>, <span class="k">"ha_ms"</span>: <span class="n">95000</span> } ],
+               <span class="k">"revertidas_pelo_jogador"</span>: [<span class="s">"turbo"</span>] },
+  <span class="k">"proxima_janela_ms"</span>: <span class="n">0</span>
+}</pre>
+<pre><span class="c">// resposta aceita</span>
+{
+  <span class="k">"alavanca"</span>: <span class="s">"camera_lenta"</span>,      <span class="c">// ou "nada"</span>
+  <span class="k">"parametros"</span>: { <span class="k">"escalar"</span>: <span class="n">0.5</span>, <span class="k">"duracao_s"</span>: <span class="n">5</span> },
+  <span class="k">"motivo"</span>: <span class="s">"Quatro contra um e a vida no fim: um fôlego."</span>
+}
+
+<span class="c">// validação dupla, na plataforma (C02):</span>
+<span class="c">// 1. alavanca existe e está disponível; cada parâmetro</span>
+<span class="c">//    dentro da faixa; motivo 1 linha até 120 caracteres;</span>
+<span class="c">//    regra de mesa: recarregar só para slot com situação</span>
+<span class="c">//    de aperto menor que o atual (RN-02, "não derrota")</span>
+<span class="c">// 2. releitura: status e fase iguais aos do pedido;</span>
+<span class="c">//    senão, descartada por situação velha (RN-08)</span>
+<span class="c">// fora disso: descartada inteira; nunca aproximada</span></pre>
+  </div>
+
+  <div class="note"><b>Por que o catálogo vai inteiro no pedido.</b> O serviço só pode escolher o que está na lista, com faixas explícitas. Quando uma alavanca fica indisponível, ela continua na lista com <code>disponivel: false</code>, para o serviço saber que existe e não existe agora. É mais barato que explicar, e torna o descarte raro: a bancada mede quantas decisões caem na validação, e esse número tem de ser pequeno.</div>
+</section>
+
+<section style="margin-top:14px">
+  <div class="kicker">Capítulo 5 · continuação</div>
+  <h2>Catálogo, tons, intensidades, teclas e o aviso</h2>
+  <p class="lead">Aqui fecham cinco decisões que os casos de uso deixaram como candidatas: DC-15 (slots), DC-17 (tons e intensidades), DC-18 (teclas), DC-19 (aviso) e, junto com o capítulo 6, DC-16 e LC-12.</p>
+
+  <h4>Contrato 3 · o catálogo universal da fase 1</h4>
+  <table style="font-size:8.8pt">
+    <thead><tr><th>Alavanca</th><th>Parâmetros e faixa</th><th>Executa por</th><th>Confirma por</th><th>Reversão</th><th>Modo reduzido</th></tr></thead>
+    <tbody>
+      <tr><td class="code">pausa</td><td>duracao_s 1 a 6</td><td>A03, comando estendido</td><td>status "pausado" e depois "rodando"</td><td>retomar na hora</td><td>indisponível</td></tr>
+      <tr><td class="code">camera_lenta</td><td>escalar 0,5 a 0,8 · duracao_s 3 a 10</td><td>A04, comando estendido</td><td>consulta de velocidade em vigor</td><td>volta ao normal</td><td>indisponível</td></tr>
+      <tr><td class="code">turbo</td><td>escalar 1,5 a 2,0 · duracao_s 3 a 10</td><td>A04, comando estendido</td><td>consulta de velocidade em vigor</td><td>volta ao normal</td><td>indisponível</td></tr>
+      <tr><td class="code">salvar_estado</td><td>nenhum; slot escolhido pela fila</td><td>A05, canal oficial</td><td>arquivo com tamanho estável em duas leituras com 300 ms</td><td>não se aplica</td><td>disponível</td></tr>
+      <tr><td class="code">recarregar</td><td>slot: um dos reservados com contexto, de aperto menor que o atual</td><td>A06, canal oficial</td><td>status "rodando" e releitura da situação</td><td>recarregar o slot de volta</td><td>disponível</td></tr>
+      <tr><td class="code">nada</td><td>nenhum</td><td>C03</td><td>registro</td><td>não se aplica</td><td>disponível</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:9pt;margin-top:6px"><b>Decisão DC-15, fechada.</b> Slots reservados ao mestre: 90 a 99, fila de 10 por jogo, o mais antigo sobrescrito. Provado no emulador do cliente: o salvamento no slot 90 funcionou e a limpeza de estados do emulador só alcança os slots de 1 a 10. Ações de mundo (fase 2) entram nesta mesma tabela como linhas novas, sem mudar o formato.</p>
+
+  <h4>Decisão DC-17, fechada · tons e intensidades (C01)</h4>
+  <div class="grid2">
+    <table style="font-size:8.8pt">
+      <thead><tr><th>Tom</th><th>O que muda no pedido de decisão</th></tr></thead>
+      <tbody>
+        <tr><td><b>Protetor</b></td><td>Prefere trégua: câmera lenta e recarga quando o aperto sobe; turbo só em exploração longa. Motivos acolhedores.</td></tr>
+        <tr><td><b>Imprevisível</b> (padrão)</td><td>Sem preferência; varia; pode apertar ou aliviar na mesma situação. Motivos curtos e teatrais.</td></tr>
+        <tr><td><b>Implacável</b></td><td>Prefere apertar: turbo em combate, recarga só após morte. Nunca cruza a regra "não derrota". Motivos secos.</td></tr>
+      </tbody>
+    </table>
+    <table style="font-size:8.8pt">
+      <thead><tr><th>Intensidade</th><th>Intervalo mínimo</th><th>Faixas</th><th>Salvar estado a cada</th></tr></thead>
+      <tbody>
+        <tr><td><b>Leve</b></td><td>60 s</td><td>duração até a metade da faixa; sem turbo</td><td>90 s</td></tr>
+        <tr><td><b>Média</b> (padrão)</td><td>30 s</td><td>faixa completa</td><td>60 s</td></tr>
+        <tr><td><b>Forte</b></td><td>15 s</td><td>faixa completa; pausa até 6 s</td><td>45 s</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>Decisão DC-18, fechada · os três gestos do jogador (D03, D05, E04)</h4>
+  <table style="font-size:8.8pt">
+    <thead><tr><th>Gesto</th><th>Tecla global</th><th>Botão no overlay</th><th>Por quê</th></tr></thead>
+    <tbody>
+      <tr><td>Reverter a última ação</td><td class="code">Ctrl+Alt+Z</td><td>Desfazer</td><td>Combinação que o emulador não usa por padrão e que a mão esquerda alcança sem soltar o controle. Confirmar no esqueleto que não colide com o jogo.</td></tr>
+      <tr><td>Pausar e retomar o mestre</td><td class="code">Ctrl+Alt+P</td><td>Pausar / Retomar</td><td>Idem. Não confunde com Espaço, que pausa o emulador.</td></tr>
+      <tr><td>Encerrar a sessão</td><td class="code">Ctrl+Alt+Q</td><td>Encerrar</td><td>Pede confirmação no overlay; nunca fecha o emulador.</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Decisão DC-19, fechada · o aviso do que sai da máquina (E02), versão 1</h4>
+  <div class="note" style="font-size:9.4pt"><b>Para o mestre enxergar o jogo, ele manda capturas da tela para fora.</b> O que sai da sua máquina: imagens reduzidas da área do jogo, uma a cada poucos segundos quando a cena muda, e um resumo em texto do estado da partida (jogo, se está rodando, última ação do mestre). Para onde: o serviço de linguagem configurado, chamado <i>[nome do adaptador]</i>. O que nunca sai: o arquivo do jogo, a BIOS, os seus saves, qualquer coisa fora da janela do jogo. Você pode pausar o mestre a qualquer momento com Ctrl+Alt+P, e com a captura desligada nada sai. Este aviso volta a aparecer se o serviço mudar. <b>[Aceitar e abrir a sessão] [Recusar]</b></div>
+
+  <h4>Contrato 4 · as classes de falha, iguais em todo lugar</h4>
+  <table style="font-size:8.8pt">
+    <thead><tr><th>Origem</th><th>Classe</th><th>Quando acontece</th><th>O que o mestre faz</th></tr></thead>
+    <tbody>
+      <tr><td class="code">servico</td><td class="code">fora_do_ar</td><td>Conexão recusada, tempo esgotado, erro 5xx</td><td>Silencia; tenta de novo com intervalo crescente; retoma sozinho.</td></tr>
+      <tr><td class="code">servico</td><td class="code">limite</td><td>Erro de cota ou de taxa</td><td>Silencia; espera o intervalo informado ou o padrão; retoma sozinho.</td></tr>
+      <tr><td class="code">servico</td><td class="code">recusa</td><td>O serviço recusou a captura por política própria</td><td>Registra com a captura; não insiste com a mesma imagem; segue no ciclo seguinte.</td></tr>
+      <tr><td class="code">servico</td><td class="code">formato</td><td>Resposta fora do contrato pela segunda vez seguida</td><td>Silencia até uma resposta válida; conta para o registro de defeitos.</td></tr>
+      <tr><td class="code">emulador</td><td class="code">canal_caido</td><td>Processo e janela vivos, socket fechado</td><td>Reconecta (A01); retoma a sessão (E05).</td></tr>
+      <tr><td class="code">emulador</td><td class="code">travado</td><td>Processo vivo, status não responde no limite</td><td>Avisa; espera o limite; trata como fechado.</td></tr>
+      <tr><td class="code">emulador</td><td class="code">fechado</td><td>Processo ausente</td><td>Encerra a sessão com resumo marcando a queda.</td></tr>
+      <tr><td class="code">emulador</td><td class="code">alavanca_falhou</td><td>Comando aceito, confirmação não veio</td><td>Registra; não repete no ciclo; três seguidas tiram a alavanca do catálogo.</td></tr>
+      <tr><td class="code">captura</td><td class="code">janela_ausente</td><td>Janela do emulador não encontrada</td><td>Ciclo com lacuna; silencia até a janela voltar.</td></tr>
+      <tr><td class="code">registro</td><td class="code">sem_escrita</td><td>Disco cheio ou pasta sem permissão</td><td>Pausa o mestre; avisa; nada executa sem registro.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============ CAP 6 EXTENSÃO DO CANAL ============ -->
+<section class="cap">
+  <div class="kicker">Capítulo 6</div>
+  <h2>A extensão do canal do emulador</h2>
+  <p class="lead">O canal oficial é um socket TCP local com um protocolo binário simples: cada mensagem é um tamanho de 4 bytes, um código de 1 byte e o argumento; a resposta é um tamanho, um resultado (0 ou 255) e o retorno. Vários comandos podem ir no mesmo pacote. A versão própria acrescenta quatro códigos ao servidor desse canal e mais nada.</p>
+
+  <div class="grid2">
+    <div class="card f1"><div class="code">O que o canal oficial já tem (verificado no código da 2.8.2)</div>
+      <ul>
+        <li>Ler e escrever memória em 8, 16, 32 e 64 bits (códigos 0 a 7).</li>
+        <li>Versão do emulador (8); salvar e recarregar estado por slot (9 e 10), assíncronos, com erro só na tela do emulador.</li>
+        <li>Título (11), serial (12), soma de verificação (13), versão do jogo (14), status rodando, pausado ou desligado (15).</li>
+      </ul>
+    </div>
+    <div class="card f2"><div class="code">O que a versão própria acrescenta</div>
+      <ul>
+        <li>Códigos com o bit mais alto ligado, de 0x80 em diante, para nunca colidir com o que o projeto original vier a criar.</li>
+        <li>Pausar e retomar, pelo mesmo ponto de entrada que o atalho do emulador usa.</li>
+        <li>Velocidade com modo, escalar e duração, com a volta ao normal dentro do próprio emulador.</li>
+        <li>Consulta de capacidades, que é como a plataforma descobre a versão própria (A07).</li>
+      </ul>
+    </div>
+  </div>
+
+  <h4>Os quatro comandos estendidos</h4>
+  <table style="font-size:8.8pt">
+    <thead><tr><th>Código</th><th>Nome</th><th>Argumento</th><th>Retorno</th><th>O que faz por dentro</th></tr></thead>
+    <tbody>
+      <tr><td class="code">0x80</td><td class="code">ExtCapabilities</td><td>nenhum</td><td>u16 versão da extensão · u32 máscara de bits (1 pausa, 2 velocidade, 4 resultado de estado)</td><td>Responde a máscara fixa da versão compilada. No emulador original, o código cai no caso padrão e volta falha: é assim que A07 detecta o modo reduzido.</td></tr>
+      <tr><td class="code">0x81</td><td class="code">ExtSetPaused</td><td>u8 pausar (1) ou retomar (0)</td><td>nenhum</td><td>Executa na thread da CPU a mesma chamada de pausa do emulador. Sem máquina virtual ativa, falha. A confirmação vem pelo status (15).</td></tr>
+      <tr><td class="code">0x82</td><td class="code">ExtSetSpeed</td><td>u8 modo (0 normal, 1 lenta, 2 turbo) · f32 escalar · u32 duração em ms</td><td>nenhum</td><td>Grava o escalar na configuração de velocidade do modo pedido, troca o modo do limitador e atualiza a velocidade alvo. Duração maior que zero arma o vigia: ao vencer, o próprio servidor do canal volta o modo a normal. Modo 0 ou duração 0 desarma o vigia e volta agora.</td></tr>
+      <tr><td class="code">0x83</td><td class="code">ExtGetSpeed</td><td>nenhum</td><td>u8 modo · f32 velocidade alvo · u32 ms restantes do vigia</td><td>Lê o modo do limitador e a velocidade alvo. É a confirmação de A04.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="ok"><b>Lacuna LC-12, fechada por desenho.</b> A volta da velocidade ao normal não depende da plataforma: o vigia mora no servidor do canal, dentro do emulador, e dispara pela thread da CPU quando a duração vence. Se o mestre cair com o jogo em câmera lenta, o jogo volta sozinho. O escalar normal do jogador nunca é tocado: a extensão só escreve nos escalares de câmera lenta e turbo e troca o modo do limitador.</div>
+
+  <div class="note"><b>Lacuna LC-11, decidida.</b> Salvar e recarregar continuam confirmados pelo arquivo e pela releitura, como as fichas A05 e A06 dizem, porque isso funciona no emulador original e a prova mediu 0,9 s. O bit 4 da máscara de capacidades fica reservado para um código futuro que devolva o resultado do salvamento pelo canal; não é dependência de nada na fase 1.</div>
+
+  <div class="seq">
+    <div class="lbl">Sequência: câmera lenta com duração, no emulador, com a plataforma caindo no meio</div>
+    <svg viewBox="0 0 640 196" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+      <g font-size="8" font-weight="700" fill="#0f1b33">
+        <rect x="20" y="4" width="120" height="22" rx="4" fill="#e9edf4" stroke="#9aa4b5"/><text x="80" y="19" text-anchor="middle">Plataforma</text>
+        <rect x="220" y="4" width="140" height="22" rx="4" fill="#e9edf4" stroke="#9aa4b5"/><text x="290" y="19" text-anchor="middle">Servidor do canal</text>
+        <rect x="460" y="4" width="140" height="22" rx="4" fill="#e9edf4" stroke="#9aa4b5"/><text x="530" y="19" text-anchor="middle">Thread da CPU</text>
+      </g>
+      <g stroke="#b9c2d0" stroke-dasharray="3 3"><line x1="80" y1="26" x2="80" y2="120"/><line x1="290" y1="26" x2="290" y2="190"/><line x1="530" y1="26" x2="530" y2="190"/></g>
+      <g stroke="#1f4fd1" stroke-width="1.2" fill="#1f4fd1" font-size="7">
+        <line x1="80" y1="44" x2="290" y2="44"/><path d="M290,44 L284,41 L284,47 Z"/><text x="185" y="40" text-anchor="middle" fill="#333" stroke="none">ExtSetSpeed(lenta, 0,5, 5000 ms)</text>
+        <line x1="290" y1="66" x2="530" y2="66"/><path d="M530,66 L524,63 L524,69 Z"/><text x="410" y="62" text-anchor="middle" fill="#333" stroke="none">escalar lenta = 0,5; limitador = lenta; alvo atualizado</text>
+        <path d="M290,80 h26 v12 h-26" fill="none"/><text x="320" y="89" fill="#333" stroke="none">vigia armado: prazo = agora + 5000 ms</text>
+        <line x1="80" y1="100" x2="290" y2="100"/><path d="M290,100 L284,97 L284,103 Z"/><text x="185" y="96" text-anchor="middle" fill="#333" stroke="none">ExtGetSpeed → lenta, 0,5, 4810 ms</text>
+      </g>
+      <g font-size="7" fill="#c53030"><rect x="30" y="112" width="100" height="16" rx="3" fill="#fdecec" stroke="#c53030"/><text x="80" y="123" text-anchor="middle">plataforma cai</text></g>
+      <g stroke="#1f4fd1" stroke-width="1.2" fill="#1f4fd1" font-size="7">
+        <path d="M290,140 h26 v12 h-26" fill="none"/><text x="320" y="149" fill="#333" stroke="none">prazo venceu</text>
+        <line x1="290" y1="168" x2="530" y2="168"/><path d="M530,168 L524,165 L524,171 Z"/><text x="410" y="164" text-anchor="middle" fill="#333" stroke="none">limitador = normal; alvo atualizado</text>
+      </g>
+    </svg>
+    <div class="cap-txt">O jogo volta ao normal sem a plataforma. O vigia é um prazo verificado no laço do servidor do canal, que já roda numa thread própria; ao vencer, enfileira a volta na thread da CPU, como os comandos de estado já fazem.</div>
+  </div>
+
+  <h4>Como a versão própria é construída e mantida</h4>
+  <table style="font-size:8.8pt">
+    <thead><tr><th>Assunto</th><th>A regra</th></tr></thead>
+    <tbody>
+      <tr><td>Repositório</td><td>Derivado do PCSX2 na etiqueta v2.8.2, com um único commit de extensão por cima, tocando só <code>pcsx2/PINE.cpp</code> e <code>pcsx2/PINE.h</code>. Repositório público, sob a mesma licença GPL-3.0, com o código da extensão (DC-14).</td></tr>
+      <tr><td>Compilação</td><td>A receita do próprio projeto para Windows: MSBuild com a solução Qt, configuração Release, MSVC. As dependências vêm do pacote pré-compilado que o projeto publica (164 MB), extraído em <code>deps/</code>; não se compila Qt nem ffmpeg.</td></tr>
+      <tr><td>Versão</td><td>O binário responde à versão do canal com o sufixo da extensão, e à consulta de capacidades com a versão da extensão. A plataforma registra os dois na sessão.</td></tr>
+      <tr><td>Acompanhar o original</td><td>A cada versão estável do projeto, rebase do commit de extensão e nova compilação. Como o diff é um arquivo, o conflito esperado é zero ou trivial.</td></tr>
+      <tr><td>Proposta ao original</td><td>Depois que o esqueleto jogar com a versão própria, o commit vira uma proposta ao projeto original, nos termos de contribuição dele. Aceito, a versão própria deixa de existir.</td></tr>
+      <tr><td>Ferramentas que faltam na máquina do cliente</td><td>Nenhuma obrigatória: MSBuild, MSVC, SDK, CMake e Ninja estão instalados. O extrator de 7z do projeto não está, e o pacote de dependências é extraído pelo Python. Disco não é mais risco: 87 GB livres após limpeza do cliente, e a árvore do projeto com dependências e objetos de compilação fica abaixo de 20 GB. O card S4-01 ainda mede o espaço ocupado, para registro.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============ CAP 7 FLUXOS ============ -->
+<section class="cap">
+  <div class="kicker">Capítulo 7</div>
+  <h2>Três fluxos ponta a ponta</h2>
+  <p class="lead">Os diagramas abaixo amarram o que veio até aqui: a captura, o pedido ao serviço, a validação, o comando ao emulador e o registro, na ordem real em que acontecem.</p>
+
+  <div class="seq">
+    <div class="lbl">Fluxo 1 · um ciclo com intervenção</div>
+    <svg viewBox="0 0 640 300" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+      <g font-size="8" font-weight="700" fill="#0f1b33">
+        <rect x="8" y="4" width="100" height="22" rx="4" fill="#e9edf4" stroke="#9aa4b5"/><text x="58" y="19" text-anchor="middle">Olho</text>
+        <rect x="140" y="4" width="110" height="22" rx="4" fill="#e9edf4" stroke="#9aa4b5"/><text x="195" y="19" text-anchor="middle">Mestre e catálogo</text>
+        <rect x="290" y="4" width="110" height="22" rx="4" fill="#e9edf4" stroke="#9aa4b5"/><text x="345" y="19" text-anchor="middle">Serviço</text>
+        <rect x="430" y="4" width="90" height="22" rx="4" fill="#e9edf4" stroke="#9aa4b5"/><text x="475" y="19" text-anchor="middle">Emulador</text>
+        <rect x="540" y="4" width="92" height="22" rx="4" fill="#e9edf4" stroke="#9aa4b5"/><text x="586" y="19" text-anchor="middle">Registro</text>
+      </g>
+      <g stroke="#b9c2d0" stroke-dasharray="3 3"><line x1="58" y1="26" x2="58" y2="294"/><line x1="195" y1="26" x2="195" y2="294"/><line x1="345" y1="26" x2="345" y2="294"/><line x1="475" y1="26" x2="475" y2="294"/><line x1="586" y1="26" x2="586" y2="294"/></g>
+      <g stroke="#1f4fd1" stroke-width="1.2" fill="#1f4fd1" font-size="6.8">
+        <line x1="58" y1="42" x2="475" y2="42"/><path d="M475,42 L469,39 L469,45 Z"/><text x="266" y="38" text-anchor="middle" fill="#333" stroke="none">status (15)</text>
+        <path d="M58,52 h22 v10 h-22" fill="none"/><text x="84" y="60" fill="#333" stroke="none">captura pela janela, recorte, 640 px, diferença acima do limiar</text>
+        <line x1="58" y1="76" x2="345" y2="76"/><path d="M345,76 L339,73 L339,79 Z"/><text x="200" y="72" text-anchor="middle" fill="#333" stroke="none">descrever(captura, estado, situação anterior)</text>
+        <line x1="345" y1="92" x2="58" y2="92" stroke-dasharray="4 3"/><path d="M58,92 L64,89 L64,95 Z"/><text x="200" y="88" text-anchor="middle" fill="#333" stroke="none">{descricao, fase: combate, aperto: 3, confianca}</text>
+        <line x1="58" y1="106" x2="586" y2="106"/><path d="M586,106 L580,103 L580,109 Z"/><text x="322" y="102" text-anchor="middle" fill="#333" stroke="none">ciclo, captura, situação</text>
+        <line x1="58" y1="120" x2="195" y2="120"/><path d="M195,120 L189,117 L189,123 Z"/><text x="126" y="116" text-anchor="middle" fill="#333" stroke="none">situacao_ok</text>
+        <path d="M195,130 h22 v10 h-22" fill="none"/><text x="221" y="138" fill="#333" stroke="none">intervalo venceu; monta pedido com catálogo e memória curta</text>
+        <line x1="195" y1="154" x2="345" y2="154"/><path d="M345,154 L339,151 L339,157 Z"/><text x="270" y="150" text-anchor="middle" fill="#333" stroke="none">decidir(…)</text>
+        <line x1="345" y1="170" x2="195" y2="170" stroke-dasharray="4 3"/><path d="M195,170 L201,167 L201,173 Z"/><text x="270" y="166" text-anchor="middle" fill="#333" stroke="none">{camera_lenta, {0,5, 5 s}, motivo}</text>
+        <path d="M195,180 h22 v10 h-22" fill="none"/><text x="221" y="188" fill="#333" stroke="none">valida catálogo, faixa, regra de mesa; relê status e fase</text>
+        <line x1="195" y1="204" x2="586" y2="204"/><path d="M586,204 L580,201 L580,207 Z"/><text x="390" y="200" text-anchor="middle" fill="#333" stroke="none">decisão validada; estado antes</text>
+        <line x1="195" y1="220" x2="475" y2="220"/><path d="M475,220 L469,217 L469,223 Z"/><text x="335" y="216" text-anchor="middle" fill="#333" stroke="none">ExtSetSpeed(lenta, 0,5, 5000)</text>
+        <line x1="195" y1="236" x2="475" y2="236"/><path d="M475,236 L469,233 L469,239 Z"/><text x="335" y="232" text-anchor="middle" fill="#333" stroke="none">ExtGetSpeed → lenta, 0,5</text>
+        <line x1="195" y1="252" x2="586" y2="252"/><path d="M586,252 L580,249 L580,255 Z"/><text x="390" y="248" text-anchor="middle" fill="#333" stroke="none">intervenção confirmada; estado depois; métricas</text>
+        <path d="M195,262 h22 v10 h-22" fill="none"/><text x="221" y="270" fill="#333" stroke="none">overlay: "Câmera lenta · Quatro contra um e a vida no fim: um fôlego." · marca reversível · zera intervalo</text>
+        <line x1="195" y1="286" x2="586" y2="286"/><path d="M586,286 L580,283 L580,289 Z"/><text x="390" y="282" text-anchor="middle" fill="#333" stroke="none">fim da duração: volta ao normal confirmada</text>
+      </g>
+    </svg>
+    <div class="cap-txt">O serviço aparece duas vezes e nunca toca o emulador. A plataforma grava antes de agir e depois de confirmar. Em modo reduzido, o mesmo fluxo com recarregar: o comando é o código 10 e a confirmação é o status mais a releitura.</div>
+  </div>
+
+  <div class="seq">
+    <div class="lbl">Fluxo 2 · o jogador reverte uma recarga</div>
+    <svg viewBox="0 0 640 170" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+      <g font-size="8" font-weight="700" fill="#0f1b33">
+        <rect x="8" y="4" width="100" height="22" rx="4" fill="#e9edf4" stroke="#9aa4b5"/><text x="58" y="19" text-anchor="middle">Jogador</text>
+        <rect x="180" y="4" width="130" height="22" rx="4" fill="#e9edf4" stroke="#9aa4b5"/><text x="245" y="19" text-anchor="middle">Sessão e catálogo</text>
+        <rect x="400" y="4" width="90" height="22" rx="4" fill="#e9edf4" stroke="#9aa4b5"/><text x="445" y="19" text-anchor="middle">Emulador</text>
+        <rect x="540" y="4" width="92" height="22" rx="4" fill="#e9edf4" stroke="#9aa4b5"/><text x="586" y="19" text-anchor="middle">Registro</text>
+      </g>
+      <g stroke="#b9c2d0" stroke-dasharray="3 3"><line x1="58" y1="26" x2="58" y2="164"/><line x1="245" y1="26" x2="245" y2="164"/><line x1="445" y1="26" x2="445" y2="164"/><line x1="586" y1="26" x2="586" y2="164"/></g>
+      <g stroke="#1f4fd1" stroke-width="1.2" fill="#1f4fd1" font-size="6.8">
+        <line x1="58" y1="42" x2="245" y2="42"/><path d="M245,42 L239,39 L239,45 Z"/><text x="151" y="38" text-anchor="middle" fill="#333" stroke="none">Ctrl+Alt+Z</text>
+        <path d="M245,52 h22 v10 h-22" fill="none"/><text x="271" y="60" fill="#333" stroke="none">enfileira jogador_reverteu; última intervenção = recarregar(93), caminho de volta = slot 97</text>
+        <line x1="245" y1="76" x2="445" y2="76"/><path d="M445,76 L439,73 L439,79 Z"/><text x="345" y="72" text-anchor="middle" fill="#333" stroke="none">recarregar slot 97 (código 10)</text>
+        <line x1="245" y1="92" x2="445" y2="92"/><path d="M445,92 L439,89 L439,95 Z"/><text x="345" y="88" text-anchor="middle" fill="#333" stroke="none">status; releitura da situação</text>
+        <line x1="245" y1="108" x2="586" y2="108"/><path d="M586,108 L580,105 L580,111 Z"/><text x="415" y="104" text-anchor="middle" fill="#333" stroke="none">intervenção origem reversao_jogador; revertida_por; marco reversão</text>
+        <line x1="245" y1="124" x2="58" y2="124" stroke-dasharray="4 3"/><path d="M58,124 L64,121 L64,127 Z"/><text x="151" y="120" text-anchor="middle" fill="#333" stroke="none">overlay: "Desfeito."</text>
+        <path d="M245,134 h22 v10 h-22" fill="none"/><text x="271" y="142" fill="#333" stroke="none">intervalo zerado; memória curta ganha "recarregar revertida pelo jogador"</text>
+        <line x1="245" y1="156" x2="586" y2="156"/><path d="M586,156 L580,153 L580,159 Z"/><text x="415" y="152" text-anchor="middle" fill="#333" stroke="none">catálogo não muda; próximo pedido leva o marco</text>
+      </g>
+    </svg>
+    <div class="cap-txt">A reversão de uma recarga é a única recarga que não salva antes: o estado atual é o slot 97, guardado pela própria recarga que está sendo desfeita.</div>
+  </div>
+
+  <div class="seq">
+    <div class="lbl">Fluxo 3 · o serviço cai no meio da sessão</div>
+    <svg viewBox="0 0 640 150" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+      <g font-size="8" font-weight="700" fill="#0f1b33">
+        <rect x="8" y="4" width="100" height="22" rx="4" fill="#e9edf4" stroke="#9aa4b5"/><text x="58" y="19" text-anchor="middle">Olho e mestre</text>
+        <rect x="180" y="4" width="110" height="22" rx="4" fill="#e9edf4" stroke="#9aa4b5"/><text x="235" y="19" text-anchor="middle">Serviço</text>
+        <rect x="330" y="4" width="110" height="22" rx="4" fill="#e9edf4" stroke="#9aa4b5"/><text x="385" y="19" text-anchor="middle">Overlay</text>
+        <rect x="520" y="4" width="112" height="22" rx="4" fill="#e9edf4" stroke="#9aa4b5"/><text x="576" y="19" text-anchor="middle">Registro</text>
+      </g>
+      <g stroke="#b9c2d0" stroke-dasharray="3 3"><line x1="58" y1="26" x2="58" y2="144"/><line x1="235" y1="26" x2="235" y2="144"/><line x1="385" y1="26" x2="385" y2="144"/><line x1="576" y1="26" x2="576" y2="144"/></g>
+      <g stroke="#1f4fd1" stroke-width="1.2" fill="#1f4fd1" font-size="6.8">
+        <line x1="58" y1="42" x2="235" y2="42"/><path d="M235,42 L229,39 L229,45 Z"/><text x="146" y="38" text-anchor="middle" fill="#333" stroke="none">descrever(…)</text>
+        <line x1="235" y1="58" x2="58" y2="58" stroke="#c53030" stroke-dasharray="4 3"/><path d="M58,58 L64,55 L64,61 Z" fill="#c53030"/><text x="146" y="54" text-anchor="middle" fill="#c53030" stroke="none">tempo esgotado</text>
+        <path d="M58,68 h22 v10 h-22" fill="none"/><text x="84" y="76" fill="#333" stroke="none">classe fora_do_ar; evento falha_servico → silenciada</text>
+        <line x1="58" y1="92" x2="385" y2="92"/><path d="M385,92 L379,89 L379,95 Z"/><text x="221" y="88" text-anchor="middle" fill="#333" stroke="none">"Serviço fora do ar · mestre em silêncio" em destaque</text>
+        <line x1="58" y1="108" x2="576" y2="108"/><path d="M576,108 L570,105 L570,111 Z"/><text x="317" y="104" text-anchor="middle" fill="#333" stroke="none">falha visível; ciclos seguintes com lacuna; nenhuma decisão</text>
+        <line x1="58" y1="124" x2="235" y2="124"/><path d="M235,124 L229,121 L229,127 Z"/><text x="146" y="120" text-anchor="middle" fill="#333" stroke="none">nova tentativa, intervalo crescente</text>
+        <line x1="235" y1="138" x2="58" y2="138" stroke-dasharray="4 3"/><path d="M58,138 L64,135 L64,141 Z"/><text x="146" y="134" text-anchor="middle" fill="#333" stroke="none">resposta válida → recuperou → observando</text>
+      </g>
+    </svg>
+    <div class="cap-txt">O jogo nunca para. O que estava em câmera lenta volta pelo vigia do emulador; o que não foi decidido não é decidido. É a regra RN-10 em desenho.</div>
+  </div>
+</section>
+
+<!-- ============ CAP 8 ROADMAP ============ -->
+<section style="margin-top:14px">
+  <div class="kicker">Capítulo 8</div>
+  <h2>O roadmap em 26 cards</h2>
+  <p class="lead">Daqui para frente o documento vira backlog. Cada card tem um identificador permanente, um motivo de existir, a lista do que entra no repositório e um critério de aceite escrito como teste. A ordem é de execução, não de importância. Não há estimativa de esforço: o que mede o avanço é card fechado com critério provado.</p>
+
+  <table>
+    <thead><tr><th>Etapa</th><th>O que muda no fim dela</th><th>Cards</th></tr></thead>
+    <tbody>
+      <tr><td><b>S0 Fundação</b></td><td>Repositório clonável, sessão viva criada e provada, simulador do canal respondendo, integração contínua verde. Ninguém escreve regra ainda.</td><td class="code">4</td></tr>
+      <tr><td><b>S1 Ponte</b></td><td>O mestre conecta, identifica o jogo, salva e recarrega nos slots reservados com confirmação, contra o emulador real e contra o simulador.</td><td class="code">3</td></tr>
+      <tr><td><b>S2 Olho</b></td><td>Captura pela janela, só o que mudou vai ao serviço, situação em formato fechado validada.</td><td class="code">3</td></tr>
+      <tr><td><b>S3 Mestre e esqueleto</b></td><td>Máquina de estados, decisão com validação dupla, catálogo reduzido, overlay com três gestos, registro completo. <b>É a primeira coisa que o cliente joga.</b></td><td class="code">6</td></tr>
+      <tr><td><b>S4 Versão própria do emulador</b></td><td>Compilar o original sem mudar nada (a medição da lacuna LC-10), depois os quatro comandos, depois pausa e velocidade no catálogo.</td><td class="code">4</td></tr>
+      <tr><td><b>S5 Robustez</b></td><td>Falhas classificadas, retomada, custo com teto, exportação e reprodução.</td><td class="code">4</td></tr>
+      <tr><td><b>S6 Bancada e sessão jogada</b></td><td>Bancada no CI com casos sintéticos, comparação de serviços, e a sessão de aceite da fase 1.</td><td class="code">2</td></tr>
+    </tbody>
+  </table>
+
+  <div class="seq" style="margin-top:12px">
+    <div class="lbl">Quem depende de quem</div>
+    <svg viewBox="0 0 700 250" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Consolas, monospace" font-size="7.5">
+      <g font-weight="700" font-size="8">
+        <rect x="6" y="6" width="90" height="16" rx="3" fill="#5b6577"/><text x="51" y="17" text-anchor="middle" fill="#fff">S0</text>
+        <rect x="106" y="6" width="90" height="16" rx="3" fill="#1f4fd1"/><text x="151" y="17" text-anchor="middle" fill="#fff">S1</text>
+        <rect x="206" y="6" width="90" height="16" rx="3" fill="#1f4fd1"/><text x="251" y="17" text-anchor="middle" fill="#fff">S2</text>
+        <rect x="306" y="6" width="90" height="16" rx="3" fill="#1f9d55"/><text x="351" y="17" text-anchor="middle" fill="#fff">S3 esqueleto</text>
+        <rect x="406" y="6" width="90" height="16" rx="3" fill="#e08a1e"/><text x="451" y="17" text-anchor="middle" fill="#fff">S4</text>
+        <rect x="506" y="6" width="90" height="16" rx="3" fill="#6b3fd1"/><text x="551" y="17" text-anchor="middle" fill="#fff">S5</text>
+        <rect x="606" y="6" width="88" height="16" rx="3" fill="#1f9d55"/><text x="650" y="17" text-anchor="middle" fill="#fff">S6</text>
+      </g>
+      <g fill="#fff" stroke="#9aa4b5" stroke-width="0.8">
+        <rect x="6" y="32" width="90" height="18" rx="3"/><rect x="6" y="62" width="90" height="18" rx="3"/><rect x="6" y="92" width="90" height="18" rx="3"/><rect x="6" y="122" width="90" height="18" rx="3"/>
+        <rect x="106" y="32" width="90" height="18" rx="3"/><rect x="106" y="62" width="90" height="18" rx="3"/><rect x="106" y="92" width="90" height="18" rx="3"/>
+        <rect x="206" y="32" width="90" height="18" rx="3"/><rect x="206" y="62" width="90" height="18" rx="3"/><rect x="206" y="92" width="90" height="18" rx="3"/>
+        <rect x="306" y="32" width="90" height="18" rx="3"/><rect x="306" y="62" width="90" height="18" rx="3"/><rect x="306" y="92" width="90" height="18" rx="3"/><rect x="306" y="122" width="90" height="18" rx="3"/><rect x="306" y="152" width="90" height="18" rx="3"/><rect x="306" y="182" width="90" height="18" rx="3" stroke="#1f9d55" stroke-width="1.6"/>
+        <rect x="406" y="32" width="90" height="18" rx="3"/><rect x="406" y="62" width="90" height="18" rx="3"/><rect x="406" y="92" width="90" height="18" rx="3"/><rect x="406" y="122" width="90" height="18" rx="3"/>
+        <rect x="506" y="32" width="90" height="18" rx="3"/><rect x="506" y="62" width="90" height="18" rx="3"/><rect x="506" y="92" width="90" height="18" rx="3"/><rect x="506" y="122" width="90" height="18" rx="3"/>
+        <rect x="606" y="32" width="88" height="18" rx="3"/><rect x="606" y="62" width="88" height="18" rx="3" stroke="#1f9d55" stroke-width="1.6"/>
+      </g>
+      <g fill="#0f1b33" text-anchor="middle">
+        <text x="51" y="44">S0-01 repo</text><text x="51" y="74">S0-02 sessão viva</text><text x="51" y="104">S0-03 simulador</text><text x="51" y="134">S0-04 CI e log</text>
+        <text x="151" y="44">S1-01 conectar</text><text x="151" y="74">S1-02 identificar</text><text x="151" y="104">S1-03 slots 90-99</text>
+        <text x="251" y="44">S2-01 captura</text><text x="251" y="74">S2-02 diferença</text><text x="251" y="104">S2-03 situação</text>
+        <text x="351" y="44">S3-01 máquina</text><text x="351" y="74">S3-02 catálogo</text><text x="351" y="104">S3-03 decidir</text><text x="351" y="134">S3-04 executar</text><text x="351" y="164">S3-05 overlay</text><text x="351" y="194" font-weight="700">S3-06 esqueleto</text>
+        <text x="451" y="44">S4-01 compilar</text><text x="451" y="74">S4-02 capacidades</text><text x="451" y="104">S4-03 pausa/veloc.</text><text x="451" y="134">S4-04 catálogo cheio</text>
+        <text x="551" y="44">S5-01 falhas</text><text x="551" y="74">S5-02 retomar</text><text x="551" y="104">S5-03 custo</text><text x="551" y="134">S5-04 exportar</text>
+        <text x="650" y="44">S6-01 bancada</text><text x="650" y="74" font-weight="700">S6-02 aceite</text>
+      </g>
+      <g stroke="#9aa4b5" stroke-width="1.1" fill="none" marker-end="url(#a)">
+        <defs><marker id="a" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#9aa4b5"/></marker></defs>
+        <path d="M96,14 H105"/><path d="M196,14 H205"/><path d="M296,14 H305"/><path d="M396,14 H405"/>
+        <path d="M351,200 V214 H451 V146"/><path d="M451,214 H551 V146"/><path d="M551,214 H650 V86"/>
+        <path d="M496,131 H506 V131" stroke-dasharray="3 2"/><path d="M596,131 H606 V76" stroke-dasharray="3 2"/>
+      </g>
+      <text x="350" y="236" text-anchor="middle" fill="#5b6577" font-family="Segoe UI, Arial" font-size="8">S0 a S3 são sequenciais. S4, S5 e S6 partem do esqueleto (S3-06) e andam em paralelo; S6-02 fecha depois de S4-04 e S5-04. Cards da mesma coluna sem seta podem andar em paralelo.</text>
+    </svg>
+  </div>
+  <div class="note"><b>Como usar estes cards.</b> Cada card vira um item no quadro, com o identificador no título. O critério de aceite é copiado como está: é a definição de terminado e deve ser executado por outra pessoa, não pelo autor; no caso deste projeto, pelo cliente, que também é o jogador. Trabalho novo entra como card novo, com código próprio.</div>
+</section>
+
+<!-- ============ CARDS ============ -->
+<section class="cap">
+  <div class="etapa">
+    <div class="eh"><div><span class="k">ETAPA S0</span><b>Fundação</b></div><span>4 cards</span></div>
+    <div class="ed">Ninguém escreve regra de negócio ainda. O objetivo é repositório, sessão viva, simulador e integração contínua, para que todo card seguinte comece com o chão pronto.</div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S0-01</span><b>Repositório, pacotes e configuração</b></div>
+      <p class="why">Deixar o projeto clonável e rodando em um comando, com a estrutura de pacotes do capítulo 2 já no lugar.</p>
+      <ul><li>Pasta <code>mestre/</code> com os nove pacotes vazios e um ponto de entrada <code>python -m mestre</code>.</li><li>Dependências fixadas: captura e janelas, pillow, pydantic, httpx, pytest, ruff.</li><li>Configuração em arquivo TOML: porta do canal, pasta de sessões, slots reservados, resolução da captura, limiar de diferença, serviço ativo, teto de custo; chave do serviço só por variável de ambiente, nunca no repositório.</li><li>README com o fluxo: abrir o emulador, abrir o mestre, teclas.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> um clone limpo, <b>quando</b> se instala e roda o ponto de entrada sem emulador, <b>então</b> ele sobe, informa "canal não encontrado" e encerra limpo, sem traceback.</div></div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S0-02</span><b>Sessão viva: esquema, gatilhos e provas</b><span class="pill uc">UC-F01 UC-F02</span></div>
+      <p class="why">Ter o registro provado antes de qualquer coisa escrever nele: intervenção sem registro não existe.</p>
+      <ul><li>Migração 0001 do capítulo 3, aplicada ao criar o arquivo da sessão.</li><li>Gatilhos de só acréscimo com as exceções nomeadas de nulo para valor.</li><li>Camada de acesso: abrir sessão, gravar ciclo, captura, situação, decisão, intervenção, falha, métrica, marco; nenhuma função de alterar ou apagar existe.</li><li>Teste com as três tentativas proibidas: alterar ciclo fechado, apagar decisão, gravar fase fora da lista.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> um arquivo de sessão novo, <b>quando</b> os três comandos proibidos rodam, <b>então</b> os três falham com "registro só de acréscimo" ou violação de CHECK e nada muda; e uma cadeia ciclo, captura, situação, decisão, intervenção grava e é lida de volta inteira.</div></div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S0-03</span><b>Simulador do canal do emulador</b><span class="pill uc">UC-A01 UC-A07</span></div>
+      <p class="why">Testar a ponte e o ciclo sem emulador, no notebook e no CI, inclusive os comandos estendidos antes de a versão própria existir.</p>
+      <ul><li>Servidor TCP em Python que fala o protocolo binário: tamanho, código, argumento; resposta com resultado 0 ou 255.</li><li>Jogo de mentira: título, serial, soma, status, memória de 32 MB zerada, slots que gravam arquivo na pasta configurada com atraso simulado de 0,9 s.</li><li>Modo "original" (só códigos 0 a 15) e modo "próprio" (mais 0x80 a 0x83 com vigia de velocidade).</li><li>Cenários de falha: canal cai, status trava, salvamento nunca aparece, jogo troca de serial no meio.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> o simulador em modo original, <b>quando</b> a ponte pede capacidades, <b>então</b> recebe falha e marca modo reduzido; em modo próprio, recebe a máscara e marca modo completo.</div></div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S0-04</span><b>Integração contínua e log estruturado</b></div>
+      <p class="why">Que todo push prove o que não depende de emulador nem de serviço, e que qualquer falha deixe rastro.</p>
+      <ul><li>Fluxo no GitHub: lint, tipos, testes unitários e os cenários do simulador, a cada push.</li><li>Log em JSON com identificador da sessão e número do ciclo em toda linha.</li><li>O CI nunca tem chave de serviço; testes que precisam de serviço são marcados e pulados nele.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> um push que quebra um cenário do simulador, <b>quando</b> o CI roda, <b>então</b> o build falha e aponta o cenário; e nenhuma variável de serviço existe no ambiente do CI.</div></div>
+  </div>
+</section>
+
+<section class="cap">
+  <div class="etapa">
+    <div class="eh"><div><span class="k">ETAPA S1</span><b>Ponte</b></div><span>3 cards</span></div>
+    <div class="ed">O mestre passa a conversar com o emulador. No fim desta etapa você salva e recarrega um estado reservado pelo terminal, contra o emulador real e contra o simulador, com a mesma chamada.</div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S1-01</span><b>Cliente do canal: conectar e sondar</b><span class="pill uc">UC-A01</span></div>
+      <p class="why">Ter um canal aberto e confirmado antes de qualquer outra coisa, tolerando o carregamento do jogo.</p>
+      <ul><li>Cliente do protocolo: conectar, versão, status, com tempo limite por chamada e reconexão.</li><li>Sondagem até "rodando" com limite configurado; tratamento do "desligado" e do erro 255 nos segundos após o lançamento.</li><li>Detecção de porta fechada e de outro programa na porta pela resposta à versão.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> o emulador lançado com o jogo, <b>quando</b> a ponte conecta no mesmo instante, <b>então</b> ela espera, e marca "canal pronto" só quando o status vira "rodando", registrando a versão do emulador.</div></div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S1-02</span><b>Identificar o jogo e o modo</b><span class="pill uc">UC-A02 UC-A07</span></div>
+      <p class="why">Nunca agir sobre o jogo errado e saber se o emulador é a versão própria.</p>
+      <ul><li>Título, serial, soma, versão do jogo pelo canal; registro na sessão.</li><li>Consulta de capacidades (0x80): falha significa modo reduzido.</li><li>Detecção de troca de jogo entre sondagens e de serial vazio.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> o jogo de abertura rodando, <b>quando</b> a ponte identifica, <b>então</b> devolve serial SLUS-21134 e soma 013e349d, e o modo é "reduzido" no emulador original.</div></div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S1-03</span><b>Slots reservados com confirmação pelo arquivo</b><span class="pill uc">UC-A05 UC-A06</span></div>
+      <p class="why">Salvar e recarregar estado do mestre sem nunca tocar nos slots do jogador, com confirmação real.</p>
+      <ul><li>Fila de slots 90 a 99 por jogo; escolha do mais antigo; registro em estados_reservados.</li><li>Confirmação: arquivo com o nome calculado existe e tem tamanho igual em duas leituras com 300 ms; limite de 10 s.</li><li>Recarga: salvar antes em slot reservado, recarregar, confirmar por status; caminho de volta registrado.</li><li>Recusa de configuração em que um slot reservado esteja entre 1 e 10.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> o jogo rodando, <b>quando</b> a ponte salva no slot da fila e recarrega, <b>então</b> o arquivo é confirmado em menos de 3 s, o status volta a "rodando", e os slots 1 a 10 continuam intocados.</div></div>
+  </div>
+
+  <div class="etapa">
+    <div class="eh"><div><span class="k">ETAPA S2</span><b>Olho</b></div><span>3 cards</span></div>
+    <div class="ed">O mestre passa a ver. No fim desta etapa, uma captura do jogo vira uma linha de situação validada, e só vai ao serviço se mudou.</div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S2-01</span><b>Captura pela janela com recorte</b><span class="pill uc">UC-B01</span></div>
+      <p class="why">Pegar o jogo e só o jogo, mesmo com outra janela por cima, como a prova mostrou.</p>
+      <ul><li>Localizar a janela pelo processo do emulador, não pelo título.</li><li>Captura pela janela com conteúdo completo, deslocada para a área do cliente: a prova trouxe a barra de menu por não deslocar.</li><li>Recorte da área do overlay quando ele estiver dentro da janela; redução para 640 px; JPEG com qualidade 80.</li><li>Lacuna registrada quando a janela não existe ou está minimizada; teste de tela cheia sem borda (lacuna LC-13).</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> o jogo com outra janela por cima, <b>quando</b> o olho captura, <b>então</b> a imagem mostra o jogo sem barra de menu e sem o overlay, com até 80 KB, em menos de 100 ms.</div></div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S2-02</span><b>Diferença entre capturas e tempo máximo</b><span class="pill uc">UC-B03</span></div>
+      <p class="why">Mandar ao serviço só o que mudou, e mesmo assim mandar de tempos em tempos.</p>
+      <ul><li>Medida de diferença sobre a imagem reduzida em cinza; limiar configurado; referência trocada a cada envio.</li><li>Tempo máximo sem envio configurado por intensidade.</li><li>Contagem de enviadas e poupadas por sessão em metricas.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> o jogo parado numa tela, <b>quando</b> passam dez ciclos, <b>então</b> no máximo um envio acontece pelo tempo máximo e os outros são registrados como poupados.</div></div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S2-03</span><b>Descrever: adaptador do serviço e formato fechado</b><span class="pill uc">UC-B02 UC-B04</span></div>
+      <p class="why">Transformar imagem em situação que o mestre consegue usar, e recusar o que não cabe no contrato.</p>
+      <ul><li>Interface do serviço com descrever e decidir; primeiro adaptador para o provedor cujo acesso o cliente já tem; respostas gravadas para teste.</li><li>Contrato 1 com validação por pydantic: campo a mais ou a menos é inválido.</li><li>Suspeita quando a fase contradiz o status; bloqueio por fase fora de jogo; marco de morte.</li><li>Latência e tokens em metricas; resposta bruta em situacoes.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> uma resposta gravada com fase fora da lista, <b>quando</b> o olho valida, <b>então</b> a situação é inválida, o ciclo fica sem situação e nada é inventado; e uma captura real do jogo de abertura devolve fase e aperto válidos.</div></div>
+  </div>
+</section>
+
+<section class="cap">
+  <div class="etapa">
+    <div class="eh"><div><span class="k">ETAPA S3</span><b>Mestre e esqueleto</b></div><span>6 cards</span></div>
+    <div class="ed">Nasce o mestre. No fim desta etapa o cliente joga uma sessão inteira em modo reduzido: o mestre vê, decide, salva e recarrega, explica, e o jogador reverte e pausa.</div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S3-01</span><b>Máquina de estados da sessão</b><span class="pill uc">UC-D04 UC-D05</span></div>
+      <p class="why">Centralizar num lugar só toda a regra de quando a sessão muda de estado.</p>
+      <ul><li>Função pura transicao(estado, evento) com a tabela do capítulo 4 inteira.</li><li>Fila única de eventos; serviço, captura e teclas só enfileiram.</li><li>Contador monotônico da sessão; intervalo mínimo congelado em bloqueada.</li><li>Testes cobrindo os oito estados e todas as transições, inclusive as inválidas.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> o estado executando, <b>quando</b> chega situacao_ok, <b>então</b> a transição é recusada com transicao_invalida e nada é gravado; e todo par da tabela tem teste verde.</div></div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S3-02</span><b>Catálogo, tons e intensidades</b><span class="pill uc">UC-C01 UC-D01</span></div>
+      <p class="why">A lista fechada do que o mestre pode fazer, com faixas e disponibilidade, versionada.</p>
+      <ul><li>Catálogo do capítulo 5 com disponibilidade por modo e por falhas repetidas; motivo padrão por alavanca.</li><li>Tons e intensidades da decisão DC-17 aplicados às faixas e ao intervalo.</li><li>Nova versão do catálogo gravada a cada mudança; tela de escolha antes da sessão; recusa de pedido de ação durante.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> o modo reduzido e intensidade leve, <b>quando</b> o catálogo é montado, <b>então</b> pausa, câmera lenta e turbo estão indisponíveis, o intervalo é 60 s e a versão 1 está gravada.</div></div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S3-03</span><b>Decidir: pedido, validação dupla, "nada" e motivo</b><span class="pill uc">UC-C02 UC-C03 UC-C04 UC-C05</span></div>
+      <p class="why">O serviço escolhe; a plataforma confere duas vezes; o silêncio é decisão.</p>
+      <ul><li>Contrato 2 com memória curta derivada do registro (últimas intervenções, marcos, ciclos sem agir, revertidas).</li><li>Validação 1: catálogo, faixa, regra de mesa (recarregar só para aperto menor). Validação 2: releitura de status e fase.</li><li>Descarte inteiro, nunca aproximação; "nada" gravado com motivo e origem; motivo conferido e substituído pelo padrão quando impróprio.</li><li>Testes com respostas gravadas para cada caminho de descarte.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> uma resposta gravada pedindo recarregar um slot de aperto maior que o atual, <b>quando</b> o mestre valida, <b>então</b> a decisão é descartada por regra de mesa, gravada com origem descarte, e o ciclo vale "nada".</div></div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S3-04</span><b>Executar e reverter pelo caso de uso de cada alavanca</b><span class="pill uc">UC-D02 UC-D03</span></div>
+      <p class="why">Nenhuma ação chega ao emulador sem passar pelo catálogo, pelo intervalo e pelo registro, e toda ação tem volta.</p>
+      <ul><li>Execução despachada por alavanca para a ponte; estado antes e depois em intervencoes.</li><li>Reversão própria por alavanca; a última intervenção reversível; reversão conta para o intervalo.</li><li>Falha de execução gravada; três seguidas tiram a alavanca do catálogo com nova versão.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> uma recarga executada, <b>quando</b> o jogador reverte, <b>então</b> o slot de volta é recarregado, a intervenção fica revertida_por e o próximo pedido ao serviço leva o marco de reversão.</div></div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S3-05</span><b>Overlay, aviso e teclas</b><span class="pill uc">UC-E01 UC-E02 UC-E03 UC-E04</span></div>
+      <p class="why">Que o jogador veja e controle o mestre sem tirar as mãos do jogo.</p>
+      <ul><li>Painel Tk sempre por cima, arrastável, fora da área capturada, com situação, ação, motivo, indicador de envio e tempo até a próxima janela.</li><li>Aviso da decisão DC-19 com aceite gravado em aceites; reapresentado ao trocar de serviço.</li><li>Teclas globais da decisão DC-18; confirmação para encerrar; resumo montado do registro.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> uma intervenção confirmada, <b>quando</b> ela acontece, <b>então</b> ação e motivo aparecem no painel no mesmo segundo; e Ctrl+Alt+P pausa o mestre sem pausar o jogo.</div></div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S3-06</span><b>Esqueleto ambulante: primeira sessão jogada</b><span class="pill uc">21 casos em modo reduzido</span></div>
+      <p class="why">Provar a arquitetura de ponta a ponta antes de qualquer funcionalidade ganhar corpo. É o primeiro item que o cliente joga.</p>
+      <ul><li>Tudo de S0 a S3 integrado no ponto de entrada; configuração padrão para o jogo de abertura.</li><li>Medição do ciclo: latência de cada etapa e custo por hora (lacuna LC-06) gravados e mostrados no resumo.</li><li>Registro de defeitos aberto: cada intervenção estranha vira item com causa.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> o emulador original com o jogo de abertura, <b>quando</b> o cliente joga uma sessão até encerrar, <b>então</b> toda intervenção está no registro com antes, depois e motivo, nenhuma fora do catálogo, e o resumo traz custo e latência.</div></div>
+  </div>
+</section>
+
+<section class="cap">
+  <div class="etapa">
+    <div class="eh"><div><span class="k">ETAPA S4</span><b>Versão própria do emulador</b></div><span>4 cards</span></div>
+    <div class="ed">Primeiro compilar o original sem mudar nada, que é a medição da lacuna LC-10. Só depois os quatro comandos, e só depois pausa e velocidade no catálogo.</div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S4-01</span><b>Compilar o emulador original, sem mudar nada</b></div>
+      <p class="why">Fechar a lacuna LC-10 com número: espaço em disco, ferramentas que faltam, e se o binário resultante roda o jogo e responde ao canal.</p>
+      <ul><li>Repositório derivado na etiqueta v2.8.2, com submódulos; dependências pré-compiladas do projeto extraídas em deps/.</li><li>Compilação pela receita do projeto: MSBuild, solução Qt, Release, MSVC.</li><li>Medição gravada no repositório: espaço ocupado, tempo de máquina, o que faltou instalar.</li><li>Binário próprio roda o jogo de abertura e responde ao canal com a mesma identificação.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> a máquina do cliente, <b>quando</b> a receita roda, <b>então</b> existe um pcsx2-qt.exe próprio que abre o jogo de abertura e responde ao serial pelo canal; e a medição de disco está gravada. Se o disco não bastar, o card termina com esse número e a decisão de onde compilar.</div></div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S4-02</span><b>Capacidades: o primeiro comando estendido</b><span class="pill uc">UC-A07</span></div>
+      <p class="why">O menor diff possível que prova o caminho inteiro: código novo no servidor do canal, resposta, plataforma detectando.</p>
+      <ul><li>Código 0x80 no enum e no despacho de PINE.cpp, avançando o contador do buffer; máscara e versão da extensão.</li><li>Sufixo da extensão na resposta à versão.</li><li>Teste de regressão: todos os 16 códigos originais seguem iguais.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> o binário próprio, <b>quando</b> a ponte pede capacidades, <b>então</b> recebe versão 1 e máscara 3; e no binário original recebe falha, como antes.</div></div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S4-03</span><b>Pausa e velocidade com vigia</b><span class="pill uc">UC-A03 UC-A04</span></div>
+      <p class="why">As duas alavancas que faltam, com a volta ao normal dentro do emulador.</p>
+      <ul><li>0x81 pausa pela chamada de pausa do emulador na thread da CPU; 0x82 velocidade pelos escalares de lenta e turbo, troca do modo do limitador e atualização do alvo; 0x83 consulta.</li><li>Vigia no laço do servidor do canal: prazo por comando, volta a normal ao vencer, cancelado por modo 0 ou duração 0.</li><li>Simulador atualizado para o mesmo comportamento, inclusive o vigia.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> câmera lenta de 5 s pedida pelo canal, <b>quando</b> o cliente do canal é morto no segundo 2, <b>então</b> o jogo volta à velocidade normal no segundo 5 sozinho, e a consulta de velocidade confirma.</div></div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S4-04</span><b>Catálogo completo e proposta ao projeto original</b><span class="pill uc">UC-D01</span></div>
+      <p class="why">Pausa e velocidade entram no catálogo pelo mesmo caminho das outras, e o commit vira proposta.</p>
+      <ul><li>Alavancas pausa, camera_lenta e turbo executadas e revertidas pela ponte; disponibilidade pela máscara.</li><li>Sessão jogada em modo completo pelo cliente.</li><li>Proposta de contribuição ao projeto original com o commit de extensão, nos termos dele.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> o binário próprio e o jogo de abertura, <b>quando</b> o mestre decide câmera lenta, <b>então</b> a intervenção é confirmada pela consulta de velocidade e volta ao normal no fim da duração, registrada com início e fim.</div></div>
+  </div>
+</section>
+
+<section class="cap">
+  <div class="etapa">
+    <div class="eh"><div><span class="k">ETAPA S5</span><b>Robustez</b></div><span>4 cards</span></div>
+    <div class="ed">O mestre passa a falhar bem: visível, em silêncio, retomando sozinho, com custo sob teto e registro exportável.</div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S5-01</span><b>Falhas classificadas do serviço e do emulador</b><span class="pill uc">UC-G02 UC-G03</span></div>
+      <p class="why">Nunca parecer vivo estando morto, e nunca deixar o jogo alterado.</p>
+      <ul><li>Contrato 4 inteiro: classes, destaque no overlay, tentativas com intervalo crescente, pausa automática após o limite.</li><li>Distinção fechado, travado, canal caído pelo processo, pela janela e pelo socket.</li><li>Ao reconectar, conferir velocidade e status e devolver ao normal se preciso.</li><li>Cenários no simulador para cada classe.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> o serviço respondendo erro 503 por três ciclos, <b>quando</b> a sessão roda, <b>então</b> o overlay mostra a falha em destaque, nenhuma ação acontece, e no quarto ciclo com resposta válida o mestre retoma sozinho, tudo registrado.</div></div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S5-02</span><b>Retomar sessão interrompida</b><span class="pill uc">UC-E05</span></div>
+      <p class="why">Nada se perde numa queda, e o mestre nunca retoma sobre um jogo que mudou.</p>
+      <ul><li>Detecção de sessão sem fim; oferta de retomar ou abrir nova; retomada só com o mesmo serial e soma.</li><li>Reconstrução de memória curta e catálogo a partir do registro; lacuna com duração; intervalo como vencido.</li><li>Registro corrompido preservado e marcado como irrecuperável.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> o mestre morto no meio de uma sessão, <b>quando</b> ele reabre com o mesmo jogo, <b>então</b> retoma a mesma sessão com a lacuna gravada e a memória curta igual à de antes da queda.</div></div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S5-03</span><b>Custo e latência com teto</b><span class="pill uc">UC-G01</span></div>
+      <p class="why">Decidir frequência, resolução e serviço com número, e nunca estourar o bolso do jogador.</p>
+      <ul><li>Tabela de preço por adaptador; custo por envio pelo tamanho; acumulado por sessão e por hora de jogo.</li><li>Teto configurado que pausa o mestre ao ser atingido; aviso ao passar de limites.</li><li>Resumo da sessão com mediana e máximo de latência de decisão e capturas poupadas.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> um teto de sessão configurado, <b>quando</b> o custo acumulado o atinge, <b>então</b> o mestre pausa, o overlay diz por quê, e a retomada só acontece pelo jogador.</div></div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S5-04</span><b>Exportar e reproduzir</b><span class="pill uc">UC-F03 UC-F04</span></div>
+      <p class="why">Entender uma sessão sem o jogo, e levar o registro para fora sem levar o que não é do jogador.</p>
+      <ul><li>Exportação em resumo ou completa, com ou sem capturas, com aviso sobre as imagens.</li><li>Reprodução pela linha do tempo: ciclos, decisões, descartes, reversões, marcos; escolha de ciclos para a bancada.</li><li>Leitura tolerante de registro de versão anterior.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> uma sessão jogada, <b>quando</b> o mapeador a reproduz, <b>então</b> vê cada decisão como veio do serviço, o resultado da validação e o que foi executado, e exporta três ciclos como casos da bancada.</div></div>
+  </div>
+
+  <div class="etapa">
+    <div class="eh"><div><span class="k">ETAPA S6</span><b>Bancada e sessão de aceite</b></div><span>2 cards</span></div>
+    <div class="ed">Provar o mestre sem jogo e fechar a fase 1 com a sessão jogada pelo cliente.</div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S6-01</span><b>Bancada de situações sintéticas</b><span class="pill uc">UC-G04</span></div>
+      <p class="why">A única forma repetível de medir o mestre e de escolher o serviço com número.</p>
+      <ul><li>Banco de casos versionado: capturas sintéticas, estado, catálogo, tom, regra testada, decisões aceitáveis; capturas reais só em casos locais.</li><li>Rodada só da plataforma com respostas gravadas, no CI; rodada com serviço sob demanda, com custo informado; dois adaptadores lado a lado.</li><li>Relatório com aprovação por regra, consistência entre repetições, latência e custo, guardado com data e versão do pedido.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> o banco de casos, <b>quando</b> a rodada roda contra dois adaptadores, <b>então</b> sai um relatório comparável com a taxa de decisões descartadas pela validação por adaptador, e o CI roda a rodada gravada sem chave de serviço.</div></div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S6-02</span><b>Sessão de aceite da fase 1</b><span class="pill uc">UC-A01 a UC-G04</span></div>
+      <p class="why">O portão da fase: o cliente joga do início ao fim com toda intervenção registrada e nenhuma fora do catálogo.</p>
+      <ul><li>Sessão inteira no jogo de abertura, em modo completo, com a intensidade padrão.</li><li>Registro de defeitos revisado; lacunas republicadas; revisão pós-fase escrita.</li><li>Validação da lacuna LC-08 planejada antes de qualquer trabalho da fase 2.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> uma sessão jogada até encerrar, <b>quando</b> o registro é reproduzido, <b>então</b> toda intervenção tem antes, depois e motivo, nenhuma decisão executada está fora do catálogo, e o cliente diz que o jogo deixou de ser o de sempre, ou diz por que não, e isso vira item.</div></div>
+  </div>
+</section>
+
+<!-- ============ CAP 9 AMBIENTES ============ -->
+<section class="cap">
+  <div class="kicker">Capítulo 9</div>
+  <h2>Ambientes, testes e definição de pronto</h2>
+  <p class="lead">Três ambientes, cinco níveis de teste e uma lista que vale para todo card. Nada aqui é opcional: é o que evita que a primeira sessão jogada seja também o primeiro teste.</p>
+
+  <table>
+    <thead><tr><th>Ambiente</th><th>Onde roda</th><th>Com o que conversa</th><th>O que prova</th></tr></thead>
+    <tbody>
+      <tr><td><b>dev</b></td><td>Máquina do cliente</td><td>Emulador real, serviço real com chave local</td><td>O ciclo de verdade, as provas de captura e de slot, as sessões jogadas.</td></tr>
+      <tr><td><b>CI</b></td><td>GitHub Actions</td><td>Simulador do canal; respostas gravadas do serviço; sem chave, sem jogo, sem BIOS</td><td>Plataforma, catálogo, máquina de estados, registro, cenários de falha.</td></tr>
+      <tr><td><b>bancada</b></td><td>Máquina do cliente, sob demanda</td><td>Serviço real, dois adaptadores</td><td>Qualidade de decisão por regra, custo e latência, escolha do serviço.</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Os cinco níveis de teste</h4>
+  <table>
+    <thead><tr><th>Nível</th><th>Onde</th><th>O que cobre</th><th>Meta</th></tr></thead>
+    <tbody>
+      <tr><td>Unitário</td><td class="code">sessao, catalogo, mestre</td><td>Máquina de estados, validação dupla, faixas, intervalo, memória curta. Sem rede, sem emulador.</td><td>Toda transição da tabela, inclusive as inválidas; todo caminho de descarte.</td></tr>
+      <tr><td>Registro</td><td class="code">registro</td><td>Esquema, gatilhos, cadeia ciclo a intervenção, reprodução.</td><td>As três tentativas proibidas falham; uma sessão gravada é lida inteira.</td></tr>
+      <tr><td>Simulador</td><td class="code">simulador</td><td>Ponte contra o canal falso em modo original e próprio; cenários de falha; vigia de velocidade.</td><td>Nenhum cenário pode regredir sem quebrar o build.</td></tr>
+      <tr><td>Contrato</td><td class="code">servicos</td><td>Respostas gravadas, válidas e inválidas, contra os contratos 1 e 2.</td><td>Toda resposta inválida conhecida é recusada; nenhuma válida é recusada.</td></tr>
+      <tr><td>Jogado</td><td class="code">emulador real</td><td>Sessão do cliente com o jogo de abertura; registro de defeitos.</td><td>Toda intervenção registrada; nenhuma fora do catálogo; o cliente aprova.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="ok" style="margin-top:12px"><b>Definição de pronto, válida para todo card</b>
+    <ul class="clean" style="font-size:9.2pt">
+      <li>O código passou no lint, nos tipos e em todos os testes do CI.</li>
+      <li>O critério de aceite do card foi executado por outra pessoa, não só pelo autor; neste projeto, pelo cliente quando envolve jogar.</li>
+      <li>Todo caminho de exceção do caso de uso ligado ao card tem teste.</li>
+      <li>Nenhum comando chega ao emulador fora da execução validada; nenhuma linha de registro é alterada ou apagada.</li>
+      <li>Nenhuma chave, captura de jogo, BIOS ou imagem de jogo entrou no repositório.</li>
+      <li>Log estruturado com sessão e ciclo em toda operação que muda estado.</li>
+    </ul>
+  </div>
+
+  <div class="warn"><b>O simulador é a peça que economiza mais tempo.</b> O emulador real precisa de janela, jogo e atenção; o serviço custa dinheiro a cada chamada. O card S0-03 entrega um canal falso com o mesmo protocolo e os cenários de falha; com ele, as etapas S1 a S3 e S5 inteiras rodam no CI, e a versão própria de S4 nasce com os comandos já testados do lado da plataforma.</div>
+</section>
+
+<!-- ============ FECHAMENTO ============ -->
+<section class="cap">
+  <div class="kicker">Fechamento</div>
+  <h2>Por onde começar</h2>
+  <p class="lead">A sequência dos primeiros cards, sem ambiguidade.</p>
+
+  <div class="grid2">
+    <div class="card f1"><div class="code">Passo 1</div><h3>Repositório, sessão viva e simulador</h3><p>Cards S0-01 a S0-04. No fim, qualquer pessoa clona, roda um comando, e o CI prova o registro e o canal falso.</p></div>
+    <div class="card f1"><div class="code">Passo 2</div><h3>Fazer a ponte falar</h3><p>Cards S1-01 a S1-03, contra o emulador real do cliente e contra o simulador. No fim, um estado reservado salvo e recarregado pelo terminal.</p></div>
+    <div class="card f1"><div class="code">Passo 3</div><h3>Dar olhos ao mestre</h3><p>Cards S2-01 a S2-03. No fim, uma captura do jogo de abertura vira uma situação validada.</p></div>
+    <div class="card f3"><div class="code">Passo 4</div><h3>O esqueleto</h3><p>Cards S3-01 a S3-06. No fim, o cliente joga. Só depois disso alguém compila o emulador.</p></div>
+  </div>
+
+  <div class="note" style="margin-top:12px"><b>O que este documento decide e fecha.</b> DC-15 (slots 90 a 99, fila de 10, provado), DC-16 (formato fechado da situação, contrato 1), DC-17 (tons e intensidades), DC-18 (teclas), DC-19 (texto do aviso), LC-11 (confirmação pelo arquivo, com número), LC-12 (vigia dentro do emulador). Todas sobem ao Mapa do Projeto como revisão 4 junto com a aprovação deste documento.</div>
+
+  <div class="warn"><b>O que este documento assume e precisa ser confirmado.</b>
+    <ul class="clean" style="font-size:9.2pt">
+      <li>Que a receita de compilação do projeto roda na máquina do cliente com as ferramentas já instaladas. O card S4-01 mede espaço e tempo de máquina e grava o que faltou (lacuna LC-10); disco deixou de ser risco com 87 GB livres.</li>
+      <li>Que a captura pela janela funciona também com o jogo em tela cheia sem borda. A prova foi em janela; o card S2-01 testa a outra (lacuna LC-13).</li>
+      <li>Que as teclas Ctrl+Alt+Z, P e Q não colidem com nenhum atalho do emulador nem do jogo. Confirmar no esqueleto.</li>
+      <li>Qual serviço de linguagem fica. O primeiro adaptador é o do provedor cujo acesso o cliente já tem; a escolha é da bancada, por número.</li>
+      <li>Que o levantamento do que já existe (lacuna LC-07) continua sem fazer, e fica antes da fase 2.</li>
+    </ul>
+  </div>
+
+  <div class="ok"><b>Quando consideramos a fase 1 entregue.</b> Quando o cliente joga uma sessão inteira do jogo de abertura, em modo completo, com toda intervenção registrada com antes, depois e motivo, nenhuma fora do catálogo, e diz se o jogo deixou de ser o de sempre. Esse é o único critério que importa: não é o código pronto, é o mestre sendo sentido.</div>
+</section>
+</body>
+</html>
