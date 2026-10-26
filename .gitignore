@@ -1,0 +1,14 @@
+node_modules/
+.env*
+!.env.example
+*.log
+.DS_Store
+# Imagens de jogo e BIOS nunca entram no repositório (DC-08)
+*.iso
+*.bin
+*.chd
+*.cso
+bios/
+jogos/
+# Dumps de memória do emulador
+*.dump
