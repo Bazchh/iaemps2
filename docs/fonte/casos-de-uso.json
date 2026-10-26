@@ -3,7 +3,7 @@
   "subtitulo": "mestre invisível por inteligência artificial para jogos de PlayStation 2 em emulador",
   "titulo": "Casos de Uso",
   "kicker": "Especificação funcional · outubro de 2026",
-  "entrega": "Entrega 3: módulos A, B e C detalhados. Os demais módulos estão no índice com código fixo e serão detalhados nas próximas entregas, módulo a módulo.",
+  "entrega": "Entrega 4: módulos A a D detalhados. Os demais módulos estão no índice com código fixo e serão detalhados nas próximas entregas, módulo a módulo.",
   "intro": "Tudo o que o mestre invisível precisa fazer, descrito um a um: quem usa, o que acontece passo a passo, o que fazer quando algo dá errado e o que ganhamos com cada um. Documento complementar ao Mapa do Projeto (revisão 3, aprovado) e ao Blueprint Técnico.",
   "rodape": "Casos de uso · IAEmPS2",
   "legenda_motor": "comando ao emulador",
@@ -1497,15 +1497,75 @@
       "letra": "D",
       "nome": "Alavancas e limites",
       "fase": 1,
-      "detalhado": false,
-      "resumo": "O catálogo universal: pausa, câmera lenta, turbo, estado salvo e recarga. Faixas, intervalo mínimo, reversão da última ação.",
+      "detalhado": true,
+      "resumo": "O catálogo universal: pausa, câmera lenta, turbo, estado salvo e recarga. Faixas, intervalo mínimo, reversão da última ação e a pausa do próprio mestre. É a única porta entre a decisão e o emulador.",
       "casos": [
         {
           "codigo": "D01",
           "nome": "Montar o catálogo de alavancas",
           "ator": "Plataforma",
           "fase": 1,
-          "prioridade": "Essencial"
+          "prioridade": "Essencial",
+          "objetivo": "Montar, ao abrir a sessão, a lista fechada de alavancas que o mestre pode usar, com disponibilidade, faixas e motivos padrão, a partir do emulador, do tom e da intensidade.",
+          "fluxo": [
+            {
+              "t": "Sessão aberta e jogo identificado",
+              "tipo": "ator"
+            },
+            {
+              "t": "Lista as alavancas universais",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Aplica disponibilidade do emulador (A07)",
+              "tipo": "sistema",
+              "desvio": {
+                "rotulo": "modo reduzido",
+                "t": "Só estado salvo e recarga",
+                "tipo": "atencao"
+              }
+            },
+            {
+              "t": "Aplica faixas da intensidade",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Catálogo da sessão pronto",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Casos de uso A02 e A07 concluídos.",
+            "Tom e intensidade da sessão definidos (caso de uso C01)."
+          ],
+          "gatilho": "A sessão abriu (caso de uso E01), ou o emulador foi reiniciado e a disponibilidade pode ter mudado.",
+          "principal": [
+            "A plataforma parte da lista fixa de alavancas universais: pausa, câmera lenta, turbo, salvar estado, recarregar estado.",
+            "A plataforma marca cada alavanca como disponível ou indisponível conforme o caso de uso A07.",
+            "A plataforma aplica as faixas da intensidade escolhida: duração máxima da pausa, fatores e duração da velocidade, intervalo mínimo entre intervenções.",
+            "A plataforma anexa a cada alavanca o motivo padrão, usado quando o motivo do serviço não serve (caso de uso C04).",
+            "A plataforma grava o catálogo na sessão viva, com versão, e o entrega ao pedido de decisão (caso de uso C02)."
+          ],
+          "alternativos": [
+            {
+              "t": "Perfil de memória casado",
+              "d": "Na fase 2: as ações de mundo do perfil (caso de uso H05) entram no catálogo com as mesmas colunas, disponibilidade, faixa e motivo padrão, sem tratamento especial."
+            },
+            {
+              "t": "Catálogo muda no meio da sessão",
+              "d": "Uma alavanca ficou indisponível por falha repetida (casos A03, A04, A05): o catálogo ganha nova versão, registrada, e o pedido seguinte já vai sem ela."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Nenhuma alavanca disponível",
+              "d": "Emulador sem comandos estendidos e salvamento de estado falhando: o catálogo fica vazio, o mestre só observa e descreve, e o overlay avisa que não há alavanca disponível."
+            }
+          ],
+          "resultado": "Catálogo fechado e versionado da sessão: o que o mestre pode usar, com que limites e com que motivo padrão. Nada fora dele existe para o mestre.",
+          "regras": [
+            "RN-06"
+          ]
         },
         {
           "codigo": "D02",
@@ -1515,6 +1575,74 @@
           "prioridade": "Essencial",
           "apoio": [
             "Emulador"
+          ],
+          "objetivo": "Executar uma decisão validada pela alavanca certa, com conferência antes e depois, de forma que nenhuma ação chegue ao emulador sem passar pelo catálogo e pelo registro.",
+          "fluxo": [
+            {
+              "t": "Decisão validada (C02)",
+              "tipo": "ator"
+            },
+            {
+              "t": "Verifica intervalo mínimo (D04)",
+              "tipo": "sistema",
+              "desvio": {
+                "rotulo": "intervalo não venceu",
+                "t": "Adia ou descarta; registra",
+                "tipo": "atencao"
+              }
+            },
+            {
+              "t": "Relê situação e estado",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Aciona a alavanca pelo caso de uso dela",
+              "tipo": "motor"
+            },
+            {
+              "t": "Registra e mostra; ação reversível",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Caso de uso C02 concluído com uma decisão diferente de \"nada\".",
+            "Catálogo da sessão montado (caso de uso D01)."
+          ],
+          "gatilho": "Uma decisão validada chegou para execução.",
+          "principal": [
+            "A plataforma confere o intervalo mínimo desde a última intervenção (caso de uso D04).",
+            "A plataforma relê a situação e o estado do emulador; se mudaram fora do esperado desde a decisão, descarta e registra.",
+            "A plataforma aciona a alavanca pelo caso de uso correspondente: pausa (A03), velocidade (A04), salvar (A05), recarregar (A06), ou ação de mundo (H07) na fase 2.",
+            "A plataforma recebe a confirmação do caso de uso acionado e grava estado antes, ação, estado depois e motivo (caso de uso F02).",
+            "A plataforma mostra ação e motivo no overlay no mesmo instante (caso de uso E03) e marca a ação como a última, reversível (caso de uso D03)."
+          ],
+          "alternativos": [
+            {
+              "t": "Ação com duração",
+              "d": "Pausa e velocidade têm fim programado: a plataforma registra o início agora e o fim quando o caso de uso acionado confirmar a volta ao normal."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Alavanca falhou na execução",
+              "d": "O caso de uso acionado devolveu falha: a plataforma registra a tentativa, não mostra a ação como feita e não repete no mesmo ciclo. Falhas repetidas tiram a alavanca do catálogo (caso de uso D01)."
+            },
+            {
+              "t": "Situação mudou entre decisão e execução",
+              "d": "Jogador entrou em menu, morreu ou a cena trocou: a decisão é descartada por situação velha e registrada como tal."
+            },
+            {
+              "t": "Mestre pausado no meio",
+              "d": "O jogador pausou o mestre (caso de uso D05) entre a decisão e a execução: nada é executado, a decisão é registrada como cancelada pelo jogador."
+            }
+          ],
+          "resultado": "Alavanca executada pelo caso de uso dela, confirmada, registrada com antes e depois, visível no overlay e marcada como reversível.",
+          "regras": [
+            "RN-01",
+            "RN-04",
+            "RN-06",
+            "RN-07",
+            "RN-08"
           ]
         },
         {
@@ -1525,6 +1653,71 @@
           "prioridade": "Essencial",
           "apoio": [
             "Emulador"
+          ],
+          "objetivo": "Dar ao jogador um gesto único que desfaz a última intervenção do mestre, qualquer que seja ela, sem precisar entender o que foi feito.",
+          "fluxo": [
+            {
+              "t": "Jogador aciona reverter",
+              "tipo": "ator"
+            },
+            {
+              "t": "Identifica a última ação reversível",
+              "tipo": "sistema",
+              "desvio": {
+                "rotulo": "nada a reverter",
+                "t": "Avisa e não faz nada",
+                "tipo": "atencao"
+              }
+            },
+            {
+              "t": "Executa a reversão própria da alavanca",
+              "tipo": "motor"
+            },
+            {
+              "t": "Registra como revertida pelo jogador",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Jogo como antes da intervenção",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Sessão aberta com pelo menos uma intervenção executada e marcada como reversível (caso de uso D02)."
+          ],
+          "gatilho": "O jogador aciona o comando de reverter no overlay ou pela tecla configurada.",
+          "principal": [
+            "A plataforma identifica a última intervenção executada e ainda reversível.",
+            "A plataforma executa a reversão própria daquela alavanca: retomar (pausa), volta ao normal (velocidade), recarregar o slot de volta (recarga, caso de uso A06) ou escrever o valor anterior (ação de mundo, fase 2).",
+            "A plataforma confirma pelo caso de uso acionado e registra a reversão com origem no jogador.",
+            "A plataforma mostra no overlay que a ação foi desfeita e entrega o marco à memória curta (caso de uso C05), para o mestre não repetir.",
+            "A plataforma conta a reversão para o intervalo mínimo, como se fosse intervenção, para o mestre não voltar à carga em seguida."
+          ],
+          "alternativos": [
+            {
+              "t": "Ação com duração já encerrada",
+              "d": "A pausa ou a velocidade já voltaram ao normal: não há o que desfazer no emulador; a plataforma registra a reversão só como sinal para o mestre."
+            },
+            {
+              "t": "Reverter duas vezes",
+              "d": "Só a última intervenção é reversível por este gesto; a anterior exige a sessão viva (caso de uso F03). O overlay informa o limite."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Nada a reverter",
+              "d": "Sem intervenção reversível: o overlay avisa e nada acontece no emulador."
+            },
+            {
+              "t": "Reversão falhou",
+              "d": "O caso de uso acionado devolveu falha: a plataforma registra, mostra no overlay que não conseguiu e oferece pausar o mestre (caso de uso D05)."
+            }
+          ],
+          "resultado": "Última intervenção desfeita pelo caminho próprio dela, registrada como revertida pelo jogador, com o mestre informado.",
+          "regras": [
+            "RN-01",
+            "RN-03",
+            "RN-04"
           ]
         },
         {
@@ -1532,14 +1725,125 @@
           "nome": "Aplicar intervalo mínimo entre intervenções",
           "ator": "Plataforma",
           "fase": 1,
-          "prioridade": "Essencial"
+          "prioridade": "Essencial",
+          "objetivo": "Garantir espaço entre intervenções, para o mestre ser presença e não ruído, com o intervalo vindo da intensidade escolhida pelo jogador.",
+          "fluxo": [
+            {
+              "t": "Decisão pronta para executar",
+              "tipo": "ator"
+            },
+            {
+              "t": "Calcula o tempo desde a última intervenção",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Menor que o mínimo?",
+              "tipo": "sistema",
+              "desvio": {
+                "rotulo": "sim",
+                "t": "Descarta e registra como adiada",
+                "tipo": "atencao"
+              }
+            },
+            {
+              "t": "Libera a execução",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Ritmo respeitado",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Intervalo mínimo definido pela intensidade da sessão (caso de uso C01) e gravado no catálogo (caso de uso D01)."
+          ],
+          "gatilho": "Uma decisão diferente de \"nada\" chegou para execução (caso de uso D02).",
+          "principal": [
+            "A plataforma calcula o tempo desde a última intervenção executada ou revertida.",
+            "Abaixo do mínimo, a plataforma descarta a decisão, registra como adiada pelo ritmo e trata o ciclo como \"nada\".",
+            "No mínimo ou acima, a plataforma libera a execução e zera a contagem no momento da confirmação.",
+            "O pedido de decisão seguinte informa ao serviço quanto tempo falta para a próxima janela, para ele decidir \"nada\" com conhecimento, em vez de ter a decisão descartada."
+          ],
+          "alternativos": [
+            {
+              "t": "Tela fora de jogo durante a espera",
+              "d": "O tempo em menu, vídeo ou carregamento não conta para o intervalo: a contagem congela e retoma quando a cena voltar ao jogo (caso de uso B04)."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Relógio do sistema alterado",
+              "d": "Salto de tempo para trás ou para frente: a plataforma usa um contador próprio da sessão, não a hora do sistema, e registra o salto."
+            }
+          ],
+          "resultado": "Nenhuma intervenção antes do intervalo mínimo; decisão descartada por ritmo registrada; o serviço informado da próxima janela.",
+          "regras": [
+            "RN-05"
+          ]
         },
         {
           "codigo": "D05",
           "nome": "Pausar e retomar o mestre",
           "ator": "Jogador",
           "fase": 1,
-          "prioridade": "Essencial"
+          "prioridade": "Essencial",
+          "objetivo": "Deixar o jogador silenciar e reativar o mestre a qualquer momento, com o jogo seguindo normalmente e a sessão intacta.",
+          "fluxo": [
+            {
+              "t": "Jogador aciona pausar o mestre",
+              "tipo": "ator"
+            },
+            {
+              "t": "Encerra ações com duração em vigor",
+              "tipo": "motor"
+            },
+            {
+              "t": "Suspende decisão e execução",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Mostra \"mestre pausado\" e registra",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Retoma quando o jogador pedir",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Sessão aberta."
+          ],
+          "gatilho": "O jogador aciona pausar ou retomar o mestre no overlay ou pela tecla configurada.",
+          "apoio": [
+            "Emulador"
+          ],
+          "principal": [
+            "A plataforma encerra qualquer ação com duração em vigor, devolvendo o jogo à velocidade normal e retomando se estiver pausado pelo mestre.",
+            "A plataforma suspende o ciclo de decisão e de execução; a captura e o registro podem continuar, conforme configuração, para a sessão viva não ter lacuna.",
+            "A plataforma mostra no overlay \"mestre pausado\" e registra o momento.",
+            "Ao retomar, a plataforma reconstrói a memória curta (caso de uso C05), reinicia o intervalo mínimo e volta ao ciclo normal, registrando a retomada."
+          ],
+          "alternativos": [
+            {
+              "t": "Pausa automática",
+              "d": "A plataforma pausa o mestre sozinha quando a reversão falha (caso de uso D03) ou quando uma alavanca falha repetidamente, e avisa; retomar é sempre decisão do jogador."
+            },
+            {
+              "t": "Captura desligada durante a pausa",
+              "d": "Se o jogador configurou, nada sai da máquina enquanto o mestre está pausado; a sessão viva registra a lacuna."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Ação com duração não volta ao normal",
+              "d": "A velocidade ou a pausa do emulador não respondem à volta: a plataforma insiste pelo caso de uso da alavanca, avisa no overlay e, persistindo, orienta o jogador a usar o próprio emulador."
+            }
+          ],
+          "resultado": "Mestre em silêncio por decisão do jogador, jogo normal, sessão viva íntegra e pronta para retomar.",
+          "regras": [
+            "RN-04",
+            "RN-10"
+          ]
         }
       ]
     },
@@ -1827,14 +2131,19 @@
       "texto": "Formato fechado da situação: linha de descrição, fase da cena numa lista fixa, grau de aperto numa escala fixa. Exigido pelo caso B02; fechar no blueprint."
     },
     {
-      "codigo": "DC-09",
-      "estado": "detalhada",
-      "texto": "O jogador não pede ação: casos C01 (tom e intensidade antes da sessão, recusa de pedido de efeito) e C04 (motivo molda, não guia)."
-    },
-    {
       "codigo": "DC-17",
       "estado": "candidata",
       "texto": "Lista de tons e de intensidades do produto, com o padrão e o que cada intensidade muda no intervalo mínimo e nas faixas. Exigida pelo caso C01; fechar no blueprint."
+    },
+    {
+      "codigo": "DC-03",
+      "estado": "detalhada",
+      "texto": "Visibilidade e controle do jogador: reverter a última ação (D03) e pausar o mestre (D05) viraram fichas, com a reversão contando para o intervalo mínimo."
+    },
+    {
+      "codigo": "DC-18",
+      "estado": "candidata",
+      "texto": "Teclas e gestos do jogador no overlay: reverter, pausar e retomar o mestre, sem conflito com os controles do jogo. Exigido por D03 e D05; fechar no blueprint."
     }
   ]
 }
