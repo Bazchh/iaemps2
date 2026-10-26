@@ -188,10 +188,12 @@ def diagrama_modulo(m):
     W = 700
     linhas = (len(casos) + 1) // 2
     H = 60 + linhas * 64 + 40
+    H = max(H, 60 + max(len(pessoas), len(sistemas)) * 78 + 40)
     pos = {}
+    topo = 70 + max(0, (H - (60 + linhas * 64 + 40)) / 2)
     for i, c in enumerate(casos):
         col, row = i % 2, i // 2
-        pos[c["codigo"]] = (260 + col * 180, 70 + row * 64)
+        pos[c["codigo"]] = (260 + col * 180, topo + row * 64)
     out = [f'<svg viewBox="0 0 {W} {H}" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">']
     # borda do módulo
     out.append(f'<rect x="150" y="18" width="400" height="{H - 30}" rx="8" fill="none" stroke="#9aa4b5" stroke-dasharray="4 3"/>')

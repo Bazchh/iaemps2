@@ -3,7 +3,7 @@
   "subtitulo": "mestre invisível por inteligência artificial para jogos de PlayStation 2 em emulador",
   "titulo": "Casos de Uso",
   "kicker": "Especificação funcional · outubro de 2026",
-  "entrega": "Entrega 4: módulos A a D detalhados. Os demais módulos estão no índice com código fixo e serão detalhados nas próximas entregas, módulo a módulo.",
+  "entrega": "Entrega 5: módulos A a G detalhados, a fase 1 inteira. H, I e J seguem no índice com código fixo, para as fases 2 e 3.",
   "intro": "Tudo o que o mestre invisível precisa fazer, descrito um a um: quem usa, o que acontece passo a passo, o que fazer quando algo dá errado e o que ganhamos com cada um. Documento complementar ao Mapa do Projeto (revisão 3, aprovado) e ao Blueprint Técnico.",
   "rodape": "Casos de uso · IAEmPS2",
   "legenda_motor": "comando ao emulador",
@@ -1851,8 +1851,8 @@
       "letra": "E",
       "nome": "Sessão e overlay",
       "fase": 1,
-      "detalhado": false,
-      "resumo": "Abrir a sessão com qualquer jogo, mostrar situação, ação e motivo na tela, pausar, retomar, encerrar com resumo.",
+      "detalhado": true,
+      "resumo": "Abrir a sessão com qualquer jogo, avisar o que sai da máquina, mostrar situação, ação e motivo sobre o jogo, encerrar com resumo e retomar depois de uma interrupção.",
       "casos": [
         {
           "codigo": "E01",
@@ -1862,6 +1862,71 @@
           "prioridade": "Essencial",
           "apoio": [
             "Emulador"
+          ],
+          "objetivo": "Começar uma sessão do mestre sobre o jogo que já está rodando no emulador, com tudo o que ela precisa confirmado antes do primeiro ciclo.",
+          "fluxo": [
+            {
+              "t": "Jogador abre a sessão",
+              "tipo": "ator"
+            },
+            {
+              "t": "Conecta e identifica o jogo (A01, A02)",
+              "tipo": "motor",
+              "desvio": {
+                "rotulo": "sem jogo rodando",
+                "t": "Espera o jogo; sessão não abre",
+                "tipo": "atencao"
+              }
+            },
+            {
+              "t": "Avisa o que sai da máquina (E02)",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Tom, intensidade e catálogo (C01, D01)",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Primeiro ciclo começa",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Emulador aberto com o jogo do jogador e o canal ligado.",
+            "Serviço de linguagem configurado com chave válida."
+          ],
+          "gatilho": "O jogador inicia o programa do mestre ou pede uma sessão nova.",
+          "principal": [
+            "A plataforma conecta ao emulador e espera o jogo estar rodando (caso de uso A01), depois identifica o jogo (caso de uso A02) e os comandos disponíveis (caso de uso A07).",
+            "A plataforma mostra o aviso do que sai da máquina e espera o jogador aceitar (caso de uso E02).",
+            "A plataforma oferece tom e intensidade (caso de uso C01) e monta o catálogo da sessão (caso de uso D01).",
+            "A plataforma cria a sessão viva com jogo, emulador, catálogo, configuração e data (caso de uso F01).",
+            "A plataforma abre o overlay (caso de uso E03) e inicia o ciclo de observação."
+          ],
+          "alternativos": [
+            {
+              "t": "Sessão anterior do mesmo jogo encontrada",
+              "d": "A plataforma oferece retomar (caso de uso E05) ou abrir uma nova; a anterior nunca é apagada."
+            },
+            {
+              "t": "Jogador abre a sessão antes do jogo",
+              "d": "A plataforma fica esperando o status \"rodando\", com aviso, e segue sozinha quando o jogo carregar."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Aviso recusado",
+              "d": "O jogador não aceita que capturas saiam da máquina: a sessão não abre, nada é capturado e a plataforma explica que sem isso o mestre não enxerga."
+            },
+            {
+              "t": "Serviço sem chave ou chave inválida",
+              "d": "A plataforma detecta na abertura, antes de qualquer captura, e orienta a configurar; a sessão não abre."
+            }
+          ],
+          "resultado": "Sessão viva criada, overlay aberto, ciclo de observação rodando sobre o jogo identificado, com o jogador ciente e configurado.",
+          "regras": [
+            "RN-09",
+            "RN-10"
           ]
         },
         {
@@ -1869,28 +1934,255 @@
           "nome": "Avisar o que sai da máquina",
           "ator": "Plataforma",
           "fase": 1,
-          "prioridade": "Essencial"
+          "prioridade": "Essencial",
+          "objetivo": "Deixar claro ao jogador, antes da primeira captura, exatamente o que sai da máquina dele, para onde e o que nunca sai, e registrar o aceite.",
+          "fluxo": [
+            {
+              "t": "Sessão em abertura",
+              "tipo": "ator"
+            },
+            {
+              "t": "Mostra o aviso: capturas e estado vão ao serviço",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Jogador aceita",
+              "tipo": "ator",
+              "desvio": {
+                "rotulo": "recusa",
+                "t": "Sessão não abre; nada sai",
+                "tipo": "falha"
+              }
+            },
+            {
+              "t": "Registra o aceite com data e versão do texto",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Captura liberada",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Texto do aviso versionado no produto, em português."
+          ],
+          "gatilho": "Primeira sessão na máquina, ou mudança na versão do texto do aviso, ou troca do serviço de linguagem configurado.",
+          "principal": [
+            "A plataforma mostra, em uma tela só, o que sai: capturas reduzidas da área do jogo e o estado resumido; para onde: o serviço de linguagem configurado, nomeado; e o que nunca sai: imagem do jogo, BIOS, saves e qualquer coisa fora da janela do jogo.",
+            "O jogador aceita ou recusa.",
+            "A plataforma registra o aceite com data e a versão do texto na configuração da máquina, e deixa de perguntar enquanto o texto e o serviço forem os mesmos.",
+            "A plataforma mostra no overlay um indicador permanente de que o mestre está enviando capturas, e um de quando não está (mestre pausado com captura desligada)."
+          ],
+          "alternativos": [
+            {
+              "t": "Serviço de linguagem trocado",
+              "d": "O destino mudou: o aviso volta a ser mostrado com o novo nome e o aceite anterior não vale."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Recusa",
+              "d": "Nada é capturado nem enviado; a sessão não abre; a plataforma registra a recusa sem data de aceite."
+            }
+          ],
+          "resultado": "Aceite registrado com data e versão; captura liberada; indicador visível no overlay enquanto a sessão durar.",
+          "regras": [
+            "RN-09"
+          ]
         },
         {
           "codigo": "E03",
           "nome": "Mostrar o overlay sobre o jogo",
           "ator": "Plataforma",
           "fase": 1,
-          "prioridade": "Essencial"
+          "prioridade": "Essencial",
+          "objetivo": "Mostrar sobre o jogo, sem atrapalhar, o que o mestre vê, o que fez e por quê, e dar ao jogador os três gestos: reverter, pausar, encerrar.",
+          "fluxo": [
+            {
+              "t": "Sessão aberta",
+              "tipo": "ator"
+            },
+            {
+              "t": "Abre o painel sobre a janela do jogo",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Atualiza situação, ação, motivo, indicadores",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Recebe os gestos do jogador",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Jogador vê e controla o mestre",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Caso de uso E01 em andamento.",
+            "Posição e tamanho do painel configuráveis, com padrão que não cobre a área central do jogo."
+          ],
+          "gatilho": "A sessão abriu, ou qualquer ciclo produziu algo novo para mostrar.",
+          "principal": [
+            "A plataforma abre o painel sobre a janela do emulador, fora da área que a captura lê (caso de uso B01), sempre por cima e arrastável.",
+            "O painel mostra: o jogo identificado e o modo (completo ou reduzido), a situação em uma linha, a última ação com motivo e quando aconteceu, o indicador de envio de capturas e o tempo até a próxima janela de intervenção.",
+            "O painel oferece os gestos: reverter a última ação (caso de uso D03), pausar e retomar o mestre (caso de uso D05), encerrar a sessão (caso de uso E04).",
+            "Ação e motivo aparecem no mesmo instante da execução, e \"nada\" aparece de forma discreta (caso de uso C03).",
+            "Falha do serviço ou do emulador aparece no painel com destaque, nunca escondida (caso de uso G02 e G03)."
+          ],
+          "alternativos": [
+            {
+              "t": "Jogo em tela cheia exclusiva",
+              "d": "O painel não consegue ficar por cima: a plataforma avisa, oferece a tela cheia sem borda e, enquanto isso, mantém a sessão com os avisos pelo registro."
+            },
+            {
+              "t": "Painel recolhido",
+              "d": "O jogador reduz o painel a um indicador mínimo; os gestos continuam pelas teclas configuradas."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Painel invade a área de captura",
+              "d": "Jogador arrastou o painel para dentro do jogo: a captura recorta a área do painel (caso de uso B01) e o painel avisa que está sendo recortado."
+            }
+          ],
+          "resultado": "Jogador vê situação, ação e motivo no momento em que acontecem e tem os três gestos à mão.",
+          "regras": [
+            "RN-04",
+            "RN-10"
+          ]
         },
         {
           "codigo": "E04",
           "nome": "Encerrar a sessão com resumo",
           "ator": "Jogador",
           "fase": 1,
-          "prioridade": "Essencial"
+          "prioridade": "Essencial",
+          "objetivo": "Fechar a sessão de forma limpa, devolvendo o jogo ao normal e deixando um resumo do que o mestre fez.",
+          "fluxo": [
+            {
+              "t": "Jogador encerra",
+              "tipo": "ator"
+            },
+            {
+              "t": "Encerra ações com duração; estado salvo final",
+              "tipo": "motor"
+            },
+            {
+              "t": "Fecha a sessão viva",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Monta o resumo da sessão",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Resumo mostrado; jogo segue normal",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Sessão aberta."
+          ],
+          "gatilho": "O jogador aciona encerrar, ou fecha o programa do mestre.",
+          "apoio": [
+            "Emulador"
+          ],
+          "principal": [
+            "A plataforma encerra qualquer ação com duração em vigor e confirma o jogo na velocidade normal e rodando.",
+            "A plataforma salva um último estado em slot reservado (caso de uso A05), marcado como fim de sessão.",
+            "A plataforma fecha a sessão viva com data de fim e totais: ciclos, capturas enviadas e poupadas, intervenções por alavanca, reversões, \"nada\", custo e latência (caso de uso G01).",
+            "A plataforma monta o resumo em texto, a partir do registro, sem serviço de linguagem: contagens e as intervenções com motivo, em ordem.",
+            "A plataforma mostra o resumo e oferece exportar (caso de uso F04). O emulador continua rodando; o jogador segue jogando sem o mestre."
+          ],
+          "alternativos": [
+            {
+              "t": "Programa fechado de forma abrupta",
+              "d": "Sem encerrar: a sessão viva fica aberta no registro e a retomada (caso de uso E05) cuida dela; nenhuma ação com duração fica em vigor porque todas têm fim próprio (caso de uso A04, lacuna LC-12)."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Emulador já fechado",
+              "d": "O jogo foi fechado antes do mestre: a plataforma fecha a sessão com o que tem, marca que o emulador caiu antes (caso de uso G03) e mostra o resumo."
+            }
+          ],
+          "resultado": "Sessão fechada, jogo normal, resumo visível e exportável, último estado do mestre guardado.",
+          "regras": [
+            "RN-01",
+            "RN-10"
+          ]
         },
         {
           "codigo": "E05",
           "nome": "Retomar sessão interrompida",
           "ator": "Plataforma",
           "fase": 1,
-          "prioridade": "Importante"
+          "prioridade": "Importante",
+          "objetivo": "Depois de qualquer interrupção, voltar a uma sessão sem perder registro nem contexto, e sem o mestre agir sobre um jogo que mudou.",
+          "fluxo": [
+            {
+              "t": "Sessão aberta encontrada",
+              "tipo": "ator"
+            },
+            {
+              "t": "Confere jogo e emulador (A02)",
+              "tipo": "motor",
+              "desvio": {
+                "rotulo": "jogo diferente",
+                "t": "Fecha a antiga; abre nova",
+                "tipo": "atencao"
+              }
+            },
+            {
+              "t": "Reconstrói memória curta e catálogo",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Marca a lacuna no registro",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Ciclo retomado",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Sessão viva sem data de fim no registro."
+          ],
+          "gatilho": "O programa do mestre abre e encontra uma sessão sem fim, ou o canal com o emulador voltou depois de cair.",
+          "apoio": [
+            "Emulador"
+          ],
+          "principal": [
+            "A plataforma encontra a sessão sem data de fim e mostra ao jogador: jogo, quando parou, última intervenção.",
+            "A plataforma conecta e identifica o jogo em execução; só retoma se serial e soma de verificação forem os mesmos.",
+            "A plataforma reconstrói memória curta (caso de uso C05) e catálogo (caso de uso D01) a partir do registro e do emulador atual, não de cópias guardadas.",
+            "A plataforma registra a lacuna entre a interrupção e a retomada, com duração, e trata o intervalo mínimo como vencido.",
+            "A plataforma retoma o ciclo de observação e informa no overlay que a sessão foi retomada."
+          ],
+          "alternativos": [
+            {
+              "t": "Jogador prefere sessão nova",
+              "d": "A antiga é fechada com resumo (caso de uso E04) e a nova abre pelo caso de uso E01."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Jogo diferente no emulador",
+              "d": "Serial ou soma de verificação mudaram: a plataforma fecha a sessão antiga com resumo e abre uma nova; nada da antiga vale para a nova."
+            },
+            {
+              "t": "Registro corrompido",
+              "d": "A sessão viva não pode ser lida até o fim: a plataforma preserva o arquivo como está, abre uma sessão nova e marca a antiga como irrecuperável no índice de sessões."
+            }
+          ],
+          "resultado": "Sessão retomada sobre o mesmo jogo, com lacuna registrada, memória e catálogo reconstruídos do registro.",
+          "regras": [
+            "RN-08",
+            "RN-10"
+          ]
         }
       ]
     },
@@ -1898,36 +2190,231 @@
       "letra": "F",
       "nome": "Registro",
       "fase": 1,
-      "detalhado": false,
-      "resumo": "Toda captura, decisão e intervenção gravadas com estado antes, ação, estado depois e motivo. Reproduzível e exportável.",
+      "detalhado": true,
+      "resumo": "Toda captura, decisão e intervenção gravadas com estado antes, ação, estado depois e motivo. A sessão viva é a única fonte de verdade: reproduzível e exportável.",
       "casos": [
         {
           "codigo": "F01",
           "nome": "Registrar ciclo de observação e decisão",
           "ator": "Plataforma",
           "fase": 1,
-          "prioridade": "Essencial"
+          "prioridade": "Essencial",
+          "objetivo": "Gravar, a cada ciclo, o que o mestre viu e decidiu, de forma que a sessão possa ser reproduzida e verificada sem o jogo.",
+          "fluxo": [
+            {
+              "t": "Ciclo começa",
+              "tipo": "ator"
+            },
+            {
+              "t": "Grava captura, status e situação",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Grava decisão, motivo e validação",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Fecha o ciclo com carimbo e custo",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Ciclo registrado",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Sessão viva criada (caso de uso E01) em pasta local do jogador, fora do repositório."
+          ],
+          "gatilho": "Cada ciclo de observação, com ou sem envio ao serviço, com ou sem decisão.",
+          "principal": [
+            "A plataforma abre um registro de ciclo com carimbo de tempo e contador próprio da sessão.",
+            "A plataforma grava a captura reduzida, o status do emulador, se a captura foi enviada ou poupada, e a situação devolvida ou a lacuna.",
+            "A plataforma grava a decisão como veio do serviço, o resultado da validação e, se houve descarte, o motivo do descarte.",
+            "A plataforma fecha o ciclo com latência de cada etapa e custo estimado do envio (caso de uso G01).",
+            "O registro é só de acréscimo: nada é editado ou apagado; correção entra como novo registro apontando para o anterior."
+          ],
+          "alternativos": [
+            {
+              "t": "Ciclo sem captura",
+              "d": "Janela não encontrada ou mestre pausado com captura desligada: o ciclo é gravado como lacuna, com o motivo."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Disco cheio ou pasta sem permissão",
+              "d": "A plataforma pausa o mestre (caso de uso D05), avisa no overlay e não executa nada enquanto não puder registrar: intervenção sem registro não existe."
+            }
+          ],
+          "resultado": "Ciclo gravado de forma completa e imutável, com o que entrou, o que saiu e quanto custou.",
+          "regras": [
+            "RN-01",
+            "RN-09"
+          ]
         },
         {
           "codigo": "F02",
           "nome": "Registrar intervenção com estado antes e depois",
           "ator": "Plataforma",
           "fase": 1,
-          "prioridade": "Essencial"
+          "prioridade": "Essencial",
+          "objetivo": "Gravar cada intervenção executada ou revertida com o estado antes e depois, para que qualquer efeito do mestre possa ser conferido e desfeito.",
+          "fluxo": [
+            {
+              "t": "Alavanca vai ser executada",
+              "tipo": "ator"
+            },
+            {
+              "t": "Grava estado antes",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Executa (D02)",
+              "tipo": "motor"
+            },
+            {
+              "t": "Grava estado depois, confirmação e motivo",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Intervenção auditável",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Caso de uso F01 em andamento no ciclo.",
+            "Decisão validada chegou para execução (caso de uso D02)."
+          ],
+          "gatilho": "Uma alavanca vai ser acionada, ou uma reversão vai acontecer (caso de uso D03).",
+          "principal": [
+            "A plataforma grava o estado antes: status do emulador, velocidade, slot de estado mais recente, situação e, na fase 2, as variáveis do perfil envolvidas.",
+            "A plataforma grava a ação: alavanca, parâmetros, motivo, origem (mestre ou reversão do jogador) e a versão do catálogo.",
+            "Após a execução, a plataforma grava o estado depois, a confirmação devolvida pelo caso de uso da alavanca e o tempo entre o comando e a confirmação.",
+            "A plataforma liga a intervenção ao ciclo e à decisão que a originou, e marca o caminho de reversão disponível."
+          ],
+          "alternativos": [
+            {
+              "t": "Ação com duração",
+              "d": "O registro recebe dois eventos ligados: início com estado antes e fim com estado depois da volta ao normal."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Falha na execução",
+              "d": "O registro grava a tentativa, a falha devolvida e o estado depois, que deve ser igual ao antes; diferença entre eles é marcada para o registro de defeitos."
+            }
+          ],
+          "resultado": "Cada intervenção com antes, ação, depois e motivo, ligada ao ciclo e à decisão, com o caminho de reversão marcado.",
+          "regras": [
+            "RN-01",
+            "RN-04"
+          ]
         },
         {
           "codigo": "F03",
           "nome": "Reproduzir uma sessão pelo registro",
           "ator": "Mapeador",
           "fase": 1,
-          "prioridade": "Importante"
+          "prioridade": "Importante",
+          "objetivo": "Rodar de novo uma sessão a partir do registro, sem emulador e sem serviço de linguagem, para verificar o que o mestre decidiu e por quê.",
+          "fluxo": [
+            {
+              "t": "Mapeador escolhe uma sessão",
+              "tipo": "ator"
+            },
+            {
+              "t": "Carrega o registro",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Percorre ciclo a ciclo com capturas e decisões",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Aponta descartes, falhas e marcos",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Sessão compreendida",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Registro de sessão íntegro na pasta local."
+          ],
+          "gatilho": "Alguém quer entender uma sessão: investigar uma intervenção estranha, alimentar a bancada ou revisar o mestre.",
+          "principal": [
+            "A plataforma carrega o registro e mostra a linha do tempo da sessão: ciclos, intervenções, reversões, marcos e lacunas.",
+            "Para cada ciclo, a plataforma mostra a captura, a situação, a decisão como veio do serviço, a validação e o que foi executado.",
+            "A plataforma destaca descartes, falhas, \"nada\" em sequência e intervenções revertidas pelo jogador.",
+            "A plataforma permite escolher ciclos para virar casos da bancada de situações sintéticas (caso de uso G04)."
+          ],
+          "alternativos": [
+            {
+              "t": "Reprodução com serviço",
+              "d": "Opcionalmente, a plataforma reenvia as mesmas capturas ao serviço para comparar decisões de ontem e de hoje, com custo informado antes."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Registro de versão antiga",
+              "d": "Formato de uma versão anterior do produto: a plataforma lê o que entende e marca os campos ausentes, sem converter o arquivo original."
+            }
+          ],
+          "resultado": "Sessão reproduzida e compreendida a partir só do registro, com os pontos de interesse marcados e exportáveis para a bancada.",
+          "regras": [
+            "RN-01"
+          ]
         },
         {
           "codigo": "F04",
           "nome": "Exportar o registro da sessão",
           "ator": "Jogador",
           "fase": 1,
-          "prioridade": "Desejável"
+          "prioridade": "Desejável",
+          "objetivo": "Deixar o jogador levar o registro de uma sessão para fora, em formato legível e sem nada que não seja dele.",
+          "fluxo": [
+            {
+              "t": "Jogador pede exportar",
+              "tipo": "ator"
+            },
+            {
+              "t": "Escolhe o conteúdo: resumo ou completo",
+              "tipo": "ator"
+            },
+            {
+              "t": "Gera o arquivo na pasta escolhida",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Arquivo pronto",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Sessão fechada (caso de uso E04) ou aberta com registro íntegro."
+          ],
+          "gatilho": "O jogador aciona exportar no resumo da sessão ou no índice de sessões.",
+          "principal": [
+            "A plataforma oferece dois conteúdos: resumo, com contagens e intervenções com motivo; completo, com todos os ciclos, capturas e decisões.",
+            "A plataforma gera o arquivo em formato aberto e legível, na pasta que o jogador escolher, com o nome do jogo e a data.",
+            "A plataforma avisa que o arquivo completo contém capturas da tela do jogo e deixa a decisão de compartilhar com o jogador."
+          ],
+          "alternativos": [
+            {
+              "t": "Exportar sem capturas",
+              "d": "O jogador escolhe o completo sem as imagens; o arquivo guarda só as situações em texto."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Pasta de destino sem permissão",
+              "d": "A plataforma avisa e pede outra pasta; nada é escrito."
+            }
+          ],
+          "resultado": "Arquivo de registro gerado onde o jogador quis, no conteúdo que ele escolheu, com aviso sobre as capturas.",
+          "regras": [
+            "RN-09"
+          ]
         }
       ]
     },
@@ -1935,15 +2422,64 @@
       "letra": "G",
       "nome": "Processos automáticos",
       "fase": 1,
-      "detalhado": false,
-      "resumo": "Medir custo e latência, tratar falha do serviço de linguagem e do emulador, manter a versão própria do emulador alinhada ao original.",
+      "detalhado": true,
+      "resumo": "Medir custo e latência, tratar falha do serviço de linguagem e queda do emulador, e rodar a bancada de situações sintéticas que prova o mestre sem jogo nenhum.",
       "casos": [
         {
           "codigo": "G01",
           "nome": "Medir custo e latência por sessão",
           "ator": "Plataforma",
           "fase": 1,
-          "prioridade": "Essencial"
+          "prioridade": "Essencial",
+          "objetivo": "Saber quanto cada sessão custa e demora, por etapa, para decidir frequência, resolução e serviço com número, nunca por impressão.",
+          "fluxo": [
+            {
+              "t": "Cada ciclo",
+              "tipo": "ator"
+            },
+            {
+              "t": "Mede latência por etapa",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Estima custo do envio",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Acumula por sessão e mostra no resumo",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Números prontos para decidir",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Tabela de preço do serviço configurado, com a unidade cobrada."
+          ],
+          "gatilho": "Todo ciclo (caso de uso F01) e todo encerramento (caso de uso E04).",
+          "principal": [
+            "A plataforma mede, por ciclo: tempo de captura, tempo de resposta do serviço para descrever e para decidir, tempo de execução até a confirmação do emulador.",
+            "A plataforma estima o custo de cada envio pela tabela configurada e pelo tamanho do que foi enviado.",
+            "A plataforma acumula por sessão e mostra no resumo: custo total, custo por hora de jogo, latência mediana e máxima de decisão, capturas poupadas.",
+            "A plataforma compara com os limites configurados e avisa no overlay ao ultrapassar, sem interromper a sessão."
+          ],
+          "alternativos": [
+            {
+              "t": "Serviço sem preço configurado",
+              "d": "A plataforma mede só latência e marca custo como não estimado."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Limite de custo da sessão atingido",
+              "d": "Se o jogador configurou um teto, a plataforma pausa o mestre ao atingi-lo (caso de uso D05), avisa e deixa a retomada com ele."
+            }
+          ],
+          "resultado": "Custo e latência por etapa e por sessão, acumulados e comparados com limites, visíveis no resumo.",
+          "regras": [
+            "RN-05"
+          ]
         },
         {
           "codigo": "G02",
@@ -1953,6 +2489,61 @@
           "prioridade": "Essencial",
           "apoio": [
             "Serviço de linguagem"
+          ],
+          "objetivo": "Fazer com que qualquer falha do serviço de linguagem, inclusive recusa de conteúdo, apareça na hora e deixe o mestre em silêncio, nunca agindo às cegas.",
+          "fluxo": [
+            {
+              "t": "Serviço falha ou recusa",
+              "tipo": "ator"
+            },
+            {
+              "t": "Classifica: fora do ar, limite, recusa, formato",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Mostra no overlay com destaque",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Mestre em silêncio; nenhuma ação",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Retoma sozinho quando o serviço voltar",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Sessão aberta com ciclo em andamento."
+          ],
+          "gatilho": "Uma chamada ao serviço devolveu erro, estourou o tempo, recusou o conteúdo ou veio fora do formato pela segunda vez.",
+          "principal": [
+            "A plataforma classifica a falha: serviço fora do ar ou tempo esgotado, limite de uso atingido, recusa de conteúdo, resposta fora do formato.",
+            "A plataforma mostra a falha no overlay com destaque e a classe, e registra o ciclo como falho (caso de uso F01).",
+            "A plataforma não decide nem executa nada nesse ciclo; o jogo segue sem o mestre.",
+            "A plataforma tenta de novo nos ciclos seguintes com intervalo crescente e retoma sozinha no primeiro sucesso, registrando a volta.",
+            "A plataforma conta falhas por classe na sessão para o resumo e para o registro de defeitos."
+          ],
+          "alternativos": [
+            {
+              "t": "Recusa de conteúdo",
+              "d": "O serviço recusou a captura por política própria: a plataforma registra a recusa com a captura para análise, não insiste com a mesma imagem e segue no ciclo seguinte."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Falhas prolongadas",
+              "d": "Acima do limite configurado de ciclos seguidos com falha, a plataforma pausa o mestre (caso de uso D05), avisa e deixa a retomada com o jogador."
+            },
+            {
+              "t": "Falha durante uma ação com duração",
+              "d": "A ação em vigor termina sozinha pelo caso de uso dela; a falha do serviço nunca deixa o jogo lento ou pausado."
+            }
+          ],
+          "resultado": "Falha classificada, visível e registrada; nenhuma ação executada; retomada automática quando o serviço voltar.",
+          "regras": [
+            "RN-07",
+            "RN-10"
           ]
         },
         {
@@ -1963,6 +2554,57 @@
           "prioridade": "Essencial",
           "apoio": [
             "Emulador"
+          ],
+          "objetivo": "Detectar quando o emulador fechou, travou ou perdeu o canal, proteger a sessão e nunca deixar o mestre achar que o jogo continua.",
+          "fluxo": [
+            {
+              "t": "Canal não responde",
+              "tipo": "ator"
+            },
+            {
+              "t": "Distingue: fechado, travado, canal caído",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Suspende o ciclo; registra",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Tenta reconectar (A01)",
+              "tipo": "motor"
+            },
+            {
+              "t": "Retoma (E05) ou fecha (E04)",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Sessão aberta."
+          ],
+          "gatilho": "Um comando ao emulador falhou, o status não responde ou o processo do emulador sumiu.",
+          "principal": [
+            "A plataforma distingue: processo do emulador ausente (fechado), processo vivo sem resposta (travado), ou processo e janela vivos com canal fechado (canal caído).",
+            "A plataforma suspende o ciclo de decisão e registra o evento com a classe.",
+            "Canal caído: a plataforma reconecta (caso de uso A01) e retoma a sessão (caso de uso E05).",
+            "Emulador fechado: a plataforma fecha a sessão com resumo (caso de uso E04), marcando que o emulador caiu antes.",
+            "Emulador travado: a plataforma avisa no overlay, espera o limite configurado e, sem resposta, trata como fechado."
+          ],
+          "alternativos": [
+            {
+              "t": "Emulador reaberto com o mesmo jogo",
+              "d": "A plataforma oferece retomar a sessão (caso de uso E05) assim que identificar o mesmo serial e soma de verificação."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Queda durante uma ação com duração",
+              "d": "Ao reconectar, a plataforma confere velocidade e status e devolve ao normal se o emulador ficou alterado; registra o que encontrou."
+            }
+          ],
+          "resultado": "Queda classificada e registrada, sessão protegida, retomada ou fechamento conforme o caso, jogo nunca deixado alterado.",
+          "regras": [
+            "RN-08",
+            "RN-10"
           ]
         },
         {
@@ -1973,6 +2615,64 @@
           "prioridade": "Importante",
           "apoio": [
             "Serviço de linguagem"
+          ],
+          "objetivo": "Provar o mestre sem jogo, sem emulador e sem jogador, com um conjunto fixo de situações em que toda decisão tem de cumprir as regras de negócio.",
+          "fluxo": [
+            {
+              "t": "Bancada disparada",
+              "tipo": "ator"
+            },
+            {
+              "t": "Carrega casos: captura, estado, catálogo, resposta esperada",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Serviço decide cada caso",
+              "tipo": "llm"
+            },
+            {
+              "t": "Confere cada decisão contra as regras",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Relatório com aprovados e reprovados",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Banco de casos versionado no repositório: capturas gravadas ou sintéticas, estado, catálogo, tom, e a regra que cada caso testa.",
+            "Emulador simulado que responde ao mesmo canal, para os casos que executam."
+          ],
+          "gatilho": "Integração contínua, troca de serviço ou de modelo, mudança no pedido de decisão, ou ciclo escolhido na reprodução (caso de uso F03).",
+          "principal": [
+            "A plataforma carrega os casos, cada um com o que o mestre vê e o que é aceitável: alavancas permitidas, proibidas e se \"nada\" é esperado.",
+            "A plataforma roda o pedido de decisão (caso de uso C02) para cada caso, contra o serviço configurado, e a validação da plataforma sem o serviço.",
+            "A plataforma confere cada decisão: regras de mesa, catálogo, faixas, formato do motivo. Decisão fora do aceitável reprova o caso.",
+            "A plataforma mede, por caso, latência e custo, e por rodada, a taxa de aprovação e a consistência entre repetições do mesmo caso.",
+            "A plataforma gera o relatório da rodada e o guarda com data, serviço e versão do pedido, para comparar rodadas."
+          ],
+          "alternativos": [
+            {
+              "t": "Rodada só da plataforma",
+              "d": "Sem serviço: os casos usam respostas gravadas, para testar validação, catálogo e execução no emulador simulado, em qualquer máquina e sem custo."
+            },
+            {
+              "t": "Comparação de serviços",
+              "d": "A mesma rodada contra dois serviços ou modelos, lado a lado, é a base da decisão do blueprint sobre qual usar."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Caso com captura real de jogo",
+              "d": "Capturas de jogo no repositório são do jogo do cliente: ficam só em casos marcados como locais, fora dos testes compartilhados, e os compartilhados usam capturas sintéticas."
+            }
+          ],
+          "resultado": "Relatório da rodada com aprovação por regra, consistência, latência e custo, comparável entre rodadas e serviços.",
+          "regras": [
+            "RN-02",
+            "RN-05",
+            "RN-06",
+            "RN-09"
           ]
         }
       ]
@@ -2136,14 +2836,29 @@
       "texto": "Lista de tons e de intensidades do produto, com o padrão e o que cada intensidade muda no intervalo mínimo e nas faixas. Exigida pelo caso C01; fechar no blueprint."
     },
     {
-      "codigo": "DC-03",
-      "estado": "detalhada",
-      "texto": "Visibilidade e controle do jogador: reverter a última ação (D03) e pausar o mestre (D05) viraram fichas, com a reversão contando para o intervalo mínimo."
-    },
-    {
       "codigo": "DC-18",
       "estado": "candidata",
       "texto": "Teclas e gestos do jogador no overlay: reverter, pausar e retomar o mestre, sem conflito com os controles do jogo. Exigido por D03 e D05; fechar no blueprint."
+    },
+    {
+      "codigo": "LC-05",
+      "estado": "detalhada",
+      "texto": "Como medir a qualidade do mestre sem gabarito: a bancada de situações sintéticas virou o caso G04, com aprovação por regra, consistência entre repetições e comparação entre serviços."
+    },
+    {
+      "codigo": "LC-06",
+      "estado": "detalhada",
+      "texto": "Custo e latência por sessão: medição por etapa e por sessão no caso G01, com teto configurável que pausa o mestre; os números vêm do esqueleto ambulante."
+    },
+    {
+      "codigo": "DC-19",
+      "estado": "candidata",
+      "texto": "Texto do aviso do que sai da máquina (E02), versionado, e a regra de reapresentar ao trocar de serviço. Fechar no blueprint com a tela de abertura."
+    },
+    {
+      "codigo": "LC-13",
+      "estado": "candidata",
+      "texto": "Captura com o jogo em tela cheia exclusiva: o painel não fica por cima e a captura pode falhar. O caso E03 pede tela cheia sem borda; confirmar no esqueleto se basta."
     }
   ]
 }
