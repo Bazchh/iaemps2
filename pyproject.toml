@@ -15,6 +15,7 @@ dependencies = [
   "pillow>=11.2,<12",
   "mss>=10.2,<11",
   "pywin32>=312; sys_platform == 'win32'",
+  "psutil>=7.2,<8",
 ]
 
 [project.optional-dependencies]
@@ -54,7 +55,7 @@ packages = ["iaemps2"]
 mypy_path = "src"
 
 [[tool.mypy.overrides]]
-module = ["mss", "mss.*", "win32gui", "win32ui", "win32con", "win32process"]
+module = ["mss", "mss.*", "win32gui", "win32ui", "win32con", "win32process", "psutil"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
