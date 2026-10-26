@@ -1,0 +1,30 @@
+name: ci
+
+# Prova o que não depende de emulador nem de serviço de linguagem (Blueprint, capítulo 9).
+# Nenhuma chave existe aqui: os testes marcados `servico` e `emulador` são pulados pelo conftest.
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Instalar
+        run: python -m pip install -e ".[dev]"
+      - name: Lint
+        run: ruff check .
+      - name: Formato
+        run: ruff format --check .
+      - name: Tipos
+        run: mypy
+      - name: Testes, inclusive os cenários do simulador
+        run: pytest -v
+      - name: Versão
+        run: mestre --versao
