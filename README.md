@@ -21,7 +21,9 @@ Para jogar com o mestre: abra o emulador (PCSX2 2.8 ou mais novo) com o canal of
 Configurações, Avançado, PINE, porta 28011; carregue o jogo; depois rode `mestre`. Sem o emulador
 aberto, o programa informa que o canal não foi encontrado e encerra.
 
-Nenhum teste chama a rede nem precisa do emulador: o simulador do canal (card S0-03) cobre tudo.
+Nenhum teste sai da máquina nem precisa do emulador: o simulador do canal cobre tudo, e a integração
+contínua no GitHub roda lint, formato, tipos e testes a cada push, sem nenhuma chave. O log é uma linha
+JSON por evento, com sessão e ciclo.
 Nenhuma chave entra no repositório; veja `.env.example`. A configuração fica em `config.toml`;
 veja `config.example.toml`.
 
