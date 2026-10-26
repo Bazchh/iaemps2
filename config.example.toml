@@ -13,6 +13,9 @@ pasta = ""              # vazio = ~/IAEmPS2/sessoes; fora do repositório e de s
 inicio = 90             # DC-15: slots do mestre, nunca entre 1 e 10
 fim = 99
 
+[emulador]
+pasta_estados = ""      # vazio = %LOCALAPPDATA%\Programs\PCSX2\sstates; onde o emulador grava os .p2s
+
 [captura]
 largura_px = 640
 qualidade_jpeg = 80
