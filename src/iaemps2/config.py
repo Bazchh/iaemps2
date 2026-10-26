@@ -97,6 +97,25 @@ class ConfigInvalidaError(ValueError):
     """O arquivo de configuração existe mas não serve."""
 
 
+def carregar_env(arquivo: Path | None = None) -> int:
+    """Lê um .env (CHAVE=valor por linha) para o ambiente, sem sobrescrever o que já existe. Devolve quantas
+    variáveis entraram. O .env nunca entra no repositório; é onde a chave do serviço mora."""
+    arquivo = arquivo or Path(".env")
+    if not arquivo.is_file():
+        return 0
+    entraram = 0
+    for linha in arquivo.read_text(encoding="utf-8").splitlines():
+        linha = linha.strip()
+        if not linha or linha.startswith("#") or "=" not in linha:
+            continue
+        nome, valor = linha.split("=", 1)
+        nome, valor = nome.strip(), valor.strip().strip('"').strip("'")
+        if nome and nome not in os.environ and valor:
+            os.environ[nome] = valor
+            entraram += 1
+    return entraram
+
+
 def localizar(caminho: Path | None = None) -> Path | None:
     """Devolve o arquivo de configuração a usar, ou None para valer os padrões."""
     if caminho is not None:

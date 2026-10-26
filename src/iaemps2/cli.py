@@ -8,7 +8,7 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from iaemps2 import __version__
-from iaemps2.config import Config, ConfigInvalidaError, carregar
+from iaemps2.config import Config, ConfigInvalidaError, carregar, carregar_env
 from iaemps2.ponte import emulador
 from iaemps2.ponte.cliente import CanalError, Cliente, ComandoFalhouError
 from iaemps2.ponte.protocolo import Status
@@ -58,6 +58,7 @@ def principal(argv: Sequence[str] | None = None) -> int:
     if args.versao:
         print(f"mestre {__version__}")
         return SAIDA_OK
+    carregar_env()
     try:
         config = carregar(args.config)
     except ConfigInvalidaError as erro:

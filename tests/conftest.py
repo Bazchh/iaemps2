@@ -10,6 +10,7 @@ from __future__ import annotations
 import os
 import socket
 from collections.abc import Callable, Iterator
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -45,6 +46,9 @@ def sem_rede(request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch) ->
 
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
     if os.environ.get("IAEMPS2_TESTES_REAIS") == "1":
+        from iaemps2.config import carregar_env
+
+        carregar_env(Path(__file__).resolve().parents[1] / ".env")  # a chave, só nos testes reais
         return
     pular = pytest.mark.skip(reason="precisa do emulador ou do serviço real; defina IAEMPS2_TESTES_REAIS=1")
     for item in items:
