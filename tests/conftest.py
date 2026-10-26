@@ -1,26 +1,36 @@
-"""Trava de rede: nenhum teste chama a rede nem o emulador real (Blueprint, capítulo 9).
+"""Trava de rede: nenhum teste sai da máquina (Blueprint, capítulo 9).
 
-Qualquer tentativa de abrir um socket durante os testes falha na hora com mensagem clara.
-O simulador do canal (card S0-03) e o adaptador falso cobrem tudo. Testes marcados com
-`emulador` ou `servico` são pulados sem a variável IAEMPS2_TESTES_REAIS=1.
+Só conexões para o endereço local passam, porque o simulador do canal (card S0-03) escuta em 127.0.0.1.
+Qualquer outra conexão falha na hora com mensagem clara. O adaptador falso cobre o serviço de linguagem.
+Testes marcados com `emulador` ou `servico` são pulados sem a variável IAEMPS2_TESTES_REAIS=1.
 """
 
 from __future__ import annotations
 
 import os
 import socket
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from typing import Any
 
 import pytest
 
+LOCAIS = {"127.0.0.1", "::1", "localhost"}
+
 
 class RedeProibidaError(RuntimeError):
-    """Um teste tentou abrir conexão de rede."""
+    """Um teste tentou abrir conexão para fora da máquina."""
 
 
-def _socket_proibido(*_args: Any, **_kwargs: Any) -> None:
-    raise RedeProibidaError("teste tentou abrir socket; use o simulador ou o adaptador falso")
+def _so_local(original: Callable[..., Any]) -> Callable[..., Any]:
+    def conectar(self: socket.socket, endereco: Any, *args: Any, **kwargs: Any) -> Any:
+        host = endereco[0] if isinstance(endereco, tuple) else endereco
+        if str(host) not in LOCAIS:
+            raise RedeProibidaError(
+                f"teste tentou conectar em {host!r}; use o simulador ou o adaptador falso"
+            )
+        return original(self, endereco, *args, **kwargs)
+
+    return conectar
 
 
 @pytest.fixture(autouse=True)
@@ -28,8 +38,8 @@ def sem_rede(request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch) ->
     if request.node.get_closest_marker("emulador") or request.node.get_closest_marker("servico"):
         yield
         return
-    monkeypatch.setattr(socket, "socket", _socket_proibido)
-    monkeypatch.setattr(socket, "create_connection", _socket_proibido)
+    monkeypatch.setattr(socket.socket, "connect", _so_local(socket.socket.connect))
+    monkeypatch.setattr(socket.socket, "connect_ex", _so_local(socket.socket.connect_ex))
     yield
 
 
