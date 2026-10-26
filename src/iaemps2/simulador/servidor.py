@@ -229,11 +229,16 @@ class Simulador:
             return
 
         def gravar() -> None:
+            # como o emulador ao comprimir: o arquivo aparece pequeno e cresce em pedaços até o fim
             time.sleep(self.atraso_salvamento_s / 3)
             caminho.parent.mkdir(parents=True, exist_ok=True)
-            caminho.write_bytes(b"P2S-SIM-PARCIAL" * 1000)
-            time.sleep(self.atraso_salvamento_s * 2 / 3)
-            caminho.write_bytes(b"P2S-SIM-COMPLETO" * 4000)
+            pedacos = 16
+            pausa = (self.atraso_salvamento_s * 2 / 3) / pedacos
+            with caminho.open("wb") as arquivo:
+                for _ in range(pedacos):
+                    arquivo.write(b"P2S-SIM-COMPLETO" * 250)
+                    arquivo.flush()
+                    time.sleep(pausa)
 
         threading.Thread(target=gravar, daemon=True).start()
 

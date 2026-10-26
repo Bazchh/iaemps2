@@ -55,6 +55,17 @@ class SlotsReservados(Secao):
         return list(range(self.inicio, self.fim + 1))
 
 
+class Emulador(Secao):
+    pasta_estados: str = ""  # vazio = %LOCALAPPDATA%/Programs/PCSX2/sstates (instalação portátil do cliente)
+
+    def caminho_estados(self) -> Path:
+        if self.pasta_estados:
+            return Path(self.pasta_estados).expanduser()
+        base = os.environ.get("LOCALAPPDATA")
+        raiz = Path(base) if base else Path.home() / "AppData" / "Local"
+        return raiz / "Programs" / "PCSX2" / "sstates"
+
+
 class Captura(Secao):
     largura_px: int = Field(default=640, ge=160, le=1920)
     qualidade_jpeg: int = Field(default=80, ge=30, le=95)
@@ -71,6 +82,7 @@ class Config(Secao):
     canal: Canal = Field(default_factory=Canal)
     sessoes: Sessoes = Field(default_factory=Sessoes)
     slots_reservados: SlotsReservados = Field(default_factory=SlotsReservados)
+    emulador: Emulador = Field(default_factory=Emulador)
     captura: Captura = Field(default_factory=Captura)
     servico: Servico = Field(default_factory=Servico)
 
