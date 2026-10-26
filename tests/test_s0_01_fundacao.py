@@ -88,3 +88,10 @@ def test_chave_vem_so_do_ambiente(monkeypatch: pytest.MonkeyPatch) -> None:
     assert config.Config.chave_servico() is None
     monkeypatch.setenv(config.VARIAVEL_CHAVE, "  x  ")
     assert config.Config.chave_servico() == "x"
+
+
+def test_trava_de_rede_bloqueia_endereco_externo() -> None:
+    from conftest import RedeProibidaError
+
+    with pytest.raises(RedeProibidaError):
+        socket.create_connection(("93.184.216.34", 80), timeout=0.1)
