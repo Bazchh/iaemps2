@@ -88,16 +88,16 @@
 
 <!-- ============ CAPA ============ -->
 <section>
-  <div class="kicker">Mapa do projeto · outubro de 2026 · revisão 2</div>
+  <div class="kicker">Mapa do projeto · outubro de 2026 · revisão 3 · aprovado</div>
   <h1>IAEmPS2</h1>
   <p class="lead" style="margin-bottom:8px">Um mestre invisível por inteligência artificial para jogos de PlayStation 2 em emulador. Ele vê a tela, lê o estado da partida e intervém, primeiro no ritmo e depois no mundo do jogo, para a experiência deixar de ser a de sempre: alivia no perigo real, aperta quando o jogador domina, e muitas vezes não faz nada. Casos de Uso e Blueprint Técnico derivam deste documento.</p>
-  <div class="note" style="max-width:150mm;margin-bottom:4px;padding:7px 12px;font-size:8.9pt"><b>Nome provisório:</b> "IAEmPS2", o nome da pasta do protótipo. <b>Revisão 1, 26 de outubro de 2026:</b> fase 1 vira tela e alavancas do emulador; Final Fantasy XII sai; versão própria mínima do emulador; LC-02 e LC-03 fechadas. <b>Revisão 2, mesmo dia:</b> perfil de memória deixa de ser opcional e vira a fase 2, a que muda o mundo; BIOS instalada.</div>
+  <div class="note" style="max-width:150mm;margin-bottom:4px;padding:7px 12px;font-size:8.9pt"><b>Nome provisório:</b> "IAEmPS2", o nome da pasta do protótipo. <b>Revisão 1, 26 de outubro de 2026:</b> fase 1 vira tela e alavancas do emulador; Final Fantasy XII sai; versão própria mínima do emulador; LC-02 e LC-03 fechadas. <b>Revisão 2, mesmo dia:</b> perfil de memória deixa de ser opcional e vira a fase 2, a que muda o mundo. <b>Revisão 3, mesmo dia:</b> as seis decisões propostas aprovadas pelo cliente; jogo de abertura rodando no emulador, LC-01 fechada. Documento aprovado.</div>
 
   <div class="stats">
     <div class="stat"><div class="big">10</div><div class="lbl">módulos funcionais</div></div>
     <div class="stat"><div class="big">3</div><div class="lbl">fases de entrega</div></div>
     <div class="stat"><div class="big">10</div><div class="lbl">regras de negócio</div></div>
-    <div class="stat"><div class="big">14</div><div class="lbl">decisões, 8 fechadas e 6 propostas</div></div>
+    <div class="stat"><div class="big">14</div><div class="lbl">decisões, todas fechadas</div></div>
   </div>
 
   <div class="grid3">
@@ -275,7 +275,7 @@
   </div>
 
   <div class="kicker" style="margin-top:14px">O esqueleto ambulante</div>
-  <p style="font-size:9.6pt">O primeiro código entregue é a fatia mais fina de ponta a ponta: a versão própria do emulador com pausar e velocidade acrescentados ao canal oficial, a captura da janela, o mestre com quatro alavancas e "nada", o overlay e o registro, rodando em qualquer jogo que o cliente tenha. Ele prova a arquitetura antes de qualquer funcionalidade ganhar corpo, e é o primeiro item que o cliente joga. O que o destrava: um jogo e a BIOS na máquina do cliente (lacuna LC-01) e o ambiente de compilação do emulador (lacuna LC-10).</p>
+  <p style="font-size:9.6pt">O primeiro código entregue é a fatia mais fina de ponta a ponta: a versão própria do emulador com pausar e velocidade acrescentados ao canal oficial, a captura da janela, o mestre com quatro alavancas e "nada", o overlay e o registro, rodando em qualquer jogo que o cliente tenha. Ele prova a arquitetura antes de qualquer funcionalidade ganhar corpo, e é o primeiro item que o cliente joga. Emulador, BIOS e jogo já rodam na máquina do cliente; o que o destrava é o ambiente de compilação do emulador (lacuna LC-10).</p>
 </section>
 
 <!-- ============ FASES ============ -->
@@ -299,14 +299,14 @@
     <span class="chip"><span class="mono">I</span> Posição de entidades</span><span class="chip"><span class="mono">I</span> Aproximar, afastar, reunir</span><span class="chip"><span class="mono">J</span> Controle virtual</span><span class="chip"><span class="mono">J</span> Regras próprias de intervenção por controle</span>
   </div>
 
-  <div class="note" style="margin-top:8px"><b>Jogo de abertura.</b> Qualquer jogo de PlayStation 2 que o cliente possua legalmente, com a BIOS do console dele; com alavancas universais, a escolha pesa pouco, e o jogo pode mudar entre sessões sem nada a refazer. Para testes automáticos e integração contínua, um emulador simulado que responde ao mesmo canal, mais um banco de capturas de tela gravadas, para que plataforma e mestre rodem sem emulador, sem jogo e sem serviço de linguagem.</div>
+  <div class="note" style="margin-top:8px"><b>Jogo de abertura.</b> Resident Evil 4, versão americana, já rodando no emulador do cliente: tensão constante e tela fácil de ler para o mestre. Com alavancas universais, qualquer outro jogo dele também serve na fase 1 sem nada a refazer; o perfil de memória da fase 2 começa por este. Para testes automáticos e integração contínua, um emulador simulado que responde ao mesmo canal, mais um banco de capturas de tela gravadas, para que plataforma e mestre rodem sem emulador, sem jogo e sem serviço de linguagem.</div>
 </section>
 
 <!-- ============ DECISÕES ============ -->
 <section class="cap">
   <div class="kicker">Decisões</div>
-  <h2>Oito fechadas, seis propostas</h2>
-  <p class="lead">As oito abaixo foram fechadas com o cliente em 26 de outubro de 2026, uma delas revisada no mesmo dia. As seis propostas vêm na página seguinte e fecham com a aprovação deste documento. Mudança posterior entra como revisão numerada, com data, e propaga para os casos de uso e para o blueprint.</p>
+  <h2>Catorze decisões fechadas com o cliente</h2>
+  <p class="lead">Todas fechadas em 26 de outubro de 2026, uma delas revisada no mesmo dia. As oito abaixo foram respondidas ao longo da conversa; as seis da página seguinte foram propostas pelo documento e aprovadas na íntegra. Mudança posterior entra como revisão numerada, com data, e propaga para os casos de uso e para o blueprint.</p>
 
   <table style="font-size:8.4pt" class="tight">
     <thead><tr><th>Código</th><th>Decisão</th><th>Escolha</th><th>Por quê</th><th>Estado</th></tr></thead>
@@ -325,19 +325,19 @@
 
 <!-- ============ DECISÕES PROPOSTAS ============ -->
 <section class="cap">
-  <div class="kicker">Decisões propostas</div>
-  <h2>Seis que fecham com a aprovação deste documento</h2>
-  <p class="lead">Cada uma pode ser aceita, alterada ou cortada pelo cliente. O que for alterado entra aqui com a data.</p>
+  <div class="kicker">Decisões · continuação</div>
+  <h2>Seis propostas pelo documento, aprovadas</h2>
+  <p class="lead">Aprovadas sem alteração pelo cliente em 26 de outubro de 2026, na revisão 3. O nome continua provisório por decisão dele.</p>
 
   <table style="font-size:8.4pt" class="tight">
     <thead><tr><th>Código</th><th>Decisão</th><th>Escolha</th><th>Por quê</th><th>Estado</th></tr></thead>
     <tbody>
-      <tr><td class="code">DC-04</td><td>Papel da inteligência artificial</td><td>Mestre invisível que molda a partida</td><td>Não é jogador por inteligência artificial nem trainer com conversa; é o produto do protótipo.</td><td><span class="pill prop">proposta</span></td></tr>
-      <tr><td class="code">DC-08</td><td>O jogo é do jogador</td><td>O produto não distribui jogo nem BIOS; imagem de jogo nunca entra no repositório</td><td>Propriedade e licença são do jogador; o produto só vê a tela e fala com o emulador.</td><td><span class="pill prop">proposta</span></td></tr>
-      <tr><td class="code">DC-09</td><td>O jogador não pede ação</td><td>Configura tom e intensidade antes da sessão; durante, só pausa, reverte e encerra</td><td>Se o jogador escolhe o efeito, é trainer. Transparência com pausa e reversão é o limite que mantém o mestre.</td><td><span class="pill prop">proposta</span></td></tr>
-      <tr><td class="code">DC-10</td><td>Idioma</td><td>Produto em português do Brasil; rótulos de perfil podem manter o nome original do jogo</td><td>Público do cliente; o nome original evita ambiguidade no mapeamento.</td><td><span class="pill prop">proposta</span></td></tr>
-      <tr><td class="code">DC-11</td><td>Nome, pasta e repositório</td><td>"IAEmPS2" (provisório); pasta Projetos-SSD\iaemps2; repositório privado, branch e merge, nunca commit direto na principal</td><td>Mesmo esquema de trabalho dos outros projetos do cliente.</td><td><span class="pill prop">proposta</span></td></tr>
-      <tr><td class="code">DC-12</td><td>Origem do perfil de memória</td><td>À mão, importado de fonte pública ou descoberta assistida; qualquer origem passa por validação contra o jogo em execução antes de entrar numa sessão</td><td>Perfil errado age no lugar errado; a validação é a mesma independente da origem.</td><td><span class="pill prop">proposta</span></td></tr>
+      <tr><td class="code">DC-04</td><td>Papel da inteligência artificial</td><td>Mestre invisível que molda a partida</td><td>Não é jogador por inteligência artificial nem trainer com conversa; é o produto do protótipo.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
+      <tr><td class="code">DC-08</td><td>O jogo é do jogador</td><td>O produto não distribui jogo nem BIOS; imagem de jogo nunca entra no repositório</td><td>Propriedade e licença são do jogador; o produto só vê a tela e fala com o emulador.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
+      <tr><td class="code">DC-09</td><td>O jogador não pede ação</td><td>Configura tom e intensidade antes da sessão; durante, só pausa, reverte e encerra</td><td>Se o jogador escolhe o efeito, é trainer. Transparência com pausa e reversão é o limite que mantém o mestre.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
+      <tr><td class="code">DC-10</td><td>Idioma</td><td>Produto em português do Brasil; rótulos de perfil podem manter o nome original do jogo</td><td>Público do cliente; o nome original evita ambiguidade no mapeamento.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
+      <tr><td class="code">DC-11</td><td>Nome, pasta e repositório</td><td>"IAEmPS2" (provisório); pasta Projetos-SSD\iaemps2; repositório privado, branch e merge, nunca commit direto na principal</td><td>Mesmo esquema de trabalho dos outros projetos do cliente.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
+      <tr><td class="code">DC-12</td><td>Origem do perfil de memória</td><td>À mão, importado de fonte pública ou descoberta assistida; qualquer origem passa por validação contra o jogo em execução antes de entrar numa sessão</td><td>Perfil errado age no lugar errado; a validação é a mesma independente da origem.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
     </tbody>
   </table>
 
@@ -355,12 +355,12 @@
 <section class="cap">
   <div class="kicker">Lacunas</div>
   <h2>O que ainda não está resolvido</h2>
-  <p class="lead" style="margin-bottom:8px">Lista republicada no fim de cada fase. Duas foram fechadas nesta revisão, verificando o emulador instalado na máquina do cliente; a primeira só o cliente fecha.</p>
+  <p class="lead" style="margin-bottom:8px">Lista republicada no fim de cada fase. Três foram fechadas no mesmo dia, verificando o emulador, a BIOS e o jogo instalados na máquina do cliente.</p>
 
   <table class="tight" style="font-size:8.3pt">
     <thead><tr><th>Código</th><th>Lacuna</th><th>Onde resolve</th><th>Risco se ficar aberta</th></tr></thead>
     <tbody>
-      <tr><td class="code">LC-01</td><td>Jogo na máquina do cliente. Emulador e BIOS instalados em 26 de outubro; falta o jogo, que o cliente traz. Candidato recomendado para abertura: Resident Evil 4, pela tensão e pela leitura fácil da tela; com alavancas universais, qualquer jogo serve para a fase 1, mas o escolhido ganha o primeiro perfil de memória na fase 2.</td><td>Cliente, antes do esqueleto ambulante</td><td>Esqueleto não anda.</td></tr>
+      <tr><td class="code">LC-01<span class="pill ok">fechada 26/10</span></td><td>Jogo e BIOS na máquina do cliente. Emulador, BIOS e Resident Evil 4 instalados e verificados com o jogo em execução: o canal oficial devolveu título, serial SLUS-21134 e versão 1.01. É o jogo de abertura e ganha o primeiro perfil de memória na fase 2.</td><td>Verificação feita nesta revisão</td><td>Nenhum.</td></tr>
       <tr><td class="code">LC-02<span class="pill ok">fechada 26/10</span></td><td>O emulador instalado expõe a memória pela interface oficial ou pelo símbolo exportado. Verificado no executável da versão 2.8.2: os três símbolos de memória são exportados e o servidor do canal oficial está embutido, com a opção nas configurações avançadas.</td><td>Verificação feita nesta revisão</td><td>Nenhum.</td></tr>
       <tr><td class="code">LC-03<span class="pill ok">fechada 26/10</span></td><td>Como identificar o jogo em execução para casar com o perfil. O canal oficial devolve título, serial, soma de verificação e versão do jogo por comando próprio.</td><td>Código-fonte da versão 2.8.2</td><td>Nenhum.</td></tr>
       <tr><td class="code">LC-04</td><td>Cobertura real e termos de uso das fontes públicas de mapas, jogo a jogo.</td><td>Casos de uso do módulo H; levantamento na fase 2</td><td>A camada de memória vale para poucos jogos.</td></tr>
