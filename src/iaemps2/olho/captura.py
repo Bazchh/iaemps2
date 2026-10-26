@@ -49,6 +49,9 @@ class Retangulo:
         return Retangulo(e, t, d, f)
 
 
+MINIATURA = (64, 36)
+
+
 @dataclass(frozen=True)
 class Captura:
     jpeg: bytes
@@ -57,6 +60,7 @@ class Captura:
     digest: str
     duracao_ms: int
     origem: Retangulo  # área do cliente, em coordenadas de tela
+    miniatura: bytes = b""  # 64x36 em cinza: o que a comparação entre capturas usa (B03)
 
     @property
     def bytes(self) -> int:
@@ -98,10 +102,14 @@ def comprimir(imagem: Image.Image, qualidade: int) -> bytes:
     return saida.getvalue()
 
 
+def miniatura(imagem: Image.Image) -> bytes:
+    """A imagem em cinza e miúda: base da impressão digital e da comparação entre capturas."""
+    return imagem.convert("L").resize(MINIATURA, Image.Resampling.BILINEAR).tobytes()
+
+
 def assinar(imagem: Image.Image) -> str:
-    """Impressão digital da imagem reduzida em cinza e miúda: igual para capturas iguais, barata."""
-    miuda = imagem.convert("L").resize((64, 36), Image.Resampling.BILINEAR)
-    return hashlib.sha1(miuda.tobytes()).hexdigest()[:16]
+    """Impressão digital da miniatura: igual para capturas iguais, barata."""
+    return hashlib.sha1(miniatura(imagem)).hexdigest()[:16]
 
 
 def preparar(
@@ -115,13 +123,15 @@ def preparar(
     """O caminho puro: recortar overlay, reduzir, assinar, comprimir."""
     sem_overlay = recortar_overlay(imagem, area, overlay)
     pequena = reduzir(sem_overlay, largura_px)
+    miuda = miniatura(pequena)
     return Captura(
         jpeg=comprimir(pequena, qualidade),
         largura=pequena.width,
         altura=pequena.height,
-        digest=assinar(pequena),
+        digest=hashlib.sha1(miuda).hexdigest()[:16],
         duracao_ms=duracao_ms,
         origem=area,
+        miniatura=miuda,
     )
 
 
