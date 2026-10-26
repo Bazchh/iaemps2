@@ -28,7 +28,7 @@
   .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
   .grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .card { background: var(--bg-card); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; border-top: 3px solid var(--line); break-inside: avoid; }
-  .grid3 .card { padding: 7px 10px; } .grid3 .card p { font-size: 8.6pt; line-height: 1.38; } .grid3 .card .meta { margin-bottom: 2px; } .grid3 .card h3 { font-size: 11.5pt; }
+  .grid3 .card { padding: 6px 10px; } .grid3 .card p { font-size: 8.6pt; line-height: 1.38; } .grid3 .card .meta { margin-bottom: 2px; } .grid3 .card h3 { font-size: 11.5pt; }
   .card .code { font-family: Consolas, monospace; font-size: 8pt; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; }
   .card h3 { margin-top: 2px; }
   .card .meta { font-family: Consolas, monospace; font-size: 8pt; color: var(--accent); margin: 2px 0 5px; }
@@ -88,10 +88,10 @@
 
 <!-- ============ CAPA ============ -->
 <section>
-  <div class="kicker">Mapa do projeto · outubro de 2026 · revisão 1</div>
+  <div class="kicker">Mapa do projeto · outubro de 2026 · revisão 2</div>
   <h1>IAEmPS2</h1>
-  <p class="lead" style="margin-bottom:8px">Um mestre invisível por inteligência artificial para jogos de PlayStation 2 em emulador. Ele vê a tela, lê o estado da partida e intervém pelas alavancas do próprio emulador, dentro de limites declarados, para a experiência ficar mais viva: alivia no perigo real, aperta quando o jogador domina, e muitas vezes não faz nada. Referência de visão, escopo, decisões e roteiro; Casos de Uso e Blueprint Técnico derivam dele.</p>
-  <div class="note" style="max-width:150mm;margin-bottom:4px;padding:7px 12px;font-size:8.9pt"><b>Nome provisório.</b> "IAEmPS2" é o nome da pasta do protótipo e segue como nome de trabalho; trocar é decisão do cliente. <b>Revisão 1, 26 de outubro de 2026:</b> a pedido do cliente, a fase 1 passa a ser tela mais alavancas do emulador, com perfil de memória como camada opcional; Final Fantasy XII sai do escopo; versão própria mínima do emulador decidida; lacunas LC-02 e LC-03 fechadas.</div>
+  <p class="lead" style="margin-bottom:8px">Um mestre invisível por inteligência artificial para jogos de PlayStation 2 em emulador. Ele vê a tela, lê o estado da partida e intervém, primeiro no ritmo e depois no mundo do jogo, para a experiência deixar de ser a de sempre: alivia no perigo real, aperta quando o jogador domina, e muitas vezes não faz nada. Casos de Uso e Blueprint Técnico derivam deste documento.</p>
+  <div class="note" style="max-width:150mm;margin-bottom:4px;padding:7px 12px;font-size:8.9pt"><b>Nome provisório:</b> "IAEmPS2", o nome da pasta do protótipo. <b>Revisão 1, 26 de outubro de 2026:</b> fase 1 vira tela e alavancas do emulador; Final Fantasy XII sai; versão própria mínima do emulador; LC-02 e LC-03 fechadas. <b>Revisão 2, mesmo dia:</b> perfil de memória deixa de ser opcional e vira a fase 2, a que muda o mundo; BIOS instalada.</div>
 
   <div class="stats">
     <div class="stat"><div class="big">10</div><div class="lbl">módulos funcionais</div></div>
@@ -108,7 +108,7 @@
     <div class="card f1"><div class="code">Módulo E</div><h3>Sessão e overlay</h3><div class="meta">fase 1</div><p>Abrir a sessão com qualquer jogo, mostrar situação, ação e motivo na tela, pausar, retomar, encerrar com resumo.</p></div>
     <div class="card f1"><div class="code">Módulo F</div><h3>Registro</h3><div class="meta">fase 1</div><p>Toda captura, decisão e intervenção gravadas com estado antes, ação, estado depois e motivo. Reproduzível e exportável.</p></div>
     <div class="card f1"><div class="code">Módulo G</div><h3>Processos automáticos</h3><div class="meta">fase 1</div><p>Medir custo e latência, tratar falha do serviço de linguagem e do emulador, manter a versão própria do emulador alinhada ao original.</p></div>
-    <div class="card f2"><div class="code">Módulo H</div><h3>Perfil de memória</h3><div class="meta">fase 2</div><p>Camada opcional por jogo: variáveis com endereço, tipo e faixa, ações numéricas, fontes públicas de mapas, perfis compartilháveis.</p></div>
+    <div class="card f2"><div class="code">Módulo H</div><h3>Perfil de memória</h3><div class="meta">fase 2</div><p>A camada que muda o mundo, por jogo: inimigo que aparece, recurso que some, item onde não existia. Endereços, faixas, ações de mundo, fontes públicas.</p></div>
     <div class="card f3"><div class="code">Módulo I</div><h3>Entidades e mundo</h3><div class="meta">fase 3</div><p>Posição de inimigos e personagens: aproximar, afastar, reunir. Exige mapa de entidades por jogo.</p></div>
     <div class="card f3"><div class="code">Módulo J</div><h3>Controle virtual</h3><div class="meta">fase 3</div><p>O mestre aciona o controle por um gamepad virtual. Outro tipo de intervenção, com regras próprias.</p></div>
   </div>
@@ -118,11 +118,11 @@
 <section class="cap">
   <div class="kicker">Visão</div>
   <h2>Olho na tela, mão nas alavancas do emulador</h2>
-  <p class="lead">O produto é um diretor de jogo por inteligência artificial: ele não joga e não obedece a pedidos do jogador. Ele vê a tela como um espectador, lê o que o emulador sabe da partida e molda o que acontece, como um mestre de mesa que percebe o grupo entediado e aperta o passo, ou percebe o desespero e dá uma trégua. O protótipo mostrou que vida e dinheiro mudando por decisão de um texto não fazem um mestre; o que faz é entender a situação e agir sobre o ritmo do jogo. Por isso as alavancas da primeira versão são as do próprio emulador, que funcionam em qualquer jogo no primeiro dia.</p>
+  <p class="lead">O produto é um diretor de jogo por inteligência artificial: ele não joga e não obedece a pedidos do jogador. Ele vê a tela como um espectador, lê o que o emulador sabe da partida e molda o que acontece, como um mestre de mesa que percebe o grupo entediado e aperta o passo, ou percebe o desespero e dá uma trégua. A graça é o jogo deixar de ser o jogo de sempre. Isso acontece em duas camadas: primeiro o ritmo, com as alavancas do próprio emulador, que funcionam em qualquer jogo no primeiro dia; depois o mundo, com o perfil de memória de cada jogo, que é onde o mestre faz aparecer o que nunca aconteceu naquele jogo. O protótipo mostrou que números mudando sem uma situação por trás não fazem um mestre; o que faz é entender a situação e escolher, no momento certo, a intervenção que o jogador sente.</p>
 
   <div class="arch">
     <div class="box llm"><h3>Mestre (serviço de linguagem)</h3><ul><li>Recebe a captura da tela e o estado</li><li>Descreve a situação em uma linha</li><li>Decide uma alavanca do catálogo e um motivo</li><li>Pode decidir "nada"</li><li>Não aciona nada; trocável por configuração</li></ul></div>
-    <div class="box imm"><h3>Alavancas</h3><ul><li>Universais: pausa, câmera lenta, turbo, estado salvo e recarga</li><li>Vêm do emulador, valem para todo jogo</li><li>Cada uma com faixa, duração e intervalo mínimo</li><li>Opcionais por jogo: ações numéricas do perfil de memória (fase 2)</li></ul></div>
+    <div class="box imm"><h3>Alavancas</h3><ul><li>Universais: pausa, câmera lenta, turbo, estado salvo e recarga</li><li>Vêm do emulador, valem para todo jogo</li><li>Cada uma com faixa, duração e intervalo mínimo</li><li>De mundo, por jogo: ações do perfil de memória (fase 2), as que fazem o jogo deixar de ser o comum</li></ul></div>
     <div class="box mut"><h3>Plataforma</h3><ul><li>Captura a janela e fala com o emulador pela ponte</li><li>Valida cada ação contra o catálogo</li><li>Relê a situação antes de agir</li><li>Registra tudo com motivo</li><li>Testável sem serviço de linguagem</li></ul></div>
   </div>
 
@@ -138,7 +138,7 @@
     </div>
     <div class="card" style="border-top-color:var(--red)"><div class="code">A primeira versão não é</div>
       <ul class="clean" style="font-size:9.4pt">
-        <li>Escrita na memória do jogo: vida, dinheiro, atributos (fase 2, por perfil).</li>
+        <li>Mudar o mundo do jogo: inimigos, recursos, itens (fase 2, por perfil de memória).</li>
         <li>Mover inimigos ou personagens no mapa (fase 3).</li>
         <li>Apertar botões pelo jogador (fase 3).</li>
         <li>Trainer com conversa: o jogador não pede efeito.</li>
@@ -147,7 +147,7 @@
     </div>
   </div>
 
-  <div class="note" style="margin-top:10px"><b>Por que começar pela tela e pelo emulador.</b> Captura de tela, pausa, velocidade e estado salvo existem para qualquer jogo, sem que ninguém mapeie nada; a memória de cada jogo é diferente e exige mapa por título, com cobertura pública desigual. E "o tempo desacelera quando você está prestes a morrer" ou "o mestre te devolve a cena de trinta segundos atrás" é um evento que o jogador sente, enquanto um número subindo é só um número. O perfil de memória continua no roteiro, como camada profunda e opcional, para jogos em que vale o trabalho.</div>
+  <div class="note" style="margin-top:10px"><b>Por que o ritmo vem antes do mundo.</b> Captura de tela, pausa, velocidade e estado salvo existem para qualquer jogo, sem que ninguém mapeie nada: é o chão, o que garante que o mestre nunca fica mudo. Mudar o mundo exige saber onde ele está na memória, e isso é por jogo, com cobertura pública desigual. Começar pelo ritmo prova a leitura de situação, o ciclo de decisão e o registro com o jogo de sempre; a fase 2 põe sobre isso o que faz o jogo virar outro. A ordem é de engenharia, não de importância.</div>
 </section>
 
 <!-- ============ ATORES ============ -->
@@ -169,7 +169,7 @@
   <h2>Universais e por jogo</h2>
   <div class="grid2" style="margin-top:6px">
     <div class="box imm"><h3>Alavancas universais</h3><p style="font-size:9.2pt">Vêm do emulador e valem para qualquer jogo sem preparo: pausar, câmera lenta, turbo, salvar estado num slot reservado ao mestre e recarregar. São a fase 1 inteira. Nenhuma depende de saber o que está em cada endereço de memória.</p></div>
-    <div class="box mut"><h3>Perfil de memória</h3><p style="font-size:9.2pt">Por jogo, opcional, versionado. Variáveis com significado e faixa, ações numéricas e lista do que nunca se toca. Entra na fase 2, só para jogos em que alguém mapeou ou mapeia, e passa pela mesma validação e pelo mesmo registro das universais.</p></div>
+    <div class="box mut"><h3>Perfil de memória</h3><p style="font-size:9.2pt">Por jogo, versionado. Variáveis com significado e faixa, ações de mundo e lista do que nunca se toca. É a fase 2 inteira, começando pelo jogo de abertura: é onde o mestre faz aparecer o que nunca aconteceu naquele jogo. Passa pela mesma validação e pelo mesmo registro das universais.</p></div>
   </div>
   <p style="font-size:9.3pt;margin-top:8px">A sessão viva é o terceiro objeto: o que de fato aconteceu numa partida, captura a captura, decisão a decisão, inclusive "nada". É a fonte de verdade para reverter, retomar e verificar, e é o que separa dirigir de trapacear.</p>
 </section>
@@ -282,16 +282,16 @@
 <section class="cap">
   <div class="kicker">Fases de entrega</div>
   <h2>O que entra em cada fase</h2>
-  <p class="lead">A fase 1 é o mestre jogável em qualquer jogo, só com tela e alavancas do emulador. A fase 2 abre a camada de memória, por jogo, e o produto para outros jogadores. A fase 3 dá ao mestre as mãos: entidades e controle.</p>
+  <p class="lead">A fase 1 é o mestre jogável em qualquer jogo, com tela e alavancas do emulador: o ritmo. A fase 2 é o mundo: o perfil de memória do jogo de abertura, com as ações que fazem o jogo deixar de ser o comum, e depois o produto para outros jogadores. A fase 3 dá ao mestre as mãos: entidades e controle.</p>
 
   <div class="phase p1"><h3>Fase 1 · mestre jogável em qualquer jogo <span>módulos A a G</span></h3>
     <p>Abrir um jogo no emulador, abrir a sessão, jogar com o mestre vendo a tela e agindo pelas alavancas do emulador dentro das regras de negócio, ver, pausar, reverter, encerrar. Termina quando o cliente joga uma sessão inteira com toda intervenção registrada e nenhuma fora do catálogo.</p>
     <span class="chip"><span class="mono">A</span> Canal oficial estendido: pausar e velocidade</span><span class="chip"><span class="mono">A</span> Identificar o jogo</span><span class="chip"><span class="mono">A</span> Estado salvo em slot reservado</span><span class="chip"><span class="mono">B</span> Captura da janela</span><span class="chip"><span class="mono">B</span> Situação em uma linha</span><span class="chip"><span class="mono">C</span> Observar e decidir</span><span class="chip"><span class="mono">C</span> Tom e intensidade</span><span class="chip"><span class="mono">D</span> Catálogo universal com faixas</span><span class="chip"><span class="mono">D</span> Reverter e pausar</span><span class="chip"><span class="mono">E</span> Overlay</span><span class="chip"><span class="mono">E</span> Resumo da sessão</span><span class="chip"><span class="mono">F</span> Registro reproduzível</span><span class="chip"><span class="mono">G</span> Falha visível</span><span class="chip"><span class="mono">G</span> Custo e latência</span>
   </div>
 
-  <div class="phase p2"><h3>Fase 2 · perfil de memória e outros jogadores <span>módulo H e instalação</span></h3>
-    <p>A camada profunda, por jogo: perfil de memória criado à mão, importado de fontes públicas ou com descoberta assistida, validado contra o jogo em execução, com ações numéricas entrando no mesmo catálogo. Perfis compartilháveis e instalação para outros jogadores. Só começa com a fase 1 jogada, revisada e com a validação da lacuna LC-08 feita.</p>
-    <span class="chip"><span class="mono">H</span> Perfil à mão, validado contra o jogo</span><span class="chip"><span class="mono">H</span> Importar de fontes públicas</span><span class="chip"><span class="mono">H</span> Descoberta assistida</span><span class="chip"><span class="mono">H</span> Publicar e importar perfil</span><span class="chip"><span class="mono">—</span> Instalação para outros jogadores</span>
+  <div class="phase p2"><h3>Fase 2 · o mundo muda: perfil de memória e outros jogadores <span>módulo H e instalação</span></h3>
+    <p>Primeiro o perfil do jogo de abertura, com ações de mundo: recurso que some ou aparece, inimigo que vem, estado que muda. Criado à mão, importado de fontes públicas ou com descoberta assistida, validado contra o jogo em execução, entrando no mesmo catálogo e no mesmo registro. Depois, perfis compartilháveis e instalação para outros jogadores, só com a validação da lacuna LC-08 feita. A primeira metade começa assim que a fase 1 for jogada e revisada.</p>
+    <span class="chip"><span class="mono">H</span> Perfil do jogo de abertura com ações de mundo</span><span class="chip"><span class="mono">H</span> Importar de fontes públicas</span><span class="chip"><span class="mono">H</span> Descoberta assistida</span><span class="chip"><span class="mono">H</span> Publicar e importar perfil</span><span class="chip"><span class="mono">—</span> Instalação para outros jogadores</span>
   </div>
 
   <div class="phase p3"><h3>Fase 3 · entidades e controle <span>módulos I, J</span></h3>
@@ -312,7 +312,7 @@
     <thead><tr><th>Código</th><th>Decisão</th><th>Escolha</th><th>Por quê</th><th>Estado</th></tr></thead>
     <tbody>
       <tr><td class="code">DC-01</td><td>Usuário final</td><td>Outros jogadores também, não só o cliente</td><td>Define desde já perfis compartilháveis e a separação entre quem mapeia e quem joga.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
-      <tr><td class="code">DC-02</td><td>Escopo da fase 1</td><td>Tela e alavancas do emulador; perfil de memória opcional por jogo na fase 2; entidades e controle na fase 3</td><td>Números não fizeram um mestre no protótipo; tela e alavancas valem para qualquer jogo no primeiro dia. Substitui a escolha anterior, só valores numéricos.</td><td><span class="pill rev">revisada 26/10</span></td></tr>
+      <tr><td class="code">DC-02</td><td>Ordem das camadas</td><td>Fase 1 é o ritmo: tela e alavancas do emulador. Fase 2 é o mundo: perfil de memória, começando pelo jogo de abertura. Entidades e controle na fase 3</td><td>O ritmo vale para qualquer jogo no primeiro dia e prova o ciclo; o mundo é o que faz o jogo deixar de ser o comum, e vem logo depois. Substitui a escolha anterior, só valores numéricos.</td><td><span class="pill rev">revisada 26/10</span></td></tr>
       <tr><td class="code">DC-03</td><td>Visibilidade</td><td>Transparente: overlay com ação e motivo, pausa e reversão</td><td>O jogador mantém o controle; é o que torna o mestre aceitável em vez de intrusivo.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
       <tr><td class="code">DC-05</td><td>Alvo</td><td>Qualquer jogo de PlayStation 2 no PCSX2; o PlayStation 2 é o objetivo, não o meio</td><td>Escolha do cliente, ciente de que um jogo de computador com modding daria mais alavancas.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
       <tr><td class="code">DC-06</td><td>Ponte com o emulador</td><td>O canal oficial de comunicação do emulador; varredura de memória por valor nunca mais</td><td>Já oferece leitura e escrita, estado salvo, identificação do jogo e status; elimina os doze scripts do protótipo.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
@@ -360,7 +360,7 @@
   <table class="tight" style="font-size:8.3pt">
     <thead><tr><th>Código</th><th>Lacuna</th><th>Onde resolve</th><th>Risco se ficar aberta</th></tr></thead>
     <tbody>
-      <tr><td class="code">LC-01</td><td>Jogo e BIOS na máquina do cliente. Ele não tem mais o jogo do protótipo nem outro; o emulador foi instalado nesta revisão, mas sem BIOS do console dele e sem um jogo que ele possua nada roda. Com alavancas universais, qual jogo pesa pouco.</td><td>Cliente, antes do esqueleto ambulante</td><td>Esqueleto não anda.</td></tr>
+      <tr><td class="code">LC-01</td><td>Jogo na máquina do cliente. Emulador e BIOS instalados em 26 de outubro; falta o jogo, que o cliente traz. Candidato recomendado para abertura: Resident Evil 4, pela tensão e pela leitura fácil da tela; com alavancas universais, qualquer jogo serve para a fase 1, mas o escolhido ganha o primeiro perfil de memória na fase 2.</td><td>Cliente, antes do esqueleto ambulante</td><td>Esqueleto não anda.</td></tr>
       <tr><td class="code">LC-02<span class="pill ok">fechada 26/10</span></td><td>O emulador instalado expõe a memória pela interface oficial ou pelo símbolo exportado. Verificado no executável da versão 2.8.2: os três símbolos de memória são exportados e o servidor do canal oficial está embutido, com a opção nas configurações avançadas.</td><td>Verificação feita nesta revisão</td><td>Nenhum.</td></tr>
       <tr><td class="code">LC-03<span class="pill ok">fechada 26/10</span></td><td>Como identificar o jogo em execução para casar com o perfil. O canal oficial devolve título, serial, soma de verificação e versão do jogo por comando próprio.</td><td>Código-fonte da versão 2.8.2</td><td>Nenhum.</td></tr>
       <tr><td class="code">LC-04</td><td>Cobertura real e termos de uso das fontes públicas de mapas, jogo a jogo.</td><td>Casos de uso do módulo H; levantamento na fase 2</td><td>A camada de memória vale para poucos jogos.</td></tr>
