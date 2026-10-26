@@ -7,6 +7,7 @@ então ele sobe, informa "canal não encontrado" e encerra limpo, sem traceback.
 from __future__ import annotations
 
 import importlib
+import os
 import socket
 from pathlib import Path
 from typing import Any
@@ -95,3 +96,15 @@ def test_trava_de_rede_bloqueia_endereco_externo() -> None:
 
     with pytest.raises(RedeProibidaError):
         socket.create_connection(("93.184.216.34", 80), timeout=0.1)
+
+
+def test_env_entra_sem_sobrescrever(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    arquivo = tmp_path / ".env"
+    linhas = ["# comentário", "IAEMPS2_X_TESTE=abc", 'IAEMPS2_Y_TESTE="com aspas"', "VAZIA=", ""]
+    arquivo.write_text("\n".join(linhas), encoding="utf-8")
+    monkeypatch.delenv("IAEMPS2_X_TESTE", raising=False)
+    monkeypatch.setenv("IAEMPS2_Y_TESTE", "ja_existia")
+    assert config.carregar_env(arquivo) == 1
+    assert os.environ["IAEMPS2_X_TESTE"] == "abc" and os.environ["IAEMPS2_Y_TESTE"] == "ja_existia"
+    assert "VAZIA" not in os.environ
+    monkeypatch.delenv("IAEMPS2_X_TESTE")
