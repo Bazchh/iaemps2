@@ -3,7 +3,7 @@
   "subtitulo": "mestre invisível por inteligência artificial para jogos de PlayStation 2 em emulador",
   "titulo": "Casos de Uso",
   "kicker": "Especificação funcional · outubro de 2026",
-  "entrega": "Entrega 2: módulos A e B detalhados. Os demais módulos estão no índice com código fixo e serão detalhados nas próximas entregas, módulo a módulo.",
+  "entrega": "Entrega 3: módulos A, B e C detalhados. Os demais módulos estão no índice com código fixo e serão detalhados nas próximas entregas, módulo a módulo.",
   "intro": "Tudo o que o mestre invisível precisa fazer, descrito um a um: quem usa, o que acontece passo a passo, o que fazer quando algo dá errado e o que ganhamos com cada um. Documento complementar ao Mapa do Projeto (revisão 3, aprovado) e ao Blueprint Técnico.",
   "rodape": "Casos de uso · IAEmPS2",
   "legenda_motor": "comando ao emulador",
@@ -1096,15 +1096,75 @@
       "letra": "C",
       "nome": "Mestre",
       "fase": 1,
-      "detalhado": false,
-      "resumo": "Observar situação e estado, decidir uma alavanca e um motivo, respeitar o ritmo. Tom e intensidade configuráveis antes da sessão.",
+      "detalhado": true,
+      "resumo": "Observar situação e estado, decidir uma alavanca e um motivo, respeitar o ritmo. O mestre decide; nunca executa. Tom e intensidade são escolhidos pelo jogador antes da sessão, nunca durante.",
       "casos": [
         {
           "codigo": "C01",
           "nome": "Configurar tom e intensidade do mestre",
           "ator": "Jogador",
           "fase": 1,
-          "prioridade": "Essencial"
+          "prioridade": "Essencial",
+          "objetivo": "Deixar o jogador definir, antes de jogar, como o mestre se comporta: o tom das intervenções e a intensidade com que ele age, sem nunca escolher uma ação específica.",
+          "fluxo": [
+            {
+              "t": "Abre as opções do mestre",
+              "tipo": "ator"
+            },
+            {
+              "t": "Mostra tons e intensidades disponíveis",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Jogador escolhe e confirma",
+              "tipo": "ator"
+            },
+            {
+              "t": "Grava a configuração da sessão",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Mestre configurado para a sessão",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Sessão em abertura (caso de uso E01) ou ainda sem decisão tomada.",
+            "Lista de tons e de intensidades definida no produto, com um padrão para quem não escolher."
+          ],
+          "gatilho": "O jogador abre a sessão pela primeira vez com um jogo, ou pede para mudar o comportamento do mestre antes de retomar.",
+          "principal": [
+            "A plataforma mostra os tons disponíveis, cada um com uma frase de exemplo do que o mestre tende a fazer: por exemplo, protetor, imprevisível, implacável.",
+            "A plataforma mostra as intensidades, que definem o intervalo mínimo entre intervenções e a faixa de cada alavanca dentro do catálogo.",
+            "O jogador escolhe um tom e uma intensidade, ou aceita o padrão.",
+            "A plataforma grava a escolha na sessão viva, com data, e aplica ao catálogo (caso de uso D01) e ao pedido de decisão (caso de uso C02).",
+            "A plataforma confirma no overlay o tom e a intensidade em vigor."
+          ],
+          "alternativos": [
+            {
+              "t": "Jogador aceita o padrão",
+              "d": "Sem escolha, a sessão abre com o tom e a intensidade padrão do produto, informados no overlay."
+            },
+            {
+              "t": "Mudança entre sessões",
+              "d": "Ao retomar um jogo, a plataforma oferece manter a configuração anterior ou trocar; a troca vale só da sessão nova em diante e fica registrada."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Pedido de mudança durante a sessão",
+              "d": "O jogador tenta trocar tom ou intensidade com o mestre em andamento: a plataforma recusa, explica que vale a partir da próxima sessão e oferece pausar o mestre (caso de uso D05)."
+            },
+            {
+              "t": "Pedido de ação específica",
+              "d": "O jogador pede um efeito, como \"me cura\" ou \"coloca um inimigo\": a plataforma recusa, lembra que o mestre não recebe pedidos e registra a tentativa."
+            }
+          ],
+          "resultado": "Tom e intensidade gravados na sessão viva e refletidos no catálogo e no pedido de decisão. O jogador configurou o mestre sem escolher nenhuma ação.",
+          "regras": [
+            "RN-05",
+            "RN-06"
+          ]
         },
         {
           "codigo": "C02",
@@ -1114,7 +1174,134 @@
           "prioridade": "Essencial",
           "apoio": [
             "Serviço de linguagem"
-          ]
+          ],
+          "objetivo": "A partir da situação, do estado e do catálogo, escolher uma alavanca com seus parâmetros e um motivo, ou nada, dentro do tom e da intensidade da sessão.",
+          "fluxo": [
+            {
+              "t": "Situação do ciclo pronta",
+              "tipo": "ator"
+            },
+            {
+              "t": "Monta o pedido: situação, estado, catálogo, memória curta",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Serviço escolhe alavanca, parâmetros e motivo",
+              "tipo": "llm",
+              "desvio": {
+                "rotulo": "fora do catálogo",
+                "t": "Decisão descartada; vale \"nada\"",
+                "tipo": "falha"
+              }
+            },
+            {
+              "t": "Valida contra catálogo e intervalo",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Decisão pronta para executar",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Caso de uso B02 concluído no ciclo, com fase da cena em exploração ou combate (caso de uso B04).",
+            "Catálogo de alavancas montado para a sessão (caso de uso D01), com disponibilidade e faixas.",
+            "Intervalo mínimo desde a última intervenção vencido (caso de uso D04), ou o ciclo decide \"nada\"."
+          ],
+          "gatilho": "Uma situação válida ficou pronta e o mestre não está pausado.",
+          "principal": [
+            "A plataforma monta o pedido com a situação atual, o estado do emulador, o catálogo com as alavancas disponíveis e suas faixas, o tom e a intensidade, e a memória curta da sessão (caso de uso C05).",
+            "O serviço de linguagem devolve, em formato fechado, uma alavanca do catálogo ou \"nada\", os parâmetros dentro da faixa e um motivo em uma frase.",
+            "A plataforma valida: a alavanca existe e está disponível, os parâmetros estão na faixa, o motivo existe e cabe no overlay.",
+            "A plataforma relê a situação e o estado antes de seguir; se mudaram fora do esperado, descarta a decisão e registra.",
+            "A plataforma registra a decisão na sessão viva e a entrega para execução (caso de uso D02)."
+          ],
+          "alternativos": [
+            {
+              "t": "Decisão \"nada\"",
+              "d": "Caso de uso C03: registrada como decisão, com motivo, sem execução."
+            },
+            {
+              "t": "Situação igual à anterior por vários ciclos",
+              "d": "A memória curta mostra monotonia; o pedido inclui esse sinal e o mestre pode decidir apertar o ritmo, sempre dentro do catálogo."
+            },
+            {
+              "t": "Marco de morte recente",
+              "d": "O registro de morte (caso de uso B04) entra no pedido; o mestre pode decidir uma trégua, como câmera lenta ou recarga, dentro das regras."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Alavanca fora do catálogo ou indisponível",
+              "d": "A plataforma descarta a decisão, registra o que o serviço pediu e trata o ciclo como \"nada\". Não corrige nem aproxima para uma alavanca parecida."
+            },
+            {
+              "t": "Parâmetro fora da faixa",
+              "d": "A plataforma descarta a decisão inteira e registra; nunca ajusta o valor para dentro da faixa por conta própria."
+            },
+            {
+              "t": "Decisão que causaria derrota direta",
+              "d": "Recarga que desfaz conquista ou aperto em grau de aperto máximo: a validação recusa pela regra de mesa, registra e trata como \"nada\"."
+            },
+            {
+              "t": "Resposta inválida ou serviço fora do ar",
+              "d": "Caso de uso G02: falha visível no overlay, nenhuma ação, jogo segue sem o mestre."
+            }
+          ],
+          "resultado": "Uma decisão validada e registrada: alavanca, parâmetros e motivo, ou \"nada\". O serviço escolheu; a plataforma conferiu; nada foi executado ainda.",
+          "regras": [
+            "RN-02",
+            "RN-06",
+            "RN-07",
+            "RN-08",
+            "RN-10"
+          ],
+          "sequencia": {
+            "colunas": [
+              "Plataforma",
+              "Serviço de linguagem",
+              "Execução (D02)"
+            ],
+            "passos": [
+              {
+                "de": 0,
+                "para": 0,
+                "t": "monta pedido: situação, estado, catálogo, tom, memória curta"
+              },
+              {
+                "de": 0,
+                "para": 1,
+                "t": "decidir: alavanca ou nada, parâmetros, motivo"
+              },
+              {
+                "de": 1,
+                "para": 0,
+                "t": "resposta em formato fechado",
+                "tracejado": true
+              },
+              {
+                "de": 0,
+                "para": 0,
+                "t": "valida catálogo, faixa, intervalo, regras de mesa"
+              },
+              {
+                "de": 0,
+                "para": 0,
+                "t": "relê situação e estado; descarta se mudou"
+              },
+              {
+                "de": 0,
+                "para": 0,
+                "t": "registra a decisão na sessão viva"
+              },
+              {
+                "de": 0,
+                "para": 2,
+                "t": "executa a alavanca validada"
+              }
+            ],
+            "legenda": "O serviço só escolhe. A plataforma valida duas vezes, contra o catálogo e contra a situação atual, antes de qualquer execução."
+          }
         },
         {
           "codigo": "C03",
@@ -1124,6 +1311,60 @@
           "prioridade": "Essencial",
           "apoio": [
             "Serviço de linguagem"
+          ],
+          "objetivo": "Tratar \"não agir\" como decisão de pleno direito: escolhida, com motivo, registrada e visível, para o ritmo da sessão ser do mestre e não do relógio.",
+          "fluxo": [
+            {
+              "t": "Decisão \"nada\" do serviço",
+              "tipo": "ator"
+            },
+            {
+              "t": "Valida o motivo",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Registra como decisão do ciclo",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Mostra no overlay, de forma discreta",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Ciclo encerrado sem intervenção",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Caso de uso C02 devolveu \"nada\", ou a validação descartou a decisão e o ciclo virou \"nada\"."
+          ],
+          "gatilho": "O serviço escolheu não agir, ou a plataforma descartou a escolha dele.",
+          "principal": [
+            "A plataforma recebe \"nada\" com o motivo, por exemplo \"jogador explorando com calma, sem razão para intervir\".",
+            "A plataforma registra a decisão na sessão viva com o mesmo peso de uma intervenção: situação, decisão, motivo, origem (escolha do serviço ou descarte da plataforma).",
+            "A plataforma mostra no overlay, de forma discreta, que o mestre observou e escolheu não agir.",
+            "A plataforma mantém o contador de intervalo mínimo como está: \"nada\" não zera nem adia o intervalo."
+          ],
+          "alternativos": [
+            {
+              "t": "\"Nada\" por descarte",
+              "d": "A decisão original foi recusada pela validação (caso de uso C02): o registro guarda a decisão recusada e o motivo da recusa, para o registro de defeitos e para a bancada."
+            },
+            {
+              "t": "Muitos \"nada\" seguidos",
+              "d": "A memória curta (caso de uso C05) passa a informar o serviço quantos ciclos se passaram sem intervenção, como sinal, nunca como obrigação de agir."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "\"Nada\" sem motivo",
+              "d": "A plataforma aceita a decisão, registra o motivo como ausente e marca para o registro de defeitos; o overlay mostra só que o mestre observou."
+            }
+          ],
+          "resultado": "Ciclo encerrado sem intervenção, com a decisão de não agir registrada e visível. O silêncio do mestre é escolha, não falha.",
+          "regras": [
+            "RN-01",
+            "RN-05"
           ]
         },
         {
@@ -1134,6 +1375,66 @@
           "prioridade": "Essencial",
           "apoio": [
             "Serviço de linguagem"
+          ],
+          "objetivo": "Garantir que toda decisão chegue ao jogador com um motivo curto, em uma frase, em português, que explique a intervenção sem revelar segredos do jogo nem instruir o jogador.",
+          "fluxo": [
+            {
+              "t": "Decisão com motivo do serviço",
+              "tipo": "ator"
+            },
+            {
+              "t": "Confere tamanho, idioma e conteúdo",
+              "tipo": "sistema",
+              "desvio": {
+                "rotulo": "motivo impróprio",
+                "t": "Troca pelo motivo padrão da alavanca",
+                "tipo": "atencao"
+              }
+            },
+            {
+              "t": "Liga o motivo à ação no registro",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Entrega ao overlay junto com a ação",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Jogador vê ação e motivo",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Caso de uso C02 ou C03 concluído com um motivo.",
+            "Cada alavanca do catálogo tem um motivo padrão, usado quando o do serviço não serve."
+          ],
+          "gatilho": "Uma decisão validada vai ser mostrada no overlay.",
+          "principal": [
+            "A plataforma confere o motivo: uma frase, dentro do limite de caracteres do overlay, em português.",
+            "A plataforma confere o conteúdo: o motivo fala da situação e da intenção do mestre, não dá instrução de jogo nem revela o que o jogador ainda não viu na tela.",
+            "A plataforma liga o motivo à decisão no registro, de forma que ação e motivo nunca se separem.",
+            "A plataforma entrega ação e motivo ao overlay no mesmo instante (caso de uso E03)."
+          ],
+          "alternativos": [
+            {
+              "t": "Motivo no tom da sessão",
+              "d": "O serviço escreve o motivo no tom configurado (caso de uso C01), por exemplo seco ou teatral; a plataforma só confere limites, não estilo."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Motivo longo, em outro idioma ou vazio",
+              "d": "A plataforma substitui pelo motivo padrão da alavanca, registra o original e marca para o registro de defeitos. A ação não é cancelada por causa do motivo."
+            },
+            {
+              "t": "Motivo que instrui ou revela",
+              "d": "Frases como \"vá pela porta da esquerda\" ou que antecipam o que vem: a plataforma substitui pelo motivo padrão e registra, porque o mestre molda, não guia."
+            }
+          ],
+          "resultado": "Toda ação mostrada ao jogador com um motivo em uma frase, ligado a ela no registro, dentro dos limites. Nunca uma ação sem explicação.",
+          "regras": [
+            "RN-01",
+            "RN-04"
           ]
         },
         {
@@ -1141,7 +1442,54 @@
           "nome": "Manter memória curta da sessão",
           "ator": "Plataforma",
           "fase": 1,
-          "prioridade": "Importante"
+          "prioridade": "Importante",
+          "objetivo": "Dar ao mestre a memória do que acabou de acontecer na sessão, o suficiente para não se repetir, perceber monotonia e respeitar marcos, sem crescer sem limite.",
+          "fluxo": [
+            {
+              "t": "Ciclo registrado",
+              "tipo": "ator"
+            },
+            {
+              "t": "Atualiza a memória curta",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Resume o que saiu da janela",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Memória pronta para o próximo pedido",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Sessão aberta com registro ativo (caso de uso F01).",
+            "Tamanho da janela da memória curta configurado: últimos ciclos, últimas intervenções e marcos."
+          ],
+          "gatilho": "Um ciclo foi registrado, com decisão ou com \"nada\".",
+          "principal": [
+            "A plataforma mantém a memória curta a partir da sessão viva: as últimas situações, as últimas intervenções com motivo e resultado, os marcos (morte, mudança de fase, reversão do jogador) e quantos ciclos se passaram sem intervenção.",
+            "O que sai da janela é resumido numa linha, para a memória ter contexto mais antigo sem crescer.",
+            "A memória curta entra no pedido de decisão (caso de uso C02) em formato fechado, nunca como texto livre acumulado.",
+            "Reversão feita pelo jogador entra como marco com destaque, para o mestre não repetir o que foi desfeito."
+          ],
+          "alternativos": [
+            {
+              "t": "Retomada de sessão",
+              "d": "Ao retomar (caso de uso E05), a memória curta é reconstruída a partir do registro, não guardada à parte: a sessão viva é a única fonte."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Registro incompleto no ciclo",
+              "d": "Um ciclo sem situação ou sem decisão entra na memória como lacuna marcada, nunca preenchida por inferência."
+            }
+          ],
+          "resultado": "Memória curta atualizada e limitada, derivada do registro, pronta para o pedido seguinte. O mestre lembra o que fez e o que o jogador desfez.",
+          "regras": [
+            "RN-01",
+            "RN-05"
+          ]
         }
       ]
     },
@@ -1454,11 +1802,6 @@
   ],
   "pendencias": [
     {
-      "codigo": "DC-13",
-      "estado": "detalhada",
-      "texto": "Versão própria do emulador: pausar e velocidade detalhados nos casos A03 e A04; a consulta de comandos disponíveis (A07) é o terceiro comando a acrescentar."
-    },
-    {
       "codigo": "LC-10",
       "estado": "aberta",
       "texto": "Ambiente de compilação do emulador. Segue aberta; o caso A07 define o comportamento enquanto não fecha: modo reduzido com o emulador original."
@@ -1482,6 +1825,16 @@
       "codigo": "DC-16",
       "estado": "candidata",
       "texto": "Formato fechado da situação: linha de descrição, fase da cena numa lista fixa, grau de aperto numa escala fixa. Exigido pelo caso B02; fechar no blueprint."
+    },
+    {
+      "codigo": "DC-09",
+      "estado": "detalhada",
+      "texto": "O jogador não pede ação: casos C01 (tom e intensidade antes da sessão, recusa de pedido de efeito) e C04 (motivo molda, não guia)."
+    },
+    {
+      "codigo": "DC-17",
+      "estado": "candidata",
+      "texto": "Lista de tons e de intensidades do produto, com o padrão e o que cada intensidade muda no intervalo mínimo e nas faixas. Exigida pelo caso C01; fechar no blueprint."
     }
   ]
 }
