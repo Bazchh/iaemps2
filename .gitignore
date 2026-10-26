@@ -12,3 +12,16 @@ bios/
 jogos/
 # Dumps de memória do emulador
 *.dump
+.venv/
+.env
+config.toml
+*.egg-info/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+# Sessões, capturas e estados ficam na máquina do jogador (RN-09)
+sessoes/
+capturas/
+*.p2s
+*.sqlite
