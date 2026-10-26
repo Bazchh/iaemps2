@@ -88,16 +88,16 @@
 
 <!-- ============ CAPA ============ -->
 <section>
-  <div class="kicker">Mapa do projeto · outubro de 2026 · revisão 3 · aprovado</div>
+  <div class="kicker">Mapa do projeto · outubro de 2026 · revisão 4 · aprovado</div>
   <h1>IAEmPS2</h1>
   <p class="lead" style="margin-bottom:8px">Um mestre invisível por inteligência artificial para jogos de PlayStation 2 em emulador. Ele vê a tela, lê o estado da partida e intervém, primeiro no ritmo e depois no mundo do jogo, para a experiência deixar de ser a de sempre: alivia no perigo real, aperta quando o jogador domina, e muitas vezes não faz nada. Casos de Uso e Blueprint Técnico derivam deste documento.</p>
-  <div class="note" style="max-width:150mm;margin-bottom:4px;padding:7px 12px;font-size:8.9pt"><b>Nome provisório:</b> "IAEmPS2", o nome da pasta do protótipo. <b>Revisão 1, 26 de outubro de 2026:</b> fase 1 vira tela e alavancas do emulador; Final Fantasy XII sai; versão própria mínima do emulador; LC-02 e LC-03 fechadas. <b>Revisão 2, mesmo dia:</b> perfil de memória deixa de ser opcional e vira a fase 2, a que muda o mundo. <b>Revisão 3, mesmo dia:</b> as seis decisões propostas aprovadas pelo cliente; jogo de abertura rodando no emulador, LC-01 fechada. Documento aprovado.</div>
+  <div class="note" style="max-width:150mm;margin-bottom:4px;padding:7px 12px;font-size:8.9pt"><b>Nome provisório:</b> "IAEmPS2", o nome da pasta do protótipo. <b>Revisão 1, 26 de outubro de 2026:</b> fase 1 vira tela e alavancas do emulador; Final Fantasy XII sai; versão própria mínima do emulador; LC-02 e LC-03 fechadas. <b>Revisão 2, mesmo dia:</b> perfil de memória deixa de ser opcional e vira a fase 2, a que muda o mundo. <b>Revisão 3, mesmo dia:</b> seis decisões propostas aprovadas; LC-01 fechada. <b>Revisão 4, mesmo dia:</b> Blueprint Técnico aprovado; entram DC-15 a DC-19 e as lacunas LC-11 a LC-13 que os Casos de Uso levantaram; disco deixa de ser risco.</div>
 
   <div class="stats">
     <div class="stat"><div class="big">10</div><div class="lbl">módulos funcionais</div></div>
     <div class="stat"><div class="big">3</div><div class="lbl">fases de entrega</div></div>
     <div class="stat"><div class="big">10</div><div class="lbl">regras de negócio</div></div>
-    <div class="stat"><div class="big">14</div><div class="lbl">decisões, todas fechadas</div></div>
+    <div class="stat"><div class="big">19</div><div class="lbl">decisões, todas fechadas</div></div>
   </div>
 
   <div class="grid3">
@@ -305,8 +305,8 @@
 <!-- ============ DECISÕES ============ -->
 <section class="cap">
   <div class="kicker">Decisões</div>
-  <h2>Catorze decisões fechadas com o cliente</h2>
-  <p class="lead">Todas fechadas em 26 de outubro de 2026, uma delas revisada no mesmo dia. As oito abaixo foram respondidas ao longo da conversa; as seis da página seguinte foram propostas pelo documento e aprovadas na íntegra. Mudança posterior entra como revisão numerada, com data, e propaga para os casos de uso e para o blueprint.</p>
+  <h2>Dezenove decisões fechadas com o cliente</h2>
+  <p class="lead">Todas fechadas em 26 de outubro de 2026, uma delas revisada no mesmo dia. As oito abaixo foram respondidas ao longo da conversa; as seis seguintes foram propostas por este documento e aprovadas; as cinco últimas nasceram nos Casos de Uso e fecharam no Blueprint Técnico. Mudança posterior entra como revisão numerada, com data, e propaga para os casos de uso e para o blueprint.</p>
 
   <table style="font-size:8.4pt" class="tight">
     <thead><tr><th>Código</th><th>Decisão</th><th>Escolha</th><th>Por quê</th><th>Estado</th></tr></thead>
@@ -326,8 +326,8 @@
 <!-- ============ DECISÕES PROPOSTAS ============ -->
 <section class="cap">
   <div class="kicker">Decisões · continuação</div>
-  <h2>Seis propostas pelo documento, aprovadas</h2>
-  <p class="lead">Aprovadas sem alteração pelo cliente em 26 de outubro de 2026, na revisão 3. O nome continua provisório por decisão dele.</p>
+  <h2>Seis propostas por este documento e cinco vindas do Blueprint</h2>
+  <p class="lead">As seis primeiras aprovadas sem alteração na revisão 3; o nome continua provisório. As cinco seguintes foram candidatas nos Casos de Uso e fecharam com a aprovação do Blueprint Técnico, onde estão detalhadas.</p>
 
   <table style="font-size:8.4pt" class="tight">
     <thead><tr><th>Código</th><th>Decisão</th><th>Escolha</th><th>Por quê</th><th>Estado</th></tr></thead>
@@ -338,38 +338,39 @@
       <tr><td class="code">DC-10</td><td>Idioma</td><td>Produto em português do Brasil; rótulos de perfil podem manter o nome original do jogo</td><td>Público do cliente; o nome original evita ambiguidade no mapeamento.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
       <tr><td class="code">DC-11</td><td>Nome, pasta e repositório</td><td>"IAEmPS2" (provisório); pasta Projetos-SSD\iaemps2; repositório privado, branch e merge, nunca commit direto na principal</td><td>Mesmo esquema de trabalho dos outros projetos do cliente.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
       <tr><td class="code">DC-12</td><td>Origem do perfil de memória</td><td>À mão, importado de fonte pública ou descoberta assistida; qualquer origem passa por validação contra o jogo em execução antes de entrar numa sessão</td><td>Perfil errado age no lugar errado; a validação é a mesma independente da origem.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
+      <tr><td class="code">DC-15</td><td>Slots de estado do mestre</td><td>Slots 90 a 99, fila de 10 por jogo, o mais antigo sobrescrito</td><td>Provado no emulador do cliente: o salvamento funciona e a limpeza do emulador só alcança os slots 1 a 10.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
+      <tr><td class="code">DC-16</td><td>Formato da situação</td><td>JSON fechado: descrição em uma linha, fase numa lista fixa, grau de aperto de 0 a 4, confiança</td><td>Campo fora da lista é resposta inválida; é o que torna a leitura de tela testável.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
+      <tr><td class="code">DC-17</td><td>Tons e intensidades</td><td>Tons protetor, imprevisível (padrão) e implacável; intensidades leve, média (padrão) e forte, que fixam intervalo mínimo e faixas</td><td>O jogador configura o comportamento sem nunca escolher uma ação.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
+      <tr><td class="code">DC-18</td><td>Gestos do jogador</td><td>Ctrl+Alt+Z reverter, Ctrl+Alt+P pausar e retomar o mestre, Ctrl+Alt+Q encerrar, mais botões no overlay</td><td>Combinações que o emulador não usa; colisão com o jogo é conferida no esqueleto.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
+      <tr><td class="code">DC-19</td><td>Aviso do que sai da máquina</td><td>Texto versionado, aceite registrado com data, reapresentado ao trocar de serviço</td><td>Capturas de tela saem da máquina; o jogador tem de saber antes da primeira.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
     </tbody>
   </table>
 
-  <div class="kicker" style="margin-top:14px">Fica para o blueprint técnico</div>
-  <ul class="clean" style="font-size:9.4pt">
-    <li>Linguagem e estrutura do repositório do mestre; o protótipo é em Python e isso é um ponto de partida, não uma decisão.</li>
-    <li>Tamanho exato da extensão do canal do emulador, e como propô-la ao projeto original para zerar o custo de manter uma versão própria.</li>
-    <li>Qual serviço de linguagem e qual modelo, decididos com medição de custo, latência e qualidade de leitura de tela e de decisão, nunca por preferência.</li>
-    <li>Ciclo de captura e decisão: frequência, resolução da captura, o que vai junto como estado.</li>
-    <li>Formato da sessão viva e, na fase 2, do perfil de memória.</li>
-  </ul>
+  <div class="note" style="margin-top:12px"><b>O que ficava para o blueprint foi decidido nele:</b> linguagem e estrutura do repositório, tamanho da extensão do canal, ciclo de captura e decisão, formato da sessão viva. A escolha do serviço de linguagem continua por medição, na bancada.</div>
 </section>
 
 <!-- ============ LACUNAS E FECHAMENTO ============ -->
 <section class="cap">
   <div class="kicker">Lacunas</div>
   <h2>O que ainda não está resolvido</h2>
-  <p class="lead" style="margin-bottom:8px">Lista republicada no fim de cada fase. Três foram fechadas no mesmo dia, verificando o emulador, a BIOS e o jogo instalados na máquina do cliente.</p>
+  <p class="lead" style="margin-bottom:6px">Lista republicada no fim de cada fase. Cinco fechadas: três na máquina do cliente, duas no Blueprint.</p>
 
   <table class="tight" style="font-size:8.3pt">
     <thead><tr><th>Código</th><th>Lacuna</th><th>Onde resolve</th><th>Risco se ficar aberta</th></tr></thead>
     <tbody>
-      <tr><td class="code">LC-01<span class="pill ok">fechada 26/10</span></td><td>Jogo e BIOS na máquina do cliente. Emulador, BIOS e Resident Evil 4 instalados e verificados com o jogo em execução: o canal oficial devolveu título, serial SLUS-21134 e versão 1.01. É o jogo de abertura e ganha o primeiro perfil de memória na fase 2.</td><td>Verificação feita nesta revisão</td><td>Nenhum.</td></tr>
-      <tr><td class="code">LC-02<span class="pill ok">fechada 26/10</span></td><td>O emulador instalado expõe a memória pela interface oficial ou pelo símbolo exportado. Verificado no executável da versão 2.8.2: os três símbolos de memória são exportados e o servidor do canal oficial está embutido, com a opção nas configurações avançadas.</td><td>Verificação feita nesta revisão</td><td>Nenhum.</td></tr>
-      <tr><td class="code">LC-03<span class="pill ok">fechada 26/10</span></td><td>Como identificar o jogo em execução para casar com o perfil. O canal oficial devolve título, serial, soma de verificação e versão do jogo por comando próprio.</td><td>Código-fonte da versão 2.8.2</td><td>Nenhum.</td></tr>
+      <tr><td class="code">LC-01<span class="pill ok">fechada 26/10</span></td><td>Jogo e BIOS na máquina do cliente. Emulador, BIOS e Resident Evil 4 (SLUS-21134, versão 1.01) instalados e verificados pelo canal. É o jogo de abertura.</td><td>Verificação feita nesta revisão</td><td>Nenhum.</td></tr>
+      <tr><td class="code">LC-02<span class="pill ok">fechada 26/10</span></td><td>O emulador instalado expõe a memória pela interface oficial. Verificado no executável 2.8.2: símbolos exportados e servidor do canal embutido.</td><td>Verificação feita nesta revisão</td><td>Nenhum.</td></tr>
+      <tr><td class="code">LC-03<span class="pill ok">fechada 26/10</span></td><td>Identificar o jogo em execução: o canal devolve título, serial, soma de verificação e versão por comando próprio.</td><td>Código-fonte da versão 2.8.2</td><td>Nenhum.</td></tr>
       <tr><td class="code">LC-04</td><td>Cobertura real e termos de uso das fontes públicas de mapas, jogo a jogo.</td><td>Casos de uso do módulo H; levantamento na fase 2</td><td>A camada de memória vale para poucos jogos.</td></tr>
-      <tr><td class="code">LC-05</td><td>Como medir a qualidade do mestre sem gabarito. Proposta: bancada de capturas e estados sintéticos em que toda decisão tem de cumprir as regras de negócio, mais sessões jogadas; a diversão em si continua julgamento do jogador.</td><td>Blueprint, seção de testes do mestre</td><td>Sem medida, regressão passa despercebida.</td></tr>
+      <tr><td class="code">LC-05</td><td>Como medir a qualidade do mestre sem gabarito: bancada de situações sintéticas em que toda decisão cumpre as regras, mais sessões jogadas; a diversão continua julgamento do jogador.</td><td>Card S6-01 do Blueprint</td><td>Sem medida, regressão passa despercebida.</td></tr>
       <tr><td class="code">LC-06</td><td>Custo e latência por sessão com captura de tela a cada ciclo, e limite aceitável para o cliente. Imagem custa mais que texto.</td><td>Medição no esqueleto ambulante</td><td>Produto inviável de operar.</td></tr>
       <tr><td class="code">LC-07</td><td>Levantamento do que já existe: produtos que alteram jogos em tempo real por evento externo, em emulador ou não. Nenhuma pesquisa feita ainda.</td><td>Antes da fase 2</td><td>Construir o que já existe.</td></tr>
       <tr><td class="code">LC-08</td><td>Validação com outros jogadores antes da fase 2: medir interesse e qual jogo pedem primeiro.</td><td>Fim da fase 1</td><td>Produto certo para uma pessoa, errado para o resto.</td></tr>
       <tr><td class="code">LC-09</td><td>Nome definitivo do produto.</td><td>Decisão do cliente, a qualquer momento</td><td>Nenhum.</td></tr>
-      <tr><td class="code">LC-10</td><td>Ambiente de compilação do emulador no Windows (C++, Qt, Visual Studio, dependências), tempo de compilação e custo de acompanhar as versões do projeto original. Nada medido ainda.</td><td>Primeiro card do blueprint</td><td>Versão própria cara demais de manter; volta a simular tecla de atalho.</td></tr>
+      <tr><td class="code">LC-10</td><td>Ambiente de compilação do emulador e custo de acompanhar o original. Ferramentas instaladas, dependências pré-compiladas, disco sem risco; falta medir a compilação.</td><td>Card S4-01 do Blueprint</td><td>Versão própria cara demais de manter; fica o modo reduzido.</td></tr>
+      <tr><td class="code">LC-11<span class="pill ok">fechada 26/10</span></td><td>Confirmação de salvar e recarregar estado: o emulador executa de forma assíncrona e reporta erro só na tela. Fechada por medição: confirmação pelo arquivo com tamanho estável, 0,9 s no jogo de abertura.</td><td>Blueprint, capítulo 6</td><td>Nenhum.</td></tr>
+      <tr><td class="code">LC-12<span class="pill ok">fechada 26/10</span></td><td>Volta da velocidade ao normal se a plataforma cair. Fechada por desenho: vigia dentro do servidor do canal do emulador, com duração no próprio comando.</td><td>Blueprint, capítulo 6</td><td>Nenhum.</td></tr>
+      <tr><td class="code">LC-13</td><td>Captura com o jogo em tela cheia exclusiva. A captura pela janela foi provada em modo janela; falta provar em tela cheia sem borda.</td><td>Card S2-01 do Blueprint</td><td>Jogador em tela cheia fica sem mestre.</td></tr>
     </tbody>
   </table>
 
