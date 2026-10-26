@@ -3,12 +3,12 @@
   "subtitulo": "mestre invisível por inteligência artificial para jogos de PlayStation 2 em emulador",
   "titulo": "Casos de Uso",
   "kicker": "Especificação funcional · outubro de 2026",
-  "entrega": "Entrega 1: módulo A detalhado. Os demais módulos estão no índice com código fixo e serão detalhados nas próximas entregas, módulo a módulo.",
+  "entrega": "Entrega 2: módulos A e B detalhados. Os demais módulos estão no índice com código fixo e serão detalhados nas próximas entregas, módulo a módulo.",
   "intro": "Tudo o que o mestre invisível precisa fazer, descrito um a um: quem usa, o que acontece passo a passo, o que fazer quando algo dá errado e o que ganhamos com cada um. Documento complementar ao Mapa do Projeto (revisão 3, aprovado) e ao Blueprint Técnico.",
   "rodape": "Casos de uso · IAEmPS2",
   "legenda_motor": "comando ao emulador",
   "mapa_legenda": "Quem usa o quê. Os módulos A a G são o mestre jogável da fase 1; H põe o mundo em jogo na fase 2; I e J dão as mãos ao mestre na fase 3.",
-  "fechamento_lead": "A fase 1 é o mestre jogável em qualquer jogo, com tela e alavancas do emulador. A fase 2 é o mundo: o perfil de memória do jogo de abertura e o produto para outros jogadores. A fase 3 dá ao mestre as mãos: entidades e controle.",
+  "fechamento_lead": "Fase 1, o ritmo: mestre jogável em qualquer jogo. Fase 2, o mundo: perfil de memória e outros jogadores. Fase 3, as mãos: entidades e controle.",
   "fases": {
     "1": {
       "nome": "mestre jogável em qualquer jogo",
@@ -795,8 +795,8 @@
       "letra": "B",
       "nome": "Tela e situação",
       "fase": 1,
-      "detalhado": false,
-      "resumo": "Capturar a janela do jogo e transformar em situação: onde o jogador está, o que enfrenta, se está parado, perdido ou dominando.",
+      "detalhado": true,
+      "resumo": "Capturar a janela do jogo e transformar em situação: onde o jogador está, o que enfrenta, se está parado, perdido ou dominando. É o olho do mestre, e o único caminho por onde a tela sai da máquina.",
       "casos": [
         {
           "codigo": "B01",
@@ -806,6 +806,75 @@
           "prioridade": "Essencial",
           "apoio": [
             "Emulador"
+          ],
+          "objetivo": "Obter, a cada ciclo, uma imagem fiel da janela do jogo, no tamanho certo para o serviço de linguagem, sem capturar nada além do jogo.",
+          "fluxo": [
+            {
+              "t": "Ciclo de observação começa",
+              "tipo": "ator"
+            },
+            {
+              "t": "Localiza a janela do emulador",
+              "tipo": "sistema",
+              "desvio": {
+                "rotulo": "janela não achada",
+                "t": "Ciclo sem captura; mestre em silêncio",
+                "tipo": "atencao"
+              }
+            },
+            {
+              "t": "Captura só a área do jogo",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Reduz e grava com carimbo de tempo",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Captura pronta para descrever",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Caso de uso A01 concluído: o canal informa que o jogo está rodando.",
+            "Emulador em janela ou em tela cheia sem borda; a resolução da captura e a frequência do ciclo estão configuradas."
+          ],
+          "gatilho": "O ciclo de observação da sessão chega ao momento de capturar (caso de uso F01), ou uma intervenção pede releitura da situação (caso de uso D02).",
+          "principal": [
+            "A plataforma localiza a janela do emulador pelo processo conhecido do canal, não pelo título, que muda com o jogo.",
+            "A plataforma captura só a área de desenho do jogo, sem a barra de menu do emulador e sem o próprio overlay.",
+            "A plataforma reduz a imagem para a resolução configurada, suficiente para ler a cena e barata para enviar.",
+            "A plataforma grava a captura na sessão viva com carimbo de tempo e o status do emulador naquele instante.",
+            "A plataforma entrega a captura ao caso de uso B02."
+          ],
+          "alternativos": [
+            {
+              "t": "Jogo pausado",
+              "d": "A captura é feita igual e marcada como pausada; serve para descrever a cena, nunca para decidir intervenção, porque nada está acontecendo."
+            },
+            {
+              "t": "Captura igual à anterior",
+              "d": "A plataforma detecta que a imagem não mudou (caso de uso B03) e não envia nada ao serviço; o ciclo registra \"sem mudança\"."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Janela do emulador não encontrada",
+              "d": "Emulador minimizado, fechado ou em outra área de trabalho: a plataforma pula a captura, registra o ciclo sem observação e o mestre fica em silêncio até a janela voltar."
+            },
+            {
+              "t": "Janela coberta por outra",
+              "d": "A captura traz outro programa por cima do jogo: a plataforma detecta a cobertura, descarta a captura, registra e avisa no overlay que o jogo precisa estar visível."
+            },
+            {
+              "t": "Overlay dentro da captura",
+              "d": "O próprio painel do mestre aparece na imagem: a plataforma recorta a área do overlay antes de enviar, para o serviço nunca ler as palavras do próprio mestre como parte do jogo."
+            }
+          ],
+          "resultado": "Uma captura da área do jogo, reduzida, com carimbo de tempo e status, gravada na sessão viva e pronta para virar situação.",
+          "regras": [
+            "RN-09",
+            "RN-10"
           ]
         },
         {
@@ -816,6 +885,78 @@
           "prioridade": "Essencial",
           "apoio": [
             "Serviço de linguagem"
+          ],
+          "objetivo": "Transformar a captura e o estado em uma linha de situação que diga onde o jogador está, o que enfrenta e como está indo, na forma que o mestre precisa para decidir.",
+          "fluxo": [
+            {
+              "t": "Captura pronta",
+              "tipo": "ator"
+            },
+            {
+              "t": "Monta o pedido: imagem, estado, situação anterior",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Serviço descreve a situação em uma linha",
+              "tipo": "llm",
+              "desvio": {
+                "rotulo": "resposta inválida",
+                "t": "Ciclo sem situação; mestre em silêncio",
+                "tipo": "falha"
+              }
+            },
+            {
+              "t": "Valida o formato e registra",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Situação pronta para o mestre",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Caso de uso B01 concluído no mesmo ciclo.",
+            "Jogador ciente, ao abrir a sessão, de que capturas de tela vão ao serviço de linguagem (caso de uso E02).",
+            "Serviço de linguagem configurado e com leitura de imagem."
+          ],
+          "gatilho": "Uma captura nova e diferente da anterior ficou pronta (caso de uso B01).",
+          "principal": [
+            "A plataforma monta o pedido com a captura, o estado conhecido do emulador (jogo, status, última alavanca) e a situação do ciclo anterior.",
+            "O serviço de linguagem devolve a situação em formato fechado: uma linha de descrição, a fase da cena (exploração, combate, menu, cena de vídeo, carregamento) e um grau de aperto do jogador, numa escala fixa.",
+            "A plataforma valida o formato: campos presentes, fase dentro da lista, grau dentro da escala. Fora disso, a resposta é inválida.",
+            "A plataforma registra a situação na sessão viva, ligada à captura que a originou.",
+            "A plataforma entrega a situação ao mestre (caso de uso C02)."
+          ],
+          "alternativos": [
+            {
+              "t": "Situação igual à anterior",
+              "d": "A fase e o grau não mudaram: a plataforma registra a continuidade e o mestre pode usar isso como sinal de monotonia."
+            },
+            {
+              "t": "Fase fora de jogo",
+              "d": "Menu, cena de vídeo ou carregamento (caso de uso B04): a situação é registrada e o mestre não decide intervenção nesse ciclo."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Resposta fora do formato",
+              "d": "A plataforma tenta uma vez mais com a mesma captura; persistindo, registra o ciclo sem situação e o mestre fica em silêncio. Nada é inventado para preencher."
+            },
+            {
+              "t": "Serviço indisponível ou recusa",
+              "d": "Tratado pelo caso de uso G02: falha visível no overlay, nenhuma ação, jogo segue sem o mestre."
+            },
+            {
+              "t": "Descrição contradiz o estado do emulador",
+              "d": "O serviço diz \"combate\" com o emulador pausado, por exemplo: a plataforma marca a situação como suspeita, registra e não decide intervenção nesse ciclo."
+            }
+          ],
+          "resultado": "Situação em formato fechado, validada e registrada, ligada à captura. O mestre tem com o que decidir, ou sabe que não tem.",
+          "regras": [
+            "RN-07",
+            "RN-08",
+            "RN-09",
+            "RN-10"
           ]
         },
         {
@@ -823,7 +964,62 @@
           "nome": "Detectar mudança de situação entre capturas",
           "ator": "Plataforma",
           "fase": 1,
-          "prioridade": "Importante"
+          "prioridade": "Importante",
+          "objetivo": "Evitar enviar ao serviço de linguagem capturas que não trazem nada de novo, para o custo e a latência da sessão ficarem no que importa.",
+          "fluxo": [
+            {
+              "t": "Captura nova",
+              "tipo": "ator"
+            },
+            {
+              "t": "Compara com a última enviada",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Mudança acima do limiar?",
+              "tipo": "sistema",
+              "desvio": {
+                "rotulo": "abaixo",
+                "t": "Não envia; registra sem mudança",
+                "tipo": "atencao"
+              }
+            },
+            {
+              "t": "Libera para descrever",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Só o que mudou vai ao serviço",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Caso de uso B01 concluído.",
+            "Limiar de mudança e tempo máximo sem envio configurados."
+          ],
+          "gatilho": "Uma captura nova ficou pronta.",
+          "principal": [
+            "A plataforma compara a captura nova com a última que foi enviada ao serviço, por uma medida simples de diferença de imagem.",
+            "Diferença abaixo do limiar: a plataforma não envia, registra o ciclo como \"sem mudança\" e mantém a situação anterior.",
+            "Diferença acima do limiar, ou tempo máximo sem envio vencido: a plataforma libera a captura para o caso de uso B02.",
+            "A plataforma registra, por sessão, quantas capturas foram enviadas e quantas foram poupadas (caso de uso G01)."
+          ],
+          "alternativos": [
+            {
+              "t": "Tempo máximo sem envio vencido",
+              "d": "Mesmo sem mudança visível, a plataforma envia uma captura de tempos em tempos, para o mestre perceber monotonia e situações que a diferença de imagem não pega."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Comparação impossível",
+              "d": "Resolução ou formato da captura mudou, por troca de tela cheia ou de jogo: a plataforma descarta a referência, envia a captura nova e recomeça a comparação."
+            }
+          ],
+          "resultado": "Só capturas com mudança real, ou com intervalo vencido, chegam ao serviço; o resto fica registrado como poupado.",
+          "regras": [
+            "RN-05"
+          ]
         },
         {
           "codigo": "B04",
@@ -833,6 +1029,65 @@
           "prioridade": "Importante",
           "apoio": [
             "Serviço de linguagem"
+          ],
+          "objetivo": "Saber quando a tela não é jogo, como menu, cena de vídeo, carregamento ou tela de morte, para o mestre não intervir onde não faz sentido.",
+          "fluxo": [
+            {
+              "t": "Situação descrita",
+              "tipo": "ator"
+            },
+            {
+              "t": "Fase da cena é fora de jogo?",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Bloqueia intervenção no ciclo",
+              "tipo": "sistema",
+              "desvio": {
+                "rotulo": "tela de morte",
+                "t": "Marca o evento para o mestre",
+                "tipo": "atencao"
+              }
+            },
+            {
+              "t": "Registra a fase e espera",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Mestre só age em jogo",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Caso de uso B02 concluído com a fase da cena preenchida."
+          ],
+          "gatilho": "A situação do ciclo chegou com fase diferente de exploração ou combate.",
+          "principal": [
+            "A plataforma lê a fase da cena devolvida pelo serviço: menu, cena de vídeo, carregamento, tela de morte ou tela de sistema do emulador.",
+            "Em qualquer fase fora de jogo, a plataforma bloqueia a decisão de intervenção nesse ciclo e registra o motivo.",
+            "Em tela de morte, a plataforma registra o evento como marco da sessão, para o mestre considerar uma trégua quando o jogo voltar.",
+            "A plataforma mantém o bloqueio enquanto a fase continuar fora de jogo e libera no primeiro ciclo em exploração ou combate."
+          ],
+          "alternativos": [
+            {
+              "t": "Pausa do próprio jogador",
+              "d": "Menu de pausa do jogo conta como fora de jogo; a plataforma não confunde com a pausa do mestre (caso de uso A03) e não retoma nada."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Fase errada do serviço",
+              "d": "O serviço marcou \"combate\" numa cena de vídeo e o mestre interveio: o registro guarda a captura e a situação para o registro de defeitos, e a sessão viva permite reverter (caso de uso D03)."
+            },
+            {
+              "t": "Jogo preso em carregamento",
+              "d": "Fase de carregamento por mais tempo que o limite: a plataforma consulta o status do emulador (caso de uso A01) e, se ele diz rodando, apenas segue esperando e avisa no overlay."
+            }
+          ],
+          "resultado": "Intervenção bloqueada fora de jogo, morte registrada como marco, mestre liberado só quando a cena voltar ao jogo.",
+          "regras": [
+            "RN-02",
+            "RN-05"
           ]
         }
       ]
@@ -1201,27 +1456,32 @@
     {
       "codigo": "DC-13",
       "estado": "detalhada",
-      "texto": "Versão própria do emulador: os dois comandos que faltam, pausar e velocidade, detalhados nos casos de uso A03 e A04; a consulta de comandos disponíveis, no A07, é o terceiro comando a acrescentar."
+      "texto": "Versão própria do emulador: pausar e velocidade detalhados nos casos A03 e A04; a consulta de comandos disponíveis (A07) é o terceiro comando a acrescentar."
     },
     {
       "codigo": "LC-10",
       "estado": "aberta",
-      "texto": "Ambiente de compilação do emulador. Segue aberta; os casos A03, A04 e A07 dependem dela e o A07 define o comportamento enquanto ela não fecha: modo reduzido com o emulador original."
+      "texto": "Ambiente de compilação do emulador. Segue aberta; o caso A07 define o comportamento enquanto não fecha: modo reduzido com o emulador original."
     },
     {
       "codigo": "DC-15",
       "estado": "candidata",
-      "texto": "Numeração dos slots de estado reservados ao mestre, distintos dos do jogador, e tamanho da fila de estados recentes. Pré-condição dos casos A05 e A06; decidir no blueprint."
+      "texto": "Numeração dos slots de estado reservados ao mestre e tamanho da fila. Pré-condição dos casos A05 e A06; decidir no blueprint."
     },
     {
       "codigo": "LC-11",
       "estado": "candidata",
-      "texto": "Confirmação de salvar e recarregar estado: o emulador executa de forma assíncrona e reporta erro na própria tela, não no canal. Os casos A05 e A06 confirmam pelo arquivo e pela releitura do estado; se a versão própria puder devolver o resultado pelo canal, a confirmação fica mais simples."
+      "texto": "Salvar e recarregar estado são assíncronos e reportam erro só na tela do emulador. A05 e A06 confirmam pelo arquivo e pela releitura; devolver o resultado pelo canal simplificaria."
     },
     {
       "codigo": "LC-12",
       "estado": "candidata",
-      "texto": "Volta garantida da velocidade ao normal se a plataforma cair: duração dentro do comando ou vigia no emulador. Exigida pelo caso A04; decidir no blueprint junto com a extensão do canal."
+      "texto": "Volta garantida da velocidade ao normal se a plataforma cair: duração dentro do comando ou vigia no emulador. Exigida pelo caso A04; decidir no blueprint."
+    },
+    {
+      "codigo": "DC-16",
+      "estado": "candidata",
+      "texto": "Formato fechado da situação: linha de descrição, fase da cena numa lista fixa, grau de aperto numa escala fixa. Exigido pelo caso B02; fechar no blueprint."
     }
   ]
 }
