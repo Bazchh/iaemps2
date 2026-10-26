@@ -223,7 +223,7 @@ class Simulador:
     def _salvar_estado(self, slot: int) -> None:
         """Como no emulador: responde OK na hora e grava depois, em duas etapas, sem avisar erro pelo canal."""
         if "salvamento_nunca_aparece" in self.cenarios:
-            pass  # QUEBRA PROPOSITAL PARA PROVAR O CI
+            return
         caminho = self.arquivo_estado(slot)
         if caminho is None:
             return
