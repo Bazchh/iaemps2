@@ -1,0 +1,1227 @@
+{
+  "produto": "IAEmPS2",
+  "subtitulo": "mestre invisível por inteligência artificial para jogos de PlayStation 2 em emulador",
+  "titulo": "Casos de Uso",
+  "kicker": "Especificação funcional · outubro de 2026",
+  "entrega": "Entrega 1: módulo A detalhado. Os demais módulos estão no índice com código fixo e serão detalhados nas próximas entregas, módulo a módulo.",
+  "intro": "Tudo o que o mestre invisível precisa fazer, descrito um a um: quem usa, o que acontece passo a passo, o que fazer quando algo dá errado e o que ganhamos com cada um. Documento complementar ao Mapa do Projeto (revisão 3, aprovado) e ao Blueprint Técnico.",
+  "rodape": "Casos de uso · IAEmPS2",
+  "legenda_motor": "comando ao emulador",
+  "mapa_legenda": "Quem usa o quê. Os módulos A a G são o mestre jogável da fase 1; H põe o mundo em jogo na fase 2; I e J dão as mãos ao mestre na fase 3.",
+  "fechamento_lead": "A fase 1 é o mestre jogável em qualquer jogo, com tela e alavancas do emulador. A fase 2 é o mundo: o perfil de memória do jogo de abertura e o produto para outros jogadores. A fase 3 dá ao mestre as mãos: entidades e controle.",
+  "fases": {
+    "1": {
+      "nome": "mestre jogável em qualquer jogo",
+      "cor": "f1",
+      "resumo": "Abrir um jogo no emulador, abrir a sessão, jogar com o mestre vendo a tela e agindo pelas alavancas do emulador dentro das regras de negócio, ver, pausar, reverter, encerrar."
+    },
+    "2": {
+      "nome": "o mundo muda: perfil de memória e outros jogadores",
+      "cor": "f2",
+      "resumo": "O perfil de memória do jogo de abertura, com ações de mundo entrando no mesmo catálogo; depois perfis compartilháveis e instalação para outros jogadores."
+    },
+    "3": {
+      "nome": "entidades e controle",
+      "cor": "f3",
+      "resumo": "Mover inimigos e personagens no mapa, para jogos com mapa de entidades, e acionar o controle por um gamepad virtual."
+    }
+  },
+  "atores": [
+    {
+      "id": "Jogador",
+      "tipo": "pessoa",
+      "desc": "Abre o emulador com o jogo dele, configura tom e intensidade, joga, vê o que o mestre fez, pausa, reverte e encerra."
+    },
+    {
+      "id": "Mapeador",
+      "tipo": "pessoa",
+      "desc": "Cria o perfil de memória de um jogo: variáveis, faixas, ações e proibições. Importa de fontes públicas, valida contra o jogo e publica versões. Entra na fase 2."
+    },
+    {
+      "id": "Plataforma",
+      "tipo": "pessoa",
+      "rotulo": "Plataforma (rotina)",
+      "desc": "O que o produto faz sozinho: capturar, falar com o emulador, validar, agir, registrar, medir, detectar falha. Inclui o mestre quando ele age por conta própria."
+    },
+    {
+      "id": "Serviço de linguagem",
+      "tipo": "sistema",
+      "desc": "O modelo que lê a tela, descreve a situação e decide alavanca e motivo. Trocável por configuração; nunca guarda estado, nunca aciona o emulador."
+    },
+    {
+      "id": "Emulador",
+      "tipo": "sistema",
+      "desc": "O PCSX2, em versão própria que só estende o canal oficial de comunicação. Roda o jogo e a BIOS do jogador; o produto não distribui nenhum dos dois."
+    },
+    {
+      "id": "Fontes de mapas",
+      "tipo": "sistema",
+      "desc": "Bases públicas de endereços de memória por jogo, mantidas por comunidades. Cobertura e termos de uso variam por título."
+    }
+  ],
+  "regras": [
+    {
+      "codigo": "RN-01",
+      "titulo": "Toda intervenção tem motivo e registro",
+      "texto": "Situação, estado antes, ação, estado depois e o motivo do mestre ficam gravados na sessão viva. Intervenção sem registro não existe.",
+      "obtemos": "mestre auditável."
+    },
+    {
+      "codigo": "RN-02",
+      "titulo": "Dificulta, não derrota",
+      "texto": "O mestre pode apertar o ritmo, acelerar, tirar a trégua. Não pode causar derrota direta nem recarregar um estado para fazer o jogador perder o que ganhou.",
+      "obtemos": "desafio sem roubo."
+    },
+    {
+      "codigo": "RN-03",
+      "titulo": "Progresso e save são intocáveis",
+      "texto": "Cartão de memória e os slots de estado do jogador nunca são tocados. O mestre usa slots reservados a ele, salva antes de qualquer recarga, para que a própria recarga seja reversível, e nunca recarrega sem mostrar.",
+      "obtemos": "conquista com valor."
+    },
+    {
+      "codigo": "RN-04",
+      "titulo": "O jogador vê e pode desfazer",
+      "texto": "Ação e motivo aparecem no overlay no momento em que acontecem. A última ação pode ser revertida e a sessão pausada a qualquer instante.",
+      "obtemos": "o controle fica com o jogador."
+    },
+    {
+      "codigo": "RN-05",
+      "titulo": "Não agir é ação válida",
+      "texto": "Há intervalo mínimo entre intervenções e \"nada\" é uma decisão registrada como qualquer outra.",
+      "obtemos": "ritmo, não ruído."
+    },
+    {
+      "codigo": "RN-06",
+      "titulo": "O mestre só age pelo catálogo",
+      "texto": "O catálogo é a lista de alavancas universais mais, se houver, as ações do perfil de memória; ele nunca vem do texto do serviço de linguagem, e todo valor fica dentro da faixa declarada.",
+      "obtemos": "nenhuma ação cega."
+    },
+    {
+      "codigo": "RN-07",
+      "titulo": "Serviço de linguagem nunca aciona o emulador",
+      "texto": "Ele devolve situação, alavanca e motivo; só a plataforma fala com o emulador, validando contra o catálogo.",
+      "obtemos": "separação testável sem modelo."
+    },
+    {
+      "codigo": "RN-08",
+      "titulo": "Decidir sobre a situação atual",
+      "texto": "A plataforma relê tela e estado antes de agir. Se a situação mudou fora do esperado desde a decisão, a ação é descartada e registrada como tal.",
+      "obtemos": "nenhuma ação sobre situação velha."
+    },
+    {
+      "codigo": "RN-09",
+      "titulo": "O jogo é do jogador",
+      "texto": "Imagem do jogo e BIOS ficam na máquina dele; nunca entram no repositório, nos testes compartilhados nem em qualquer envio. Ao serviço de linguagem vão capturas de tela e o estado resumido, e só isso, com o jogador ciente disso ao abrir a sessão.",
+      "obtemos": "respeito à propriedade e à licença."
+    },
+    {
+      "codigo": "RN-10",
+      "titulo": "Falha é visível e silencia o mestre",
+      "texto": "Serviço fora do ar ou resposta inválida aparece no overlay; sem decisão válida, nenhuma ação acontece; o jogo segue sem o mestre e a sessão retoma.",
+      "obtemos": "nunca parece vivo estando morto."
+    }
+  ],
+  "modulos": [
+    {
+      "letra": "A",
+      "nome": "Ponte com o emulador",
+      "fase": 1,
+      "detalhado": true,
+      "resumo": "O canal oficial do emulador, estendido com o mínimo que falta: conectar, identificar o jogo, pausar, velocidade, estado salvo em slot reservado e, na fase 2, memória.",
+      "casos": [
+        {
+          "codigo": "A01",
+          "nome": "Conectar ao emulador pelo canal oficial",
+          "ator": "Plataforma",
+          "fase": 1,
+          "prioridade": "Essencial",
+          "objetivo": "Ter um canal aberto e confirmado com o emulador em execução, sabendo a versão dele e se o jogo já está rodando, antes de qualquer outra coisa.",
+          "fluxo": [
+            {
+              "t": "Sessão aberta pede conexão",
+              "tipo": "ator"
+            },
+            {
+              "t": "Abre o canal na porta configurada",
+              "tipo": "sistema",
+              "desvio": {
+                "rotulo": "porta fechada",
+                "t": "Avisa que o canal está desligado no emulador",
+                "tipo": "falha"
+              }
+            },
+            {
+              "t": "Pede a versão do emulador",
+              "tipo": "motor"
+            },
+            {
+              "t": "Pede o status até o jogo rodar",
+              "tipo": "motor"
+            },
+            {
+              "t": "Canal pronto, jogo rodando",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Emulador aberto na máquina do jogador, com o canal oficial ligado nas configurações avançadas e a porta conhecida pela plataforma.",
+            "Jogo escolhido pelo jogador já carregado no emulador, ou em carregamento."
+          ],
+          "gatilho": "O jogador abre a sessão (caso de uso E01), ou a plataforma perdeu o canal e tenta reconectar.",
+          "apoio": [
+            "Emulador"
+          ],
+          "principal": [
+            "A plataforma abre uma conexão local com o emulador na porta configurada.",
+            "A plataforma pede a versão do emulador e registra a resposta na sessão viva.",
+            "A plataforma pede o status do emulador: rodando, pausado ou desligado.",
+            "Enquanto o status for \"desligado\" ou o título não responder, a plataforma sonda em intervalos curtos, com um limite de tempo configurado.",
+            "Com o status \"rodando\", a plataforma marca o canal como pronto e segue para identificar o jogo (caso de uso A02)."
+          ],
+          "alternativos": [
+            {
+              "t": "Jogo ainda carregando",
+              "d": "Logo após o lançamento, o emulador responde a versão mas devolve \"desligado\" e erro nos comandos do jogo por alguns segundos. A plataforma trata como carregamento normal e continua sondando até o limite de tempo."
+            },
+            {
+              "t": "Reconexão no meio da sessão",
+              "d": "O canal caiu com a sessão aberta: a plataforma reconecta sem reiniciar a sessão, reavalia o status e, se o jogo em execução for o mesmo, retoma do último registro."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Porta fechada",
+              "d": "Ninguém escuta na porta: o emulador está fechado ou o canal está desligado. A plataforma mostra no overlay como ligar o canal nas configurações avançadas e espera; nada é registrado como intervenção."
+            },
+            {
+              "t": "Limite de tempo sem o jogo rodar",
+              "d": "O emulador responde, mas o status não sai de \"desligado\" dentro do limite. A plataforma informa que não há jogo em execução e aguarda o jogador carregar um."
+            },
+            {
+              "t": "Outro programa na porta",
+              "d": "A resposta à versão não tem o formato do canal oficial. A plataforma recusa, informa o conflito de porta e sugere outra porta nas configurações do emulador."
+            }
+          ],
+          "resultado": "Canal aberto, versão do emulador registrada, jogo em execução. A ponte está pronta para identificar o jogo e receber comandos.",
+          "regras": [
+            "RN-10"
+          ]
+        },
+        {
+          "codigo": "A02",
+          "nome": "Identificar o jogo em execução",
+          "ator": "Plataforma",
+          "fase": 1,
+          "prioridade": "Essencial",
+          "objetivo": "Saber com certeza qual jogo está rodando, por serial e soma de verificação, para montar o catálogo certo e nunca agir sobre o jogo errado.",
+          "fluxo": [
+            {
+              "t": "Canal pronto",
+              "tipo": "ator"
+            },
+            {
+              "t": "Pede título, serial, soma e versão",
+              "tipo": "motor"
+            },
+            {
+              "t": "Procura perfil de memória para o serial",
+              "tipo": "sistema",
+              "desvio": {
+                "rotulo": "sem perfil",
+                "t": "Modo universal: só alavancas do emulador",
+                "tipo": "atencao"
+              }
+            },
+            {
+              "t": "Registra a identificação na sessão",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Jogo identificado, catálogo definido",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Caso de uso A01 concluído com status \"rodando\"."
+          ],
+          "gatilho": "A ponte ficou pronta, ou o emulador trocou de jogo durante a sessão.",
+          "apoio": [
+            "Emulador"
+          ],
+          "principal": [
+            "A plataforma pede ao emulador o título, o serial, a soma de verificação e a versão do jogo em execução.",
+            "A plataforma registra os quatro valores na sessão viva, junto com a versão do emulador.",
+            "A plataforma procura um perfil de memória para aquele serial e soma de verificação.",
+            "Sem perfil, a plataforma entra em modo universal: o catálogo é só o das alavancas do emulador (caso de uso D01).",
+            "A plataforma mostra no overlay o nome do jogo e o modo em que o mestre vai operar."
+          ],
+          "alternativos": [
+            {
+              "t": "Perfil encontrado para o serial",
+              "d": "Na fase 2: a plataforma valida o perfil contra o jogo em execução (caso de uso H04) e, aprovado, acrescenta as ações de mundo ao catálogo."
+            },
+            {
+              "t": "Jogo trocado no meio da sessão",
+              "d": "O serial mudou entre duas sondagens: a plataforma encerra a sessão anterior com resumo, abre outra e identifica de novo. Nenhuma ação do jogo anterior vale para o novo."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Serial ausente",
+              "d": "O emulador devolve serial vazio, como em programas caseiros ou discos não reconhecidos. A plataforma opera em modo universal, avisa no overlay que o jogo não foi identificado e nunca casa perfil por título."
+            },
+            {
+              "t": "Mesmo serial, soma de verificação diferente do perfil",
+              "d": "Versão do jogo diferente da mapeada: a plataforma recusa o perfil, informa a diferença e segue em modo universal até o mapeador validar o perfil para essa versão."
+            }
+          ],
+          "resultado": "Jogo identificado por serial e soma de verificação, modo de operação definido e registrado, overlay informando o jogador.",
+          "regras": [
+            "RN-06"
+          ]
+        },
+        {
+          "codigo": "A03",
+          "nome": "Pausar e retomar a emulação",
+          "ator": "Plataforma",
+          "fase": 1,
+          "prioridade": "Essencial",
+          "objetivo": "Congelar e soltar o jogo por comando, como alavanca do mestre e como proteção do jogador, com confirmação pelo próprio emulador.",
+          "fluxo": [
+            {
+              "t": "Alavanca de pausa validada",
+              "tipo": "ator"
+            },
+            {
+              "t": "Envia pausar pelo canal estendido",
+              "tipo": "motor",
+              "desvio": {
+                "rotulo": "comando ausente",
+                "t": "Alavanca indisponível; mestre segue com as outras",
+                "tipo": "atencao"
+              }
+            },
+            {
+              "t": "Confirma status \"pausado\"",
+              "tipo": "motor"
+            },
+            {
+              "t": "Mostra no overlay e registra",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Retoma ao fim da duração",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Versão própria do emulador em execução, com o comando de pausa no canal (decisão DC-13).",
+            "Caso de uso A02 concluído."
+          ],
+          "gatilho": "O mestre decidiu uma pausa dramática (caso de uso C02) com duração, ou o jogador pediu pausa do mestre que exige congelar o jogo (caso de uso D05).",
+          "apoio": [
+            "Emulador",
+            "Jogador"
+          ],
+          "principal": [
+            "A plataforma recebe a alavanca de pausa já validada contra o catálogo, com a duração em segundos.",
+            "A plataforma envia o comando de pausar pelo canal estendido.",
+            "A plataforma pede o status e só considera a pausa feita quando o emulador responde \"pausado\".",
+            "A plataforma mostra no overlay a pausa e o motivo, e registra estado antes, ação e estado depois.",
+            "Ao fim da duração, a plataforma envia o comando de retomar e confirma o status \"rodando\".",
+            "A plataforma registra a retomada."
+          ],
+          "alternativos": [
+            {
+              "t": "Jogador retoma antes do fim",
+              "d": "O jogador pede para seguir pelo overlay: a plataforma retoma na hora, registra a interrupção e conta a ação como revertida pelo jogador."
+            },
+            {
+              "t": "Jogo já estava pausado pelo próprio jogador",
+              "d": "O status já era \"pausado\" antes do comando: a plataforma não age, registra \"nada\" com o motivo e não retoma por conta própria."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Comando ausente no emulador",
+              "d": "O emulador em execução não é a versão própria e não conhece o comando (caso de uso A07): a alavanca fica marcada indisponível no catálogo e o mestre segue com as outras."
+            },
+            {
+              "t": "Status não muda",
+              "d": "O comando foi aceito mas o status continua \"rodando\" após o tempo de confirmação: a plataforma registra falha da alavanca, não mostra pausa no overlay e não tenta de novo no mesmo ciclo."
+            },
+            {
+              "t": "Canal cai durante a pausa",
+              "d": "A plataforma reconecta (caso de uso A01); se o jogo continuar pausado, retoma assim que o canal voltar, para o jogador nunca ficar preso."
+            }
+          ],
+          "resultado": "Jogo pausado pelo tempo decidido e retomado, com as duas transições confirmadas pelo emulador e registradas.",
+          "regras": [
+            "RN-01",
+            "RN-04",
+            "RN-06"
+          ]
+        },
+        {
+          "codigo": "A04",
+          "nome": "Mudar a velocidade por tempo determinado",
+          "ator": "Plataforma",
+          "fase": 1,
+          "prioridade": "Essencial",
+          "objetivo": "Pôr o jogo em câmera lenta ou em turbo por uma duração definida, com volta garantida à velocidade normal, mesmo se a plataforma cair no meio.",
+          "fluxo": [
+            {
+              "t": "Alavanca de velocidade validada",
+              "tipo": "ator"
+            },
+            {
+              "t": "Envia velocidade e duração pelo canal",
+              "tipo": "motor",
+              "desvio": {
+                "rotulo": "comando ausente",
+                "t": "Alavanca indisponível; mestre segue com as outras",
+                "tipo": "atencao"
+              }
+            },
+            {
+              "t": "Confirma a velocidade em vigor",
+              "tipo": "motor"
+            },
+            {
+              "t": "Mostra no overlay e registra",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Volta ao normal e confirma",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Versão própria do emulador em execução, com o comando de velocidade no canal (decisão DC-13).",
+            "Caso de uso A02 concluído e jogo com status \"rodando\"."
+          ],
+          "gatilho": "O mestre decidiu câmera lenta ou turbo (caso de uso C02), com fator e duração dentro da faixa do catálogo.",
+          "apoio": [
+            "Emulador"
+          ],
+          "principal": [
+            "A plataforma recebe a alavanca validada: fator de velocidade e duração, ambos dentro da faixa declarada no catálogo.",
+            "A plataforma envia o comando de velocidade com o fator e a duração pelo canal estendido.",
+            "A plataforma confirma com o emulador a velocidade em vigor.",
+            "A plataforma mostra no overlay a mudança e o motivo, e registra estado antes, ação e estado depois.",
+            "Ao fim da duração, a velocidade volta ao normal; a plataforma confirma e registra a volta."
+          ],
+          "alternativos": [
+            {
+              "t": "Jogador reverte antes do fim",
+              "d": "A plataforma manda a volta ao normal na hora, confirma e registra a ação como revertida pelo jogador (caso de uso D03)."
+            },
+            {
+              "t": "Nova decisão de velocidade durante uma em vigor",
+              "d": "O intervalo mínimo entre intervenções (caso de uso D04) impede que se acumulem; a nova decisão espera a volta ao normal ou é descartada e registrada."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Comando ausente no emulador",
+              "d": "Emulador sem o comando (caso de uso A07): alavanca marcada indisponível, mestre segue com as outras."
+            },
+            {
+              "t": "Plataforma cai com a velocidade alterada",
+              "d": "O jogo não pode ficar lento ou acelerado para sempre: a volta ao normal tem de acontecer sem a plataforma, seja porque a duração vai dentro do comando, seja por um vigia no emulador. Qual dos dois é decisão do blueprint; a ficha exige o resultado."
+            },
+            {
+              "t": "Velocidade confirmada diferente da pedida",
+              "d": "O emulador aplicou outro fator, por limite próprio: a plataforma registra o fator real, mostra o real no overlay e ajusta a faixa do catálogo para a próxima decisão."
+            }
+          ],
+          "resultado": "Velocidade alterada pelo tempo decidido e devolvida ao normal, com as duas transições confirmadas e registradas.",
+          "regras": [
+            "RN-01",
+            "RN-04",
+            "RN-06"
+          ]
+        },
+        {
+          "codigo": "A05",
+          "nome": "Salvar estado em slot reservado",
+          "ator": "Plataforma",
+          "fase": 1,
+          "prioridade": "Essencial",
+          "objetivo": "Guardar o estado atual do jogo num slot que pertence ao mestre, com confirmação de que o arquivo foi gravado, sem nunca tocar nos slots do jogador.",
+          "fluxo": [
+            {
+              "t": "Ponto de salvamento decidido",
+              "tipo": "ator"
+            },
+            {
+              "t": "Escolhe o slot reservado mais antigo",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Envia salvar estado no slot",
+              "tipo": "motor"
+            },
+            {
+              "t": "Confirma o arquivo gravado",
+              "tipo": "sistema",
+              "desvio": {
+                "rotulo": "arquivo não apareceu",
+                "t": "Salvamento não contado; tenta no ciclo seguinte",
+                "tipo": "falha"
+              }
+            },
+            {
+              "t": "Estado reservado disponível",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Caso de uso A02 concluído e jogo com status \"rodando\".",
+            "Slots reservados ao mestre configurados, distintos dos slots que o jogador usa; a numeração é decisão do blueprint."
+          ],
+          "gatilho": "Salvamento periódico da sessão, ou salvamento obrigatório antes de uma recarga (caso de uso A06).",
+          "apoio": [
+            "Emulador"
+          ],
+          "principal": [
+            "A plataforma escolhe, entre os slots reservados, o mais antigo, para manter uma fila de estados recentes.",
+            "A plataforma envia o comando de salvar estado nesse slot.",
+            "Como o emulador salva de forma assíncrona e reporta erro só na própria tela, a plataforma não trata a resposta do comando como confirmação.",
+            "A plataforma confirma o salvamento pelo arquivo de estado do slot: existe e tem data posterior ao comando.",
+            "A plataforma registra o slot, a data e a situação do jogo naquele momento, para que a recarga tenha contexto."
+          ],
+          "alternativos": [
+            {
+              "t": "Jogo pausado no momento do salvamento",
+              "d": "O salvamento vale igual; a plataforma registra que o estado foi tomado em pausa."
+            },
+            {
+              "t": "Fila de slots cheia",
+              "d": "Comportamento normal: o mais antigo é sobrescrito. A plataforma registra qual estado deixou de existir."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Arquivo não apareceu no tempo de confirmação",
+              "d": "O salvamento não conta. A plataforma registra a falha, não oferece esse slot para recarga e tenta de novo no ciclo seguinte; três falhas seguidas marcam a alavanca de recarga como indisponível e avisam no overlay."
+            },
+            {
+              "t": "Slot reservado coincide com slot do jogador",
+              "d": "Configuração inválida: a plataforma recusa qualquer salvamento até a configuração ser corrigida, para nunca sobrescrever estado do jogador."
+            }
+          ],
+          "resultado": "Estado do jogo gravado num slot do mestre, confirmado pelo arquivo, com contexto registrado. Nada do jogador foi tocado.",
+          "regras": [
+            "RN-03"
+          ]
+        },
+        {
+          "codigo": "A06",
+          "nome": "Recarregar estado reservado",
+          "ator": "Plataforma",
+          "fase": 1,
+          "prioridade": "Essencial",
+          "objetivo": "Devolver o jogo a um estado recente do mestre, de forma reversível e visível para o jogador.",
+          "fluxo": [
+            {
+              "t": "Alavanca de recarga validada",
+              "tipo": "ator"
+            },
+            {
+              "t": "Salva o estado atual antes (A05)",
+              "tipo": "motor",
+              "desvio": {
+                "rotulo": "salvamento falhou",
+                "t": "Recarga cancelada e registrada",
+                "tipo": "falha"
+              }
+            },
+            {
+              "t": "Mostra no overlay o que vai acontecer",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Envia recarregar o slot pedido",
+              "tipo": "motor"
+            },
+            {
+              "t": "Confirma status e registra",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Pelo menos um estado reservado confirmado pelo caso de uso A05.",
+            "A alavanca de recarga validada pelo catálogo, inclusive pela regra de nunca desfazer conquista."
+          ],
+          "gatilho": "O mestre decidiu devolver o jogador a um momento recente (caso de uso C02), ou o jogador reverteu uma recarga (caso de uso D03).",
+          "apoio": [
+            "Emulador",
+            "Jogador"
+          ],
+          "principal": [
+            "A plataforma recebe a alavanca validada, com o slot reservado de destino.",
+            "A plataforma salva o estado atual num slot reservado (caso de uso A05) e só continua com a confirmação do arquivo.",
+            "A plataforma mostra no overlay o que vai acontecer e o motivo, antes da recarga.",
+            "A plataforma envia o comando de recarregar o slot de destino.",
+            "A plataforma confirma pelo status e por uma releitura do estado.",
+            "A plataforma registra antes, slot, depois e motivo, e guarda o slot do passo 2 como caminho de volta."
+          ],
+          "alternativos": [
+            {
+              "t": "Jogador desfaz a recarga",
+              "d": "A plataforma recarrega o slot guardado no passo 2, confirma e registra a reversão, sem novo salvamento antes."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Salvamento prévio falhou",
+              "d": "Sem caminho de volta não há recarga: a plataforma cancela, registra a decisão como não executada e informa o mestre."
+            },
+            {
+              "t": "Recarga falhou sem retorno pelo canal",
+              "d": "O emulador reporta erro na própria tela, não no canal. Se status e releitura mostram que nada mudou, a plataforma registra a falha, mostra no overlay e marca o slot como suspeito."
+            }
+          ],
+          "resultado": "Jogo devolvido ao estado escolhido, com o estado anterior guardado para desfazer, tudo mostrado e registrado.",
+          "regras": [
+            "RN-02",
+            "RN-03",
+            "RN-04",
+            "RN-08"
+          ],
+          "sequencia": {
+            "colunas": [
+              "Plataforma",
+              "Emulador",
+              "Overlay (jogador)"
+            ],
+            "passos": [
+              {
+                "de": 0,
+                "para": 1,
+                "t": "salvar estado no slot reservado de volta"
+              },
+              {
+                "de": 0,
+                "para": 0,
+                "t": "confirma o arquivo gravado"
+              },
+              {
+                "de": 0,
+                "para": 2,
+                "t": "mostra: vai recarregar, e o motivo"
+              },
+              {
+                "de": 0,
+                "para": 1,
+                "t": "recarregar o slot de destino"
+              },
+              {
+                "de": 1,
+                "para": 0,
+                "t": "status rodando, estado do slot",
+                "tracejado": true
+              },
+              {
+                "de": 0,
+                "para": 0,
+                "t": "registra antes, ação, depois, motivo"
+              },
+              {
+                "de": 2,
+                "para": 0,
+                "t": "desfazer (opcional)",
+                "tracejado": true
+              },
+              {
+                "de": 0,
+                "para": 1,
+                "t": "recarregar o slot de volta"
+              }
+            ],
+            "legenda": "Recarga sempre com caminho de volta. O salvamento prévio é confirmado pelo arquivo, não pela resposta do canal, e o overlay mostra antes de o jogo mudar."
+          }
+        },
+        {
+          "codigo": "A07",
+          "nome": "Detectar emulador sem os comandos estendidos",
+          "ator": "Plataforma",
+          "fase": 1,
+          "prioridade": "Importante",
+          "objetivo": "Saber se o emulador em execução é a versão própria ou a original, e ajustar o catálogo em vez de falhar, para o mestre funcionar com o que houver.",
+          "fluxo": [
+            {
+              "t": "Canal pronto",
+              "tipo": "ator"
+            },
+            {
+              "t": "Pergunta quais comandos estendidos existem",
+              "tipo": "motor"
+            },
+            {
+              "t": "Marca pausa e velocidade disponíveis ou não",
+              "tipo": "sistema",
+              "desvio": {
+                "rotulo": "emulador original",
+                "t": "Catálogo só com estado salvo e recarga",
+                "tipo": "atencao"
+              }
+            },
+            {
+              "t": "Informa o modo no overlay",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Catálogo coerente com o emulador",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Caso de uso A01 concluído."
+          ],
+          "gatilho": "A ponte ficou pronta, ou o emulador foi reiniciado durante a sessão.",
+          "apoio": [
+            "Emulador"
+          ],
+          "principal": [
+            "A plataforma pergunta ao emulador, por um comando próprio da versão estendida, quais comandos além do canal oficial ele oferece.",
+            "A plataforma marca no catálogo cada alavanca como disponível ou indisponível conforme a resposta.",
+            "A plataforma informa no overlay o modo: completo, com pausa e velocidade, ou reduzido, só com estado salvo e recarga.",
+            "A plataforma registra a versão do emulador e o modo na sessão viva."
+          ],
+          "alternativos": [
+            {
+              "t": "Versão própria mais antiga que a plataforma",
+              "d": "Parte dos comandos existe: a plataforma usa os que respondem e marca os demais indisponíveis, sem recusar a sessão."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Emulador original, sem comando de consulta",
+              "d": "O comando de consulta devolve \"não implementado\": é o emulador original. A plataforma entra em modo reduzido, avisa no overlay e indica onde obter a versão própria."
+            },
+            {
+              "t": "Emulador responde, mas comando estendido falha ao ser usado",
+              "d": "Consulta disse que existe e o uso falhou: a plataforma marca a alavanca indisponível a partir daí e registra a divergência para o registro de defeitos."
+            }
+          ],
+          "resultado": "Catálogo coerente com o emulador em execução, modo informado ao jogador e registrado. O mestre nunca decide uma alavanca que o emulador não tem.",
+          "regras": [
+            "RN-06",
+            "RN-10"
+          ]
+        },
+        {
+          "codigo": "A08",
+          "nome": "Ler e escrever memória pelo canal",
+          "ator": "Plataforma",
+          "fase": 2,
+          "prioridade": "Essencial",
+          "objetivo": "Ler e escrever variáveis do jogo nos endereços declarados pelo perfil de memória, pelo canal oficial, sem varredura e sem nenhum endereço fora do perfil.",
+          "fluxo": [
+            {
+              "t": "Variável do perfil pedida",
+              "tipo": "ator"
+            },
+            {
+              "t": "Confere endereço, tipo e faixa no perfil",
+              "tipo": "sistema",
+              "desvio": {
+                "rotulo": "fora do perfil",
+                "t": "Recusa e registra",
+                "tipo": "falha"
+              }
+            },
+            {
+              "t": "Lê ou escreve pelo canal",
+              "tipo": "motor"
+            },
+            {
+              "t": "Relê e confere o valor",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Valor lido ou escrito, registrado",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Perfil de memória validado para o jogo em execução (caso de uso H04).",
+            "Caso de uso A02 concluído com o perfil casado por serial e soma de verificação."
+          ],
+          "gatilho": "A plataforma precisa do valor de uma variável para montar o estado, ou uma ação de mundo validada pede uma escrita (caso de uso H07).",
+          "apoio": [
+            "Emulador"
+          ],
+          "principal": [
+            "A plataforma recebe o nome da variável e, em escrita, o valor desejado.",
+            "A plataforma resolve o nome no perfil: endereço, tipo e faixa válida. Nome fora do perfil é recusado.",
+            "Em escrita, a plataforma confere que o valor está na faixa e relê o valor atual antes de escrever, para decidir sobre o estado presente.",
+            "A plataforma envia o comando de leitura ou escrita do tamanho certo pelo canal.",
+            "A plataforma relê o endereço e confere o valor; em escrita, valor diferente do pedido é falha.",
+            "A plataforma registra variável, endereço, valor antes, valor depois e o caso de uso que pediu."
+          ],
+          "alternativos": [
+            {
+              "t": "Leitura em lote para montar o estado",
+              "d": "Várias variáveis do perfil são lidas no mesmo ciclo, uma a uma pelo canal, e o estado é montado só quando todas responderem; uma falha invalida o estado inteiro desse ciclo."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Nome fora do perfil ou valor fora da faixa",
+              "d": "Recusa antes de qualquer comando; registro com o pedido recusado e o motivo."
+            },
+            {
+              "t": "Valor relido diferente do escrito",
+              "d": "O jogo sobrescreveu ou o endereço não é o esperado: a plataforma registra a divergência, marca a variável como suspeita e suspende as ações de mundo que dependem dela até o mapeador revalidar (caso de uso H04)."
+            },
+            {
+              "t": "Valor atual mudou entre a decisão e a escrita",
+              "d": "Situação velha: a ação é descartada e registrada, sem escrever."
+            }
+          ],
+          "resultado": "Variável lida ou escrita com conferência, dentro do perfil e da faixa, com registro completo. Nenhum endereço fora do perfil foi tocado.",
+          "regras": [
+            "RN-06",
+            "RN-07",
+            "RN-08"
+          ]
+        }
+      ]
+    },
+    {
+      "letra": "B",
+      "nome": "Tela e situação",
+      "fase": 1,
+      "detalhado": false,
+      "resumo": "Capturar a janela do jogo e transformar em situação: onde o jogador está, o que enfrenta, se está parado, perdido ou dominando.",
+      "casos": [
+        {
+          "codigo": "B01",
+          "nome": "Capturar a janela do jogo",
+          "ator": "Plataforma",
+          "fase": 1,
+          "prioridade": "Essencial",
+          "apoio": [
+            "Emulador"
+          ]
+        },
+        {
+          "codigo": "B02",
+          "nome": "Descrever a situação em uma linha",
+          "ator": "Plataforma",
+          "fase": 1,
+          "prioridade": "Essencial",
+          "apoio": [
+            "Serviço de linguagem"
+          ]
+        },
+        {
+          "codigo": "B03",
+          "nome": "Detectar mudança de situação entre capturas",
+          "ator": "Plataforma",
+          "fase": 1,
+          "prioridade": "Importante"
+        },
+        {
+          "codigo": "B04",
+          "nome": "Reconhecer tela fora de jogo",
+          "ator": "Plataforma",
+          "fase": 1,
+          "prioridade": "Importante",
+          "apoio": [
+            "Serviço de linguagem"
+          ]
+        }
+      ]
+    },
+    {
+      "letra": "C",
+      "nome": "Mestre",
+      "fase": 1,
+      "detalhado": false,
+      "resumo": "Observar situação e estado, decidir uma alavanca e um motivo, respeitar o ritmo. Tom e intensidade configuráveis antes da sessão.",
+      "casos": [
+        {
+          "codigo": "C01",
+          "nome": "Configurar tom e intensidade do mestre",
+          "ator": "Jogador",
+          "fase": 1,
+          "prioridade": "Essencial"
+        },
+        {
+          "codigo": "C02",
+          "nome": "Decidir a intervenção",
+          "ator": "Plataforma",
+          "fase": 1,
+          "prioridade": "Essencial",
+          "apoio": [
+            "Serviço de linguagem"
+          ]
+        },
+        {
+          "codigo": "C03",
+          "nome": "Decidir não agir",
+          "ator": "Plataforma",
+          "fase": 1,
+          "prioridade": "Essencial",
+          "apoio": [
+            "Serviço de linguagem"
+          ]
+        },
+        {
+          "codigo": "C04",
+          "nome": "Explicar o motivo em uma frase",
+          "ator": "Plataforma",
+          "fase": 1,
+          "prioridade": "Essencial",
+          "apoio": [
+            "Serviço de linguagem"
+          ]
+        },
+        {
+          "codigo": "C05",
+          "nome": "Manter memória curta da sessão",
+          "ator": "Plataforma",
+          "fase": 1,
+          "prioridade": "Importante"
+        }
+      ]
+    },
+    {
+      "letra": "D",
+      "nome": "Alavancas e limites",
+      "fase": 1,
+      "detalhado": false,
+      "resumo": "O catálogo universal: pausa, câmera lenta, turbo, estado salvo e recarga. Faixas, intervalo mínimo, reversão da última ação.",
+      "casos": [
+        {
+          "codigo": "D01",
+          "nome": "Montar o catálogo de alavancas",
+          "ator": "Plataforma",
+          "fase": 1,
+          "prioridade": "Essencial"
+        },
+        {
+          "codigo": "D02",
+          "nome": "Executar uma alavanca com validação",
+          "ator": "Plataforma",
+          "fase": 1,
+          "prioridade": "Essencial",
+          "apoio": [
+            "Emulador"
+          ]
+        },
+        {
+          "codigo": "D03",
+          "nome": "Reverter a última ação",
+          "ator": "Jogador",
+          "fase": 1,
+          "prioridade": "Essencial",
+          "apoio": [
+            "Emulador"
+          ]
+        },
+        {
+          "codigo": "D04",
+          "nome": "Aplicar intervalo mínimo entre intervenções",
+          "ator": "Plataforma",
+          "fase": 1,
+          "prioridade": "Essencial"
+        },
+        {
+          "codigo": "D05",
+          "nome": "Pausar e retomar o mestre",
+          "ator": "Jogador",
+          "fase": 1,
+          "prioridade": "Essencial"
+        }
+      ]
+    },
+    {
+      "letra": "E",
+      "nome": "Sessão e overlay",
+      "fase": 1,
+      "detalhado": false,
+      "resumo": "Abrir a sessão com qualquer jogo, mostrar situação, ação e motivo na tela, pausar, retomar, encerrar com resumo.",
+      "casos": [
+        {
+          "codigo": "E01",
+          "nome": "Abrir a sessão",
+          "ator": "Jogador",
+          "fase": 1,
+          "prioridade": "Essencial",
+          "apoio": [
+            "Emulador"
+          ]
+        },
+        {
+          "codigo": "E02",
+          "nome": "Avisar o que sai da máquina",
+          "ator": "Plataforma",
+          "fase": 1,
+          "prioridade": "Essencial"
+        },
+        {
+          "codigo": "E03",
+          "nome": "Mostrar o overlay sobre o jogo",
+          "ator": "Plataforma",
+          "fase": 1,
+          "prioridade": "Essencial"
+        },
+        {
+          "codigo": "E04",
+          "nome": "Encerrar a sessão com resumo",
+          "ator": "Jogador",
+          "fase": 1,
+          "prioridade": "Essencial"
+        },
+        {
+          "codigo": "E05",
+          "nome": "Retomar sessão interrompida",
+          "ator": "Plataforma",
+          "fase": 1,
+          "prioridade": "Importante"
+        }
+      ]
+    },
+    {
+      "letra": "F",
+      "nome": "Registro",
+      "fase": 1,
+      "detalhado": false,
+      "resumo": "Toda captura, decisão e intervenção gravadas com estado antes, ação, estado depois e motivo. Reproduzível e exportável.",
+      "casos": [
+        {
+          "codigo": "F01",
+          "nome": "Registrar ciclo de observação e decisão",
+          "ator": "Plataforma",
+          "fase": 1,
+          "prioridade": "Essencial"
+        },
+        {
+          "codigo": "F02",
+          "nome": "Registrar intervenção com estado antes e depois",
+          "ator": "Plataforma",
+          "fase": 1,
+          "prioridade": "Essencial"
+        },
+        {
+          "codigo": "F03",
+          "nome": "Reproduzir uma sessão pelo registro",
+          "ator": "Mapeador",
+          "fase": 1,
+          "prioridade": "Importante"
+        },
+        {
+          "codigo": "F04",
+          "nome": "Exportar o registro da sessão",
+          "ator": "Jogador",
+          "fase": 1,
+          "prioridade": "Desejável"
+        }
+      ]
+    },
+    {
+      "letra": "G",
+      "nome": "Processos automáticos",
+      "fase": 1,
+      "detalhado": false,
+      "resumo": "Medir custo e latência, tratar falha do serviço de linguagem e do emulador, manter a versão própria do emulador alinhada ao original.",
+      "casos": [
+        {
+          "codigo": "G01",
+          "nome": "Medir custo e latência por sessão",
+          "ator": "Plataforma",
+          "fase": 1,
+          "prioridade": "Essencial"
+        },
+        {
+          "codigo": "G02",
+          "nome": "Tratar recusa ou falha do serviço de linguagem",
+          "ator": "Plataforma",
+          "fase": 1,
+          "prioridade": "Essencial",
+          "apoio": [
+            "Serviço de linguagem"
+          ]
+        },
+        {
+          "codigo": "G03",
+          "nome": "Tratar queda do emulador",
+          "ator": "Plataforma",
+          "fase": 1,
+          "prioridade": "Essencial",
+          "apoio": [
+            "Emulador"
+          ]
+        },
+        {
+          "codigo": "G04",
+          "nome": "Rodar a bancada de situações sintéticas",
+          "ator": "Plataforma",
+          "fase": 1,
+          "prioridade": "Importante",
+          "apoio": [
+            "Serviço de linguagem"
+          ]
+        }
+      ]
+    },
+    {
+      "letra": "H",
+      "nome": "Perfil de memória",
+      "fase": 2,
+      "detalhado": false,
+      "resumo": "A camada que muda o mundo, por jogo: inimigo que aparece, recurso que some, item onde não existia. Endereços, faixas, ações de mundo.",
+      "casos": [
+        {
+          "codigo": "H01",
+          "nome": "Criar perfil de memória à mão",
+          "ator": "Mapeador",
+          "fase": 2,
+          "prioridade": "Essencial"
+        },
+        {
+          "codigo": "H02",
+          "nome": "Importar variáveis de fonte pública",
+          "ator": "Mapeador",
+          "fase": 2,
+          "prioridade": "Importante",
+          "apoio": [
+            "Fontes de mapas"
+          ]
+        },
+        {
+          "codigo": "H03",
+          "nome": "Descobrir variáveis com assistência",
+          "ator": "Mapeador",
+          "fase": 2,
+          "prioridade": "Importante",
+          "apoio": [
+            "Serviço de linguagem",
+            "Emulador"
+          ]
+        },
+        {
+          "codigo": "H04",
+          "nome": "Validar o perfil contra o jogo em execução",
+          "ator": "Plataforma",
+          "fase": 2,
+          "prioridade": "Essencial",
+          "apoio": [
+            "Emulador"
+          ]
+        },
+        {
+          "codigo": "H05",
+          "nome": "Definir ações de mundo e proibições",
+          "ator": "Mapeador",
+          "fase": 2,
+          "prioridade": "Essencial"
+        },
+        {
+          "codigo": "H06",
+          "nome": "Publicar e importar perfil",
+          "ator": "Mapeador",
+          "fase": 2,
+          "prioridade": "Importante"
+        },
+        {
+          "codigo": "H07",
+          "nome": "Executar ação de mundo",
+          "ator": "Plataforma",
+          "fase": 2,
+          "prioridade": "Essencial",
+          "apoio": [
+            "Emulador"
+          ]
+        }
+      ]
+    },
+    {
+      "letra": "I",
+      "nome": "Entidades e mundo",
+      "fase": 3,
+      "detalhado": false,
+      "resumo": "Posição de inimigos e personagens: aproximar, afastar, reunir. Exige mapa de entidades por jogo.",
+      "casos": [
+        {
+          "codigo": "I01",
+          "nome": "Mapear entidades do jogo",
+          "ator": "Mapeador",
+          "fase": 3,
+          "prioridade": "Importante",
+          "apoio": [
+            "Emulador"
+          ]
+        },
+        {
+          "codigo": "I02",
+          "nome": "Aproximar, afastar ou reunir entidades",
+          "ator": "Plataforma",
+          "fase": 3,
+          "prioridade": "Importante",
+          "apoio": [
+            "Emulador"
+          ]
+        }
+      ]
+    },
+    {
+      "letra": "J",
+      "nome": "Controle virtual",
+      "fase": 3,
+      "detalhado": false,
+      "resumo": "O mestre aciona o controle por um gamepad virtual. Outro tipo de intervenção, com regras próprias.",
+      "casos": [
+        {
+          "codigo": "J01",
+          "nome": "Acionar o controle virtual",
+          "ator": "Plataforma",
+          "fase": 3,
+          "prioridade": "Desejável",
+          "apoio": [
+            "Emulador"
+          ]
+        },
+        {
+          "codigo": "J02",
+          "nome": "Limitar intervenções por controle",
+          "ator": "Plataforma",
+          "fase": 3,
+          "prioridade": "Desejável"
+        }
+      ]
+    }
+  ],
+  "pendencias": [
+    {
+      "codigo": "DC-13",
+      "estado": "detalhada",
+      "texto": "Versão própria do emulador: os dois comandos que faltam, pausar e velocidade, detalhados nos casos de uso A03 e A04; a consulta de comandos disponíveis, no A07, é o terceiro comando a acrescentar."
+    },
+    {
+      "codigo": "LC-10",
+      "estado": "aberta",
+      "texto": "Ambiente de compilação do emulador. Segue aberta; os casos A03, A04 e A07 dependem dela e o A07 define o comportamento enquanto ela não fecha: modo reduzido com o emulador original."
+    },
+    {
+      "codigo": "DC-15",
+      "estado": "candidata",
+      "texto": "Numeração dos slots de estado reservados ao mestre, distintos dos do jogador, e tamanho da fila de estados recentes. Pré-condição dos casos A05 e A06; decidir no blueprint."
+    },
+    {
+      "codigo": "LC-11",
+      "estado": "candidata",
+      "texto": "Confirmação de salvar e recarregar estado: o emulador executa de forma assíncrona e reporta erro na própria tela, não no canal. Os casos A05 e A06 confirmam pelo arquivo e pela releitura do estado; se a versão própria puder devolver o resultado pelo canal, a confirmação fica mais simples."
+    },
+    {
+      "codigo": "LC-12",
+      "estado": "candidata",
+      "texto": "Volta garantida da velocidade ao normal se a plataforma cair: duração dentro do comando ou vigia no emulador. Exigida pelo caso A04; decidir no blueprint junto com a extensão do canal."
+    }
+  ]
+}
