@@ -21,15 +21,14 @@
   h3 { font-size: 12.5pt; margin: 0 0 3px; }
   .lead { font-size: 11.5pt; color: var(--text); max-width: 150mm; margin-bottom: 12px; }
   p { margin: 0 0 6px; }
-  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 14px 0; }
-  .stat { background: var(--bg-card); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; break-inside: avoid; }
-  .stat .big { font-size: 26pt; line-height: 1; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 8px 0; }
+  .stat { background: var(--bg-card); border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; break-inside: avoid; }
+  .stat .big { font-size: 22pt; line-height: 1; }
   .stat .lbl { font-size: 9pt; color: var(--muted); margin-top: 4px; }
   .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
   .grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .card { background: var(--bg-card); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; border-top: 3px solid var(--line); break-inside: avoid; }
   .grid3 .card { padding: 7px 10px; } .grid3 .card p { font-size: 8.6pt; line-height: 1.38; } .grid3 .card .meta { margin-bottom: 2px; } .grid3 .card h3 { font-size: 11.5pt; }
-  .stats .stat { padding: 7px 12px; } .stats .big { font-size: 22pt; }
   .card .code { font-family: Consolas, monospace; font-size: 8pt; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; }
   .card h3 { margin-top: 2px; }
   .card .meta { font-family: Consolas, monospace; font-size: 8pt; color: var(--accent); margin: 2px 0 5px; }
@@ -37,12 +36,14 @@
   .f1 { border-top-color: var(--f1); } .f2 { border-top-color: var(--f2); } .f3 { border-top-color: var(--f3); }
   .pill { display: inline-block; font-family: Consolas, monospace; font-size: 7.5pt; padding: 1px 7px; border-radius: 10px; border: 1px solid; margin-right: 3px; vertical-align: middle; white-space: nowrap; }
   .pill.ok { color: var(--f3); border-color: var(--f3); background: #e8f7ee; }
+  .pill.rev { color: var(--f1); border-color: var(--f1); background: #eaf0ff; }
   .pill.prop { color: var(--amber); border-color: var(--amber); background: #fff6e0; }
   table { width: 100%; border-collapse: collapse; font-size: 9.3pt; }
   th { text-align: left; font-family: Consolas, monospace; font-size: 7.5pt; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; background: #e9edf4; padding: 6px 8px; }
   td { padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
   tr { break-inside: avoid; }
   td.code { font-family: Consolas, monospace; color: var(--accent); white-space: nowrap; }
+  td.code .pill { display: block; width: fit-content; margin-top: 4px; }
   table.tight td { padding: 4px 6px; } table.tight th { padding: 5px 6px; }
   .rules { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .rule { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; display: grid; grid-template-columns: 44px 1fr; gap: 8px; break-inside: avoid; }
@@ -87,90 +88,90 @@
 
 <!-- ============ CAPA ============ -->
 <section>
-  <div class="kicker">Mapa do projeto · outubro de 2026</div>
+  <div class="kicker">Mapa do projeto · outubro de 2026 · revisão 1</div>
   <h1>IAEmPS2</h1>
-  <p class="lead" style="margin-bottom:8px">Um mestre invisível por inteligência artificial para jogos de PlayStation 2 em emulador. Ele observa a partida pela memória do emulador e intervém, dentro de limites declarados por jogo, para a experiência ficar mais viva: alivia no perigo real, aperta quando o jogador domina, e muitas vezes não faz nada. Referência de visão, escopo, decisões e roteiro; Casos de Uso e Blueprint Técnico derivam dele.</p>
-  <div class="note" style="max-width:150mm;margin-bottom:4px;padding:7px 12px;font-size:8.9pt"><b>Nome provisório.</b> "IAEmPS2" é o nome da pasta do protótipo e segue como nome de trabalho; trocar é decisão do cliente e não altera nada além do título. <b>Origem.</b> Protótipo sobre Final Fantasy XII, de fevereiro a março de 2026; o que provou e ensinou está na seção Origem.</div>
+  <p class="lead" style="margin-bottom:8px">Um mestre invisível por inteligência artificial para jogos de PlayStation 2 em emulador. Ele vê a tela, lê o estado da partida e intervém pelas alavancas do próprio emulador, dentro de limites declarados, para a experiência ficar mais viva: alivia no perigo real, aperta quando o jogador domina, e muitas vezes não faz nada. Referência de visão, escopo, decisões e roteiro; Casos de Uso e Blueprint Técnico derivam dele.</p>
+  <div class="note" style="max-width:150mm;margin-bottom:4px;padding:7px 12px;font-size:8.9pt"><b>Nome provisório.</b> "IAEmPS2" é o nome da pasta do protótipo e segue como nome de trabalho; trocar é decisão do cliente. <b>Revisão 1, 26 de outubro de 2026:</b> a pedido do cliente, a fase 1 passa a ser tela mais alavancas do emulador, com perfil de memória como camada opcional; Final Fantasy XII sai do escopo; versão própria mínima do emulador decidida; lacunas LC-02 e LC-03 fechadas.</div>
 
-  <div class="stats" style="margin:8px 0">
+  <div class="stats">
     <div class="stat"><div class="big">10</div><div class="lbl">módulos funcionais</div></div>
     <div class="stat"><div class="big">3</div><div class="lbl">fases de entrega</div></div>
     <div class="stat"><div class="big">10</div><div class="lbl">regras de negócio</div></div>
-    <div class="stat"><div class="big">12</div><div class="lbl">decisões, 3 fechadas e 9 propostas</div></div>
+    <div class="stat"><div class="big">14</div><div class="lbl">decisões, 8 fechadas e 6 propostas</div></div>
   </div>
 
   <div class="grid3">
-    <div class="card f1"><div class="code">Módulo A</div><h3>Emulador e memória</h3><div class="meta">fase 1</div><p>A ponte com o emulador: localizar a memória do jogo pela interface oficial, identificar o jogo em execução, ler e escrever com segurança.</p></div>
-    <div class="card f1"><div class="code">Módulo B</div><h3>Perfil de jogo</h3><div class="meta">fase 1</div><p>O mapa de significado de cada jogo: variáveis com endereço, tipo, faixa e rótulo, ações permitidas e o que nunca tocar. Criado, importado, validado e versionado.</p></div>
-    <div class="card f1"><div class="code">Módulo C</div><h3>Mestre</h3><div class="meta">fase 1</div><p>Observar o estado, decidir uma ação e um motivo, respeitar o ritmo. Tom e intensidade configuráveis antes da sessão.</p></div>
-    <div class="card f1"><div class="code">Módulo D</div><h3>Ações e limites</h3><div class="meta">fase 1</div><p>O catálogo de ações derivado do perfil, a validação de faixa, o intervalo mínimo, a reversão da última ação e a pausa.</p></div>
-    <div class="card f1"><div class="code">Módulo E</div><h3>Sessão e overlay</h3><div class="meta">fase 1</div><p>Abrir a sessão com um perfil, mostrar estado, ação e motivo na tela, pausar, retomar, encerrar com resumo.</p></div>
-    <div class="card f1"><div class="code">Módulo F</div><h3>Registro</h3><div class="meta">fase 1</div><p>Toda observação e intervenção gravadas com estado antes, ação, estado depois e motivo. Reproduzível e exportável.</p></div>
-    <div class="card f1"><div class="code">Módulo G</div><h3>Processos automáticos</h3><div class="meta">fase 1</div><p>Validar o perfil contra o jogo em execução, medir custo e latência, tratar falha do serviço de linguagem e do emulador.</p></div>
-    <div class="card f2"><div class="code">Módulo H</div><h3>Catálogo de perfis</h3><div class="meta">fase 2</div><p>Perfis compartilháveis entre jogadores, descoberta assistida de variáveis e importação de fontes públicas de mapas.</p></div>
-    <div class="card f2"><div class="code">Módulo I</div><h3>Entidades e mundo</h3><div class="meta">fase 2</div><p>Posição de inimigos e personagens: aproximar, afastar, reunir. Exige mapa de entidades por jogo.</p></div>
-    <div class="card f3"><div class="code">Módulo J</div><h3>Visão e controle</h3><div class="meta">fase 3</div><p>O mestre vê a tela e aciona o controle. Outro tipo de intervenção, só depois que as anteriores estiverem provadas.</p></div>
+    <div class="card f1"><div class="code">Módulo A</div><h3>Ponte com o emulador</h3><div class="meta">fase 1</div><p>O canal oficial do emulador, estendido com o mínimo que falta: pausar e velocidade. Identificar o jogo, salvar e recarregar estado, ler memória.</p></div>
+    <div class="card f1"><div class="code">Módulo B</div><h3>Tela e situação</h3><div class="meta">fase 1</div><p>Capturar a janela do jogo e transformar em situação: onde o jogador está, o que enfrenta, se está parado, perdido ou dominando.</p></div>
+    <div class="card f1"><div class="code">Módulo C</div><h3>Mestre</h3><div class="meta">fase 1</div><p>Observar situação e estado, decidir uma alavanca e um motivo, respeitar o ritmo. Tom e intensidade configuráveis antes da sessão.</p></div>
+    <div class="card f1"><div class="code">Módulo D</div><h3>Alavancas e limites</h3><div class="meta">fase 1</div><p>O catálogo universal: pausa, câmera lenta, turbo, estado salvo e recarga. Faixas, intervalo mínimo, reversão da última ação.</p></div>
+    <div class="card f1"><div class="code">Módulo E</div><h3>Sessão e overlay</h3><div class="meta">fase 1</div><p>Abrir a sessão com qualquer jogo, mostrar situação, ação e motivo na tela, pausar, retomar, encerrar com resumo.</p></div>
+    <div class="card f1"><div class="code">Módulo F</div><h3>Registro</h3><div class="meta">fase 1</div><p>Toda captura, decisão e intervenção gravadas com estado antes, ação, estado depois e motivo. Reproduzível e exportável.</p></div>
+    <div class="card f1"><div class="code">Módulo G</div><h3>Processos automáticos</h3><div class="meta">fase 1</div><p>Medir custo e latência, tratar falha do serviço de linguagem e do emulador, manter a versão própria do emulador alinhada ao original.</p></div>
+    <div class="card f2"><div class="code">Módulo H</div><h3>Perfil de memória</h3><div class="meta">fase 2</div><p>Camada opcional por jogo: variáveis com endereço, tipo e faixa, ações numéricas, fontes públicas de mapas, perfis compartilháveis.</p></div>
+    <div class="card f3"><div class="code">Módulo I</div><h3>Entidades e mundo</h3><div class="meta">fase 3</div><p>Posição de inimigos e personagens: aproximar, afastar, reunir. Exige mapa de entidades por jogo.</p></div>
+    <div class="card f3"><div class="code">Módulo J</div><h3>Controle virtual</h3><div class="meta">fase 3</div><p>O mestre aciona o controle por um gamepad virtual. Outro tipo de intervenção, com regras próprias.</p></div>
   </div>
 </section>
 
 <!-- ============ VISÃO ============ -->
 <section class="cap">
   <div class="kicker">Visão</div>
-  <h2>Um mestre que decide, um perfil que limita, uma plataforma que executa</h2>
-  <p class="lead">O produto é um diretor de jogo por inteligência artificial: ele não joga e não obedece a pedidos do jogador. Ele lê o estado da partida e molda o que acontece, como um mestre de mesa que percebe o grupo entediado e solta uma emboscada, ou percebe o desespero e deixa um frasco de cura na gaveta. O que ele não faz é tocar memória diretamente: todo endereço, faixa e escrita vivem no perfil do jogo e na plataforma, que são código determinístico.</p>
+  <h2>Olho na tela, mão nas alavancas do emulador</h2>
+  <p class="lead">O produto é um diretor de jogo por inteligência artificial: ele não joga e não obedece a pedidos do jogador. Ele vê a tela como um espectador, lê o que o emulador sabe da partida e molda o que acontece, como um mestre de mesa que percebe o grupo entediado e aperta o passo, ou percebe o desespero e dá uma trégua. O protótipo mostrou que vida e dinheiro mudando por decisão de um texto não fazem um mestre; o que faz é entender a situação e agir sobre o ritmo do jogo. Por isso as alavancas da primeira versão são as do próprio emulador, que funcionam em qualquer jogo no primeiro dia.</p>
 
   <div class="arch">
-    <div class="box llm"><h3>Mestre (serviço de linguagem)</h3><ul><li>Recebe o estado resumido pelo perfil</li><li>Decide uma ação do catálogo e um motivo</li><li>Pode decidir "nada"</li><li>Não conhece nenhum endereço</li><li>Trocável por configuração</li></ul></div>
-    <div class="box imm"><h3>Perfil de jogo</h3><ul><li>Variável = endereço, tipo, faixa, rótulo</li><li>Ações permitidas e seus limites</li><li>Lista do que nunca se toca</li><li>Imutável durante a sessão</li><li>Versionado e validado contra o jogo</li></ul></div>
-    <div class="box mut"><h3>Plataforma</h3><ul><li>Lê e escreve a memória pela ponte</li><li>Valida cada escrita contra o perfil</li><li>Relê o estado antes de escrever</li><li>Registra tudo com motivo</li><li>Testável sem serviço de linguagem</li></ul></div>
+    <div class="box llm"><h3>Mestre (serviço de linguagem)</h3><ul><li>Recebe a captura da tela e o estado</li><li>Descreve a situação em uma linha</li><li>Decide uma alavanca do catálogo e um motivo</li><li>Pode decidir "nada"</li><li>Não aciona nada; trocável por configuração</li></ul></div>
+    <div class="box imm"><h3>Alavancas</h3><ul><li>Universais: pausa, câmera lenta, turbo, estado salvo e recarga</li><li>Vêm do emulador, valem para todo jogo</li><li>Cada uma com faixa, duração e intervalo mínimo</li><li>Opcionais por jogo: ações numéricas do perfil de memória (fase 2)</li></ul></div>
+    <div class="box mut"><h3>Plataforma</h3><ul><li>Captura a janela e fala com o emulador pela ponte</li><li>Valida cada ação contra o catálogo</li><li>Relê a situação antes de agir</li><li>Registra tudo com motivo</li><li>Testável sem serviço de linguagem</li></ul></div>
   </div>
 
   <div class="grid2">
     <div class="card f3"><div class="code">A primeira versão é</div>
       <ul class="clean" style="font-size:9.4pt">
-        <li>Um jogador, um jogo, um perfil pronto: Final Fantasy XII, o banco de ensaio.</li>
+        <li>Um jogador, qualquer jogo de PlayStation 2 que ele possua, nenhum mapeamento prévio.</li>
         <li>Overlay sobre a janela do emulador; produto em português do Brasil.</li>
-        <li>O ciclo completo: abrir a sessão, o mestre observa, decide e age dentro do perfil, o jogador vê, pausa ou reverte, encerra com resumo.</li>
-        <li>Só valores numéricos: vida, energia, dinheiro, atributos, itens contáveis.</li>
+        <li>O ciclo completo: abrir a sessão, o mestre vê e decide, age pelo emulador, o jogador vê, pausa ou reverte, encerra com resumo.</li>
+        <li>Uma versão própria do emulador que só acrescenta ao canal oficial o que falta: pausar e velocidade.</li>
         <li>Toda intervenção registrada e reproduzível.</li>
       </ul>
     </div>
     <div class="card" style="border-top-color:var(--red)"><div class="code">A primeira versão não é</div>
       <ul class="clean" style="font-size:9.4pt">
-        <li>Catálogo de perfis compartilhado entre jogadores (fase 2).</li>
-        <li>Mover inimigos ou personagens no mapa (fase 2).</li>
-        <li>Ver a tela ou apertar botões (fase 3).</li>
+        <li>Escrita na memória do jogo: vida, dinheiro, atributos (fase 2, por perfil).</li>
+        <li>Mover inimigos ou personagens no mapa (fase 3).</li>
+        <li>Apertar botões pelo jogador (fase 3).</li>
         <li>Trainer com conversa: o jogador não pede efeito.</li>
-        <li>Jogador por inteligência artificial, nem outro emulador ou console.</li>
+        <li>Jogador por inteligência artificial, outro emulador ou outro console.</li>
       </ul>
     </div>
   </div>
 
-  <div class="note" style="margin-top:10px"><b>Por que começar por valores numéricos.</b> Uma variável numérica tem gabarito: valor antes, valor depois, faixa válida. Dá para testar cada intervenção sem opinião, e é exatamente o que as fontes públicas de mapas de memória já documentam para centenas de jogos. Entidades no mapa não têm esse gabarito: a tentativa do protótipo de achá-las por varredura devolveu trinta candidatas, das quais duas pareciam reais. Elas exigem engenharia reversa por jogo e entram quando o produto já estiver provado no que é mensurável.</div>
+  <div class="note" style="margin-top:10px"><b>Por que começar pela tela e pelo emulador.</b> Captura de tela, pausa, velocidade e estado salvo existem para qualquer jogo, sem que ninguém mapeie nada; a memória de cada jogo é diferente e exige mapa por título, com cobertura pública desigual. E "o tempo desacelera quando você está prestes a morrer" ou "o mestre te devolve a cena de trinta segundos atrás" é um evento que o jogador sente, enquanto um número subindo é só um número. O perfil de memória continua no roteiro, como camada profunda e opcional, para jogos em que vale o trabalho.</div>
 </section>
 
 <!-- ============ ATORES ============ -->
 <section class="cap">
   <div class="kicker">Atores</div>
   <h2>Quem usa e o que fica de fora</h2>
-  <p class="lead">Ator é quem inicia ou recebe alguma coisa da plataforma. Na primeira versão, jogador e mapeador são a mesma pessoa, que também é o cliente deste projeto: ele aprova cada documento e cada sessão jogada é um teste de aceitação. A separação existe desde já porque o produto é para outros jogadores também, e a maioria deles só vai jogar.</p>
+  <p class="lead">Ator é quem inicia ou recebe alguma coisa da plataforma. Na primeira versão, o jogador é o cliente deste projeto: ele aprova cada documento e cada sessão jogada é um teste de aceitação. O mapeador só aparece na fase 2, e a separação existe desde já porque o produto é para outros jogadores também, e a maioria deles só vai jogar.</p>
 
   <div class="actors">
-    <div class="actor"><div class="ico">&#9823;</div><div><b>Jogador</b><div class="m">pessoa · ator principal nos módulos C, E</div><p>Escolhe o perfil, configura tom e intensidade, joga, vê o que o mestre fez, pausa, reverte e encerra.</p></div></div>
-    <div class="actor"><div class="ico">&#9819;</div><div><b>Mapeador</b><div class="m">pessoa · ator principal nos módulos B, H</div><p>Cria o perfil de um jogo: variáveis, faixas, ações e proibições. Importa de fontes públicas, valida contra o jogo e publica versões.</p></div></div>
-    <div class="actor"><div class="ico">&#9881;</div><div><b>Plataforma (rotina)</b><div class="m">sistema · ator principal nos módulos A, D, F, G</div><p>O que o produto faz sozinho: ler, validar, escrever, registrar, medir, detectar falha.</p></div></div>
-    <div class="actor"><div class="ico">&#9998;</div><div><b>Serviço de linguagem</b><div class="m">sistema externo · participa de C, G</div><p>O modelo que decide ação e motivo a partir do estado resumido. Trocável por configuração; nunca guarda estado, nunca toca memória.</p></div></div>
-    <div class="actor"><div class="ico">&#127918;</div><div><b>Emulador</b><div class="m">sistema externo · participa de A, G</div><p>O PCSX2 rodando o jogo do jogador. Expõe a memória pela interface oficial; o produto não o modifica.</p></div></div>
-    <div class="actor"><div class="ico">&#128214;</div><div><b>Fontes de mapas</b><div class="m">sistema externo · participa de B, H</div><p>Bases públicas de endereços de memória por jogo, mantidas por comunidades. Cobertura e termos de uso variam por título.</p></div></div>
+    <div class="actor"><div class="ico">&#9823;</div><div><b>Jogador</b><div class="m">pessoa · ator principal nos módulos C, E</div><p>Abre o emulador com o jogo dele, configura tom e intensidade, joga, vê o que o mestre fez, pausa, reverte e encerra.</p></div></div>
+    <div class="actor"><div class="ico">&#9819;</div><div><b>Mapeador</b><div class="m">pessoa · ator principal no módulo H (fase 2)</div><p>Cria o perfil de memória de um jogo: variáveis, faixas, ações e proibições. Importa de fontes públicas, valida contra o jogo e publica versões.</p></div></div>
+    <div class="actor"><div class="ico">&#9881;</div><div><b>Plataforma (rotina)</b><div class="m">sistema · ator principal nos módulos A, B, D, F, G</div><p>O que o produto faz sozinho: capturar, falar com o emulador, validar, agir, registrar, medir, detectar falha.</p></div></div>
+    <div class="actor"><div class="ico">&#9998;</div><div><b>Serviço de linguagem</b><div class="m">sistema externo · participa de B, C, G</div><p>O modelo que lê a tela, descreve a situação e decide alavanca e motivo. Trocável por configuração; nunca guarda estado, nunca aciona o emulador.</p></div></div>
+    <div class="actor"><div class="ico">&#127918;</div><div><b>Emulador</b><div class="m">sistema externo · participa de A, D, G</div><p>O PCSX2, em versão própria que só estende o canal oficial de comunicação. Roda o jogo e a BIOS do jogador; o produto não distribui nenhum dos dois.</p></div></div>
+    <div class="actor"><div class="ico">&#128214;</div><div><b>Fontes de mapas</b><div class="m">sistema externo · participa de H (fase 2)</div><p>Bases públicas de endereços de memória por jogo, mantidas por comunidades. Cobertura e termos de uso variam por título.</p></div></div>
   </div>
 
-  <div class="kicker" style="margin-top:16px">Dois objetos que não se misturam</div>
-  <h2>Perfil de jogo e sessão viva</h2>
+  <div class="kicker" style="margin-top:16px">Dois tipos de alavanca que não se misturam</div>
+  <h2>Universais e por jogo</h2>
   <div class="grid2" style="margin-top:6px">
-    <div class="box imm"><h3>Perfil de jogo</h3><p style="font-size:9.2pt">Imutável durante a sessão, versionado. É o que o jogo é para o produto: identificação do título, variáveis com significado e faixa, catálogo de ações com limites, lista do que nunca se toca. Um perfil serve a qualquer sessão daquele jogo, em qualquer máquina.</p></div>
-    <div class="box mut"><h3>Sessão viva</h3><p style="font-size:9.2pt">Mutável. É o que de fato aconteceu numa partida: cada observação, cada decisão do mestre inclusive "nada", cada escrita com estado antes e depois, cada pausa e reversão do jogador. É a fonte de verdade para reverter, retomar e verificar.</p></div>
+    <div class="box imm"><h3>Alavancas universais</h3><p style="font-size:9.2pt">Vêm do emulador e valem para qualquer jogo sem preparo: pausar, câmera lenta, turbo, salvar estado num slot reservado ao mestre e recarregar. São a fase 1 inteira. Nenhuma depende de saber o que está em cada endereço de memória.</p></div>
+    <div class="box mut"><h3>Perfil de memória</h3><p style="font-size:9.2pt">Por jogo, opcional, versionado. Variáveis com significado e faixa, ações numéricas e lista do que nunca se toca. Entra na fase 2, só para jogos em que alguém mapeou ou mapeia, e passa pela mesma validação e pelo mesmo registro das universais.</p></div>
   </div>
-  <p style="font-size:9.3pt;margin-top:8px">O mestre pode surpreender, como um mestre humano faz. A diferença é que toda surpresa fica registrada com motivo e dentro do perfil: isso é o que separa dirigir de trapacear, e é o que permite testar o mestre em vez de só opinar sobre ele.</p>
+  <p style="font-size:9.3pt;margin-top:8px">A sessão viva é o terceiro objeto: o que de fato aconteceu numa partida, captura a captura, decisão a decisão, inclusive "nada". É a fonte de verdade para reverter, retomar e verificar, e é o que separa dirigir de trapacear.</p>
 </section>
 
 <!-- ============ REGRAS DE NEGÓCIO ============ -->
@@ -180,53 +181,52 @@
   <p class="lead">As cinco primeiras são as regras de mesa: o que mantém a diversão quando o mestre intervém. As demais são regras do produto, e quatro delas nascem de falhas que o protótipo teve de verdade. Cada uma vira teste.</p>
 
   <div class="rules">
-    <div class="rule"><span class="tag">RN-01</span><div><b>Toda intervenção tem motivo e registro</b><p>Estado antes, ação, estado depois e o motivo do mestre ficam gravados na sessão viva. Intervenção sem registro não existe. Obtemos: mestre auditável.</p><div class="where">módulos C, D, F</div></div></div>
-    <div class="rule"><span class="tag">RN-02</span><div><b>Dificulta, não derrota</b><p>O mestre pode endurecer, tirar recurso e criar aperto. Não pode zerar a vida nem causar derrota direta. Obtemos: desafio sem roubo.</p><div class="where">módulos C, D</div></div></div>
-    <div class="rule"><span class="tag">RN-03</span><div><b>Progresso e save são intocáveis</b><p>História, nível, itens-chave, arquivo de save e cartão de memória nunca entram no catálogo de ações. Recursos consumíveis entram, dentro da faixa. Obtemos: conquista com valor.</p><div class="where">módulos B, D</div></div></div>
+    <div class="rule"><span class="tag">RN-01</span><div><b>Toda intervenção tem motivo e registro</b><p>Situação, estado antes, ação, estado depois e o motivo do mestre ficam gravados na sessão viva. Intervenção sem registro não existe. Obtemos: mestre auditável.</p><div class="where">módulos C, D, F</div></div></div>
+    <div class="rule"><span class="tag">RN-02</span><div><b>Dificulta, não derrota</b><p>O mestre pode apertar o ritmo, acelerar, tirar a trégua. Não pode causar derrota direta nem recarregar um estado para fazer o jogador perder o que ganhou. Obtemos: desafio sem roubo.</p><div class="where">módulos C, D</div></div></div>
+    <div class="rule"><span class="tag">RN-03</span><div><b>Progresso e save são intocáveis</b><p>Cartão de memória e os slots de estado do jogador nunca são tocados. O mestre usa slots reservados a ele, salva antes de qualquer recarga, para que a própria recarga seja reversível, e nunca recarrega sem mostrar. Obtemos: conquista com valor.</p><div class="where">módulos A, D</div></div></div>
     <div class="rule"><span class="tag">RN-04</span><div><b>O jogador vê e pode desfazer</b><p>Ação e motivo aparecem no overlay no momento em que acontecem. A última ação pode ser revertida e a sessão pausada a qualquer instante. Obtemos: o controle fica com o jogador.</p><div class="where">módulos D, E</div></div></div>
     <div class="rule"><span class="tag">RN-05</span><div><b>Não agir é ação válida</b><p>Há intervalo mínimo entre intervenções e "nada" é uma decisão registrada como qualquer outra. Obtemos: ritmo, não ruído.</p><div class="where">módulos C, F</div></div></div>
-    <div class="rule"><span class="tag">RN-06</span><div><b>O mestre só age pelo perfil</b><p>O catálogo de ações é derivado do perfil, nunca do texto do serviço de linguagem, e todo valor escrito fica dentro da faixa declarada. O protótipo somava dinheiro sem teto. Obtemos: nenhuma escrita cega.</p><div class="where">módulos B, C, D</div></div></div>
-    <div class="rule"><span class="tag">RN-07</span><div><b>Serviço de linguagem nunca toca memória</b><p>Ele devolve ação e motivo; só a plataforma lê e escreve, validando contra o perfil. Obtemos: separação testável sem modelo.</p><div class="where">módulos A, C, D</div></div></div>
-    <div class="rule"><span class="tag">RN-08</span><div><b>Decidir sobre o estado atual</b><p>A plataforma relê a variável antes de escrever. Se mudou fora do esperado desde a decisão, a ação é descartada e registrada como tal. O protótipo agia sobre um estado lido segundos antes. Obtemos: nenhuma ação sobre estado velho.</p><div class="where">módulos C, D, G</div></div></div>
-    <div class="rule"><span class="tag">RN-09</span><div><b>O jogo é do jogador</b><p>Imagem do jogo e BIOS ficam na máquina dele; nunca entram no repositório, nos testes compartilhados nem em qualquer envio. Ao serviço de linguagem só vai o estado resumido pelo perfil. Obtemos: respeito à propriedade e à licença.</p><div class="where">módulos A, G</div></div></div>
-    <div class="rule"><span class="tag">RN-10</span><div><b>Falha é visível e silencia o mestre</b><p>Serviço fora do ar ou resposta inválida aparece no overlay; sem decisão válida, nenhuma escrita acontece; o jogo segue sem o mestre e a sessão retoma. O protótipo ficou meses parecendo vivo com o serviço desligado. Obtemos: nunca parece vivo estando morto.</p><div class="where">módulos E, G</div></div></div>
+    <div class="rule"><span class="tag">RN-06</span><div><b>O mestre só age pelo catálogo</b><p>O catálogo é a lista de alavancas universais mais, se houver, as ações do perfil de memória; ele nunca vem do texto do serviço de linguagem, e todo valor fica dentro da faixa declarada. O protótipo somava dinheiro sem teto. Obtemos: nenhuma ação cega.</p><div class="where">módulos C, D, H</div></div></div>
+    <div class="rule"><span class="tag">RN-07</span><div><b>Serviço de linguagem nunca aciona o emulador</b><p>Ele devolve situação, alavanca e motivo; só a plataforma fala com o emulador, validando contra o catálogo. Obtemos: separação testável sem modelo.</p><div class="where">módulos A, C, D</div></div></div>
+    <div class="rule"><span class="tag">RN-08</span><div><b>Decidir sobre a situação atual</b><p>A plataforma relê tela e estado antes de agir. Se a situação mudou fora do esperado desde a decisão, a ação é descartada e registrada como tal. O protótipo agia sobre um estado lido segundos antes. Obtemos: nenhuma ação sobre situação velha.</p><div class="where">módulos B, D, G</div></div></div>
+    <div class="rule"><span class="tag">RN-09</span><div><b>O jogo é do jogador</b><p>Imagem do jogo e BIOS ficam na máquina dele; nunca entram no repositório, nos testes compartilhados nem em qualquer envio. Ao serviço de linguagem vão capturas de tela e o estado resumido, e só isso, com o jogador ciente disso ao abrir a sessão. Obtemos: respeito à propriedade e à licença.</p><div class="where">módulos A, B, G</div></div></div>
+    <div class="rule"><span class="tag">RN-10</span><div><b>Falha é visível e silencia o mestre</b><p>Serviço fora do ar ou resposta inválida aparece no overlay; sem decisão válida, nenhuma ação acontece; o jogo segue sem o mestre e a sessão retoma. O protótipo ficou meses parecendo vivo com o serviço desligado. Obtemos: nunca parece vivo estando morto.</p><div class="where">módulos E, G</div></div></div>
   </div>
 </section>
 
 <!-- ============ ORIGEM ============ -->
 <section class="cap">
   <div class="kicker">Origem</div>
-  <h2>O que o protótipo provou e o que ensinou</h2>
-  <p class="lead">Entre fevereiro e março de 2026 o cliente construiu um protótipo sobre Final Fantasy XII no PCSX2: um overlay que lia vida, energia, dinheiro e atributos do personagem direto da memória do emulador e, a cada ciclo, pedia a um serviço de linguagem uma ação de mestre. Vinte scripts, a maioria ferramentas de varredura de memória.</p>
+  <h2>O que o protótipo mostrou e por que a direção mudou</h2>
+  <p class="lead">Entre fevereiro e março de 2026 o cliente construiu um protótipo sobre Final Fantasy XII no PCSX2: um overlay que lia vida, energia, dinheiro e atributos do personagem direto da memória do emulador e, a cada ciclo, pedia a um serviço de linguagem uma ação de mestre. Vinte scripts, a maioria ferramentas de varredura de memória. Na avaliação do cliente, não funcionou. Este mapa parte dessa conclusão.</p>
 
   <div class="grid2" style="margin-bottom:10px">
-    <div class="card f3"><div class="code">Provou</div>
+    <div class="card f3"><div class="code">Funcionou como mecanismo</div>
       <ul class="clean" style="font-size:9.4pt">
         <li>Ler e escrever a memória do jogo de fora do emulador funciona, em tempo real, sem modificar o emulador.</li>
-        <li>O ciclo observar, decidir, agir com um serviço de linguagem no meio funciona e produz decisões com motivo.</li>
+        <li>O ciclo observar, decidir, agir com um serviço de linguagem no meio roda e devolve decisões com motivo.</li>
         <li>Um overlay sobre a janela do jogo é suficiente como interface: estado, última ação, motivo, histórico.</li>
-        <li>Deslocamentos relativos entre variáveis do mesmo jogo são estáveis entre sessões: achado um ponto de referência, o resto segue.</li>
       </ul>
     </div>
-    <div class="card" style="border-top-color:var(--red)"><div class="code">Falhou</div>
+    <div class="card" style="border-top-color:var(--red)"><div class="code">Não funcionou como experiência nem como engenharia</div>
       <ul class="clean" style="font-size:9.4pt">
-        <li>A base da memória era procurada por varredura do valor do dinheiro, com filtros e um teste de escrita que perguntava ao jogador se o valor mudou. Doze scripts para um problema que a interface oficial do emulador resolve.</li>
-        <li>Posições de entidades foram caçadas por diferença de movimento: trinta candidatas, duas plausíveis, nenhuma confiável.</li>
-        <li>O serviço de linguagem usado foi descontinuado e o código engolia o erro: o overlay seguia vivo decidindo "nada".</li>
-        <li>Endereços absolutos de uma sessão ficaram gravados no código; a chave do serviço também.</li>
+        <li>Com só números na entrada, o mestre decidia o que meia dúzia de regras fixas decidiriam; o jogador via vida e dinheiro mudando, não um evento. É o motivo desta revisão.</li>
+        <li>A base da memória era procurada por varredura do valor do dinheiro, com doze scripts para um problema que o canal oficial do emulador resolve.</li>
+        <li>Posições de entidades caçadas por diferença de movimento: trinta candidatas, duas plausíveis, nenhuma confiável.</li>
+        <li>O serviço de linguagem usado foi descontinuado e o código engolia o erro; endereços de uma sessão e a chave do serviço ficaram gravados no código.</li>
       </ul>
     </div>
   </div>
 
   <div class="kicker">Quatro lições que viraram regra</div>
   <div class="lesson">
-    <div class="card f1"><b>Falha silenciosa</b><p>A exceção do serviço virava a decisão "nada" com o erro escondido no motivo. Agora é RN-10: falha visível, mestre em silêncio, nenhuma escrita.</p></div>
-    <div class="card f1"><b>Estado velho</b><p>O estado era lido, o serviço demorava, e a escrita usava o valor antigo. Agora é RN-08: reler antes de escrever, descartar se mudou.</p></div>
-    <div class="card f1"><b>Sem teto</b><p>Dar dinheiro somava sem limite; atributos tinham tetos fixos no código. Agora é RN-06: faixa no perfil, catálogo derivado do perfil.</p></div>
+    <div class="card f1"><b>Falha silenciosa</b><p>A exceção do serviço virava a decisão "nada" com o erro escondido no motivo. Agora é RN-10: falha visível, mestre em silêncio, nenhuma ação.</p></div>
+    <div class="card f1"><b>Estado velho</b><p>O estado era lido, o serviço demorava, e a escrita usava o valor antigo. Agora é RN-08: reler antes de agir, descartar se mudou.</p></div>
+    <div class="card f1"><b>Sem teto</b><p>Dar dinheiro somava sem limite; atributos tinham tetos fixos no código. Agora é RN-06: catálogo com faixa, nunca vindo do texto do serviço.</p></div>
     <div class="card f1"><b>Ação dentro do serviço</b><p>O serviço escolhia entre ações cujas escritas estavam coladas no mesmo código. Agora é RN-07: o serviço devolve intenção, a plataforma executa e valida.</p></div>
   </div>
 
-  <div class="note" style="margin-top:10px"><b>O que se aproveita.</b> A tabela de deslocamentos do personagem relativa ao endereço do dinheiro, o desenho do overlay e o ciclo de decisão. O que se descarta: toda a varredura de memória, os endereços absolutos, o mapeamento de entidades e a chave gravada no código.</div>
+  <div class="note" style="margin-top:10px"><b>O que se aproveita.</b> O desenho do overlay e o ciclo de decisão. O que se descarta: toda a varredura de memória, os endereços absolutos, o mapeamento de entidades, a chave gravada no código e a tabela de deslocamentos do personagem, que valia só para uma versão do jogo que o cliente não tem mais.</div>
 </section>
 
 <!-- ============ ROTEIRO ============ -->
@@ -245,7 +245,7 @@
     <div class="step gate"><b>Portão</b>Aprovação do cliente.</div>
   </div>
   <div class="flow">
-    <div class="step"><b>3. Blueprint técnico</b>Arquitetura, formato do perfil, protocolo entre mestre e plataforma, cards de implementação com critério de aceite.</div>
+    <div class="step"><b>3. Blueprint técnico</b>Arquitetura, extensão do canal do emulador, protocolo entre mestre e plataforma, cards de implementação com critério de aceite.</div>
     <div class="arrow">&#8594;</div>
     <div class="step gate"><b>Portão</b>Aprovação do cliente.</div>
     <div class="arrow">&#8594;</div>
@@ -258,8 +258,8 @@
     <div class="card f1"><div class="code">Como cada card é fechado</div>
       <ul class="clean" style="font-size:9.2pt">
         <li>Critério de aceite escrito antes do código, no blueprint.</li>
-        <li>Plataforma e perfil testados isolados, sem serviço de linguagem, com memória simulada.</li>
-        <li>Mestre testado numa bancada de estados sintéticos em que toda decisão tem de cumprir as regras de negócio.</li>
+        <li>Plataforma testada isolada, sem serviço de linguagem, contra um emulador simulado que responde ao mesmo canal.</li>
+        <li>Mestre testado numa bancada de capturas e estados sintéticos em que toda decisão tem de cumprir as regras de negócio.</li>
         <li>Integração contínua verde é o registro de entrega.</li>
         <li>Mudança de requisito entra como caso de uso novo, com código próprio.</li>
       </ul>
@@ -275,85 +275,101 @@
   </div>
 
   <div class="kicker" style="margin-top:14px">O esqueleto ambulante</div>
-  <p style="font-size:9.6pt">O primeiro código entregue é a fatia mais fina de ponta a ponta: a ponte pela interface oficial do emulador, o perfil mínimo de Final Fantasy XII com vida e dinheiro, o mestre com três ações e "nada", o overlay e o registro. Ele prova a arquitetura antes de qualquer funcionalidade ganhar corpo, e é o primeiro item que o cliente joga. O que o destrava é um único dado: o endereço fixo do dinheiro na versão do jogo que o cliente usa (lacuna LC-01).</p>
-
-  <div class="kicker" style="margin-top:14px">Fica para o blueprint técnico</div>
-  <ul class="clean" style="font-size:9.4pt">
-    <li>Linguagem e estrutura do repositório; o protótipo é em Python e isso é um ponto de partida, não uma decisão.</li>
-    <li>Qual das duas pontes com o emulador, decidida por medição de latência e robustez, nunca por preferência.</li>
-    <li>Qual serviço de linguagem e qual modelo, decididos com medição de custo, latência e qualidade de decisão, nunca por preferência.</li>
-    <li>Formato exato do perfil de jogo e da sessão viva, e como o mapeador valida um perfil.</li>
-    <li>Protocolo entre mestre e plataforma, o ciclo de decisão e o que acontece quando o mestre pede algo fora do catálogo.</li>
-  </ul>
+  <p style="font-size:9.6pt">O primeiro código entregue é a fatia mais fina de ponta a ponta: a versão própria do emulador com pausar e velocidade acrescentados ao canal oficial, a captura da janela, o mestre com quatro alavancas e "nada", o overlay e o registro, rodando em qualquer jogo que o cliente tenha. Ele prova a arquitetura antes de qualquer funcionalidade ganhar corpo, e é o primeiro item que o cliente joga. O que o destrava: um jogo e a BIOS na máquina do cliente (lacuna LC-01) e o ambiente de compilação do emulador (lacuna LC-10).</p>
 </section>
 
 <!-- ============ FASES ============ -->
 <section class="cap">
   <div class="kicker">Fases de entrega</div>
   <h2>O que entra em cada fase</h2>
-  <p class="lead">A fase 1 é o mestre jogável com um perfil. A fase 2 abre o produto para outros jogadores e outros jogos, e traz as entidades. A fase 3 dá olhos e mãos ao mestre, só sobre o que as duas anteriores provaram.</p>
+  <p class="lead">A fase 1 é o mestre jogável em qualquer jogo, só com tela e alavancas do emulador. A fase 2 abre a camada de memória, por jogo, e o produto para outros jogadores. A fase 3 dá ao mestre as mãos: entidades e controle.</p>
 
-  <div class="phase p1"><h3>Fase 1 · mestre jogável com um perfil <span>módulos A a G</span></h3>
-    <p>Abrir o jogo no emulador, abrir a sessão com o perfil de Final Fantasy XII, jogar com o mestre intervindo em valores numéricos dentro das regras de negócio, ver, pausar, reverter, encerrar. Termina quando o cliente joga uma sessão inteira com toda intervenção registrada e nenhuma fora do perfil.</p>
-    <span class="chip"><span class="mono">A</span> Ponte pela interface oficial</span><span class="chip"><span class="mono">A</span> Identificar o jogo em execução</span><span class="chip"><span class="mono">B</span> Perfil à mão, validado contra o jogo</span><span class="chip"><span class="mono">B</span> Versão do perfil</span><span class="chip"><span class="mono">C</span> Observar e decidir</span><span class="chip"><span class="mono">C</span> Tom e intensidade</span><span class="chip"><span class="mono">D</span> Catálogo e faixa</span><span class="chip"><span class="mono">D</span> Reverter e pausar</span><span class="chip"><span class="mono">E</span> Overlay</span><span class="chip"><span class="mono">E</span> Resumo da sessão</span><span class="chip"><span class="mono">F</span> Registro reproduzível</span><span class="chip"><span class="mono">G</span> Falha visível</span><span class="chip"><span class="mono">G</span> Custo e latência</span>
+  <div class="phase p1"><h3>Fase 1 · mestre jogável em qualquer jogo <span>módulos A a G</span></h3>
+    <p>Abrir um jogo no emulador, abrir a sessão, jogar com o mestre vendo a tela e agindo pelas alavancas do emulador dentro das regras de negócio, ver, pausar, reverter, encerrar. Termina quando o cliente joga uma sessão inteira com toda intervenção registrada e nenhuma fora do catálogo.</p>
+    <span class="chip"><span class="mono">A</span> Canal oficial estendido: pausar e velocidade</span><span class="chip"><span class="mono">A</span> Identificar o jogo</span><span class="chip"><span class="mono">A</span> Estado salvo em slot reservado</span><span class="chip"><span class="mono">B</span> Captura da janela</span><span class="chip"><span class="mono">B</span> Situação em uma linha</span><span class="chip"><span class="mono">C</span> Observar e decidir</span><span class="chip"><span class="mono">C</span> Tom e intensidade</span><span class="chip"><span class="mono">D</span> Catálogo universal com faixas</span><span class="chip"><span class="mono">D</span> Reverter e pausar</span><span class="chip"><span class="mono">E</span> Overlay</span><span class="chip"><span class="mono">E</span> Resumo da sessão</span><span class="chip"><span class="mono">F</span> Registro reproduzível</span><span class="chip"><span class="mono">G</span> Falha visível</span><span class="chip"><span class="mono">G</span> Custo e latência</span>
   </div>
 
-  <div class="phase p2"><h3>Fase 2 · outros jogadores, outros jogos, entidades <span>módulos H, I</span></h3>
-    <p>Perfis compartilháveis, importação de fontes públicas de mapas, descoberta assistida de variáveis com o serviço de linguagem como ajudante do mapeador, segundo e terceiro jogo com perfil, e o primeiro jogo com mapa de entidades. Só começa com a fase 1 jogada, revisada e com a validação da lacuna LC-08 feita.</p>
-    <span class="chip"><span class="mono">H</span> Publicar e importar perfil</span><span class="chip"><span class="mono">H</span> Importar de fontes públicas</span><span class="chip"><span class="mono">H</span> Descoberta assistida</span><span class="chip"><span class="mono">I</span> Posição de entidades</span><span class="chip"><span class="mono">I</span> Aproximar, afastar, reunir</span><span class="chip"><span class="mono">—</span> Instalação para outros jogadores</span>
+  <div class="phase p2"><h3>Fase 2 · perfil de memória e outros jogadores <span>módulo H e instalação</span></h3>
+    <p>A camada profunda, por jogo: perfil de memória criado à mão, importado de fontes públicas ou com descoberta assistida, validado contra o jogo em execução, com ações numéricas entrando no mesmo catálogo. Perfis compartilháveis e instalação para outros jogadores. Só começa com a fase 1 jogada, revisada e com a validação da lacuna LC-08 feita.</p>
+    <span class="chip"><span class="mono">H</span> Perfil à mão, validado contra o jogo</span><span class="chip"><span class="mono">H</span> Importar de fontes públicas</span><span class="chip"><span class="mono">H</span> Descoberta assistida</span><span class="chip"><span class="mono">H</span> Publicar e importar perfil</span><span class="chip"><span class="mono">—</span> Instalação para outros jogadores</span>
   </div>
 
-  <div class="phase p3"><h3>Fase 3 · visão e controle <span>módulo J</span></h3>
-    <p>O mestre passa a ver a tela do jogo e a acionar o controle por um gamepad virtual. É outro tipo de intervenção, com outras regras, e só entra sobre perfis e registro já provados. As regras de negócio continuam valendo: tudo visível, tudo registrado, nada de derrota direta.</p>
-    <span class="chip"><span class="mono">J</span> Captura da tela para o mestre</span><span class="chip"><span class="mono">J</span> Controle virtual</span><span class="chip"><span class="mono">J</span> Regras próprias de intervenção por controle</span>
+  <div class="phase p3"><h3>Fase 3 · entidades e controle <span>módulos I, J</span></h3>
+    <p>Mover inimigos e personagens no mapa, para jogos com mapa de entidades, e acionar o controle por um gamepad virtual. São outros tipos de intervenção, com regras próprias, e só entram sobre registro e catálogo já provados. As regras de negócio continuam valendo: tudo visível, tudo registrado, nada de derrota direta.</p>
+    <span class="chip"><span class="mono">I</span> Posição de entidades</span><span class="chip"><span class="mono">I</span> Aproximar, afastar, reunir</span><span class="chip"><span class="mono">J</span> Controle virtual</span><span class="chip"><span class="mono">J</span> Regras próprias de intervenção por controle</span>
   </div>
 
-  <div class="note" style="margin-top:8px"><b>Jogo de abertura.</b> Final Fantasy XII, na versão que o cliente já usa, com o perfil montado a partir dos deslocamentos que o protótipo levantou. Para testes automáticos e integração contínua, uma memória simulada com o mesmo formato do perfil, sem jogo nenhum, para que a plataforma e o mestre rodem sem emulador e sem serviço de linguagem.</div>
+  <div class="note" style="margin-top:8px"><b>Jogo de abertura.</b> Qualquer jogo de PlayStation 2 que o cliente possua legalmente, com a BIOS do console dele; com alavancas universais, a escolha pesa pouco, e o jogo pode mudar entre sessões sem nada a refazer. Para testes automáticos e integração contínua, um emulador simulado que responde ao mesmo canal, mais um banco de capturas de tela gravadas, para que plataforma e mestre rodem sem emulador, sem jogo e sem serviço de linguagem.</div>
 </section>
 
 <!-- ============ DECISÕES ============ -->
 <section class="cap">
   <div class="kicker">Decisões</div>
-  <h2>Três fechadas, nove propostas</h2>
-  <p class="lead">As três primeiras foram respondidas pelo cliente em 26 de outubro de 2026. As demais são propostas deste documento e fecham com a aprovação dele. Mudança posterior entra como revisão numerada, com data, e propaga para os casos de uso e para o blueprint.</p>
+  <h2>Oito fechadas, seis propostas</h2>
+  <p class="lead">As oito abaixo foram fechadas com o cliente em 26 de outubro de 2026, uma delas revisada no mesmo dia. As seis propostas vêm na página seguinte e fecham com a aprovação deste documento. Mudança posterior entra como revisão numerada, com data, e propaga para os casos de uso e para o blueprint.</p>
 
   <table style="font-size:8.4pt" class="tight">
     <thead><tr><th>Código</th><th>Decisão</th><th>Escolha</th><th>Por quê</th><th>Estado</th></tr></thead>
     <tbody>
       <tr><td class="code">DC-01</td><td>Usuário final</td><td>Outros jogadores também, não só o cliente</td><td>Define desde já perfis compartilháveis e a separação entre quem mapeia e quem joga.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
-      <tr><td class="code">DC-02</td><td>Escopo da fase 1</td><td>Só valores numéricos; entidades na fase 2; tela e controle na fase 3</td><td>Valores numéricos têm gabarito e fontes públicas; entidades exigem engenharia reversa por jogo.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
+      <tr><td class="code">DC-02</td><td>Escopo da fase 1</td><td>Tela e alavancas do emulador; perfil de memória opcional por jogo na fase 2; entidades e controle na fase 3</td><td>Números não fizeram um mestre no protótipo; tela e alavancas valem para qualquer jogo no primeiro dia. Substitui a escolha anterior, só valores numéricos.</td><td><span class="pill rev">revisada 26/10</span></td></tr>
       <tr><td class="code">DC-03</td><td>Visibilidade</td><td>Transparente: overlay com ação e motivo, pausa e reversão</td><td>O jogador mantém o controle; é o que torna o mestre aceitável em vez de intrusivo.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
-      <tr><td class="code">DC-04</td><td>Papel da inteligência artificial</td><td>Mestre invisível que molda a partida</td><td>Não é jogador por inteligência artificial nem trainer com conversa; é o produto do protótipo.</td><td><span class="pill prop">proposta</span></td></tr>
-      <tr><td class="code">DC-05</td><td>Alvo</td><td>Qualquer jogo de PlayStation 2 no PCSX2; Final Fantasy XII é o banco de ensaio e o perfil número 1</td><td>O genérico está na ponte e no formato do perfil; o específico fica dentro de cada perfil.</td><td><span class="pill prop">proposta</span></td></tr>
-      <tr><td class="code">DC-06</td><td>Ponte com o emulador</td><td>Interface oficial do emulador ou símbolo exportado da memória; varredura por valor nunca mais</td><td>Elimina os doze scripts do protótipo e torna os endereços do jogo constantes.</td><td><span class="pill prop">proposta</span></td></tr>
-      <tr><td class="code">DC-07</td><td>Emulador</td><td>Só PCSX2 na fase 1; outros emuladores e consoles fora até o formato do perfil estar provado</td><td>Um emulador, uma ponte, uma fonte de variação a menos.</td><td><span class="pill prop">proposta</span></td></tr>
-      <tr><td class="code">DC-08</td><td>O jogo é do jogador</td><td>O produto não distribui jogo nem BIOS; imagem de jogo nunca entra no repositório</td><td>Propriedade e licença são do jogador; o produto só lê memória em execução.</td><td><span class="pill prop">proposta</span></td></tr>
-      <tr><td class="code">DC-09</td><td>O jogador não pede ação</td><td>Configura tom e intensidade antes da sessão; durante, só pausa, reverte e encerra</td><td>Se o jogador escolhe o efeito, é trainer. Transparência com pausa e reversão é o limite que mantém o mestre.</td><td><span class="pill prop">proposta</span></td></tr>
-      <tr><td class="code">DC-10</td><td>Idioma</td><td>Produto e perfis em português do Brasil; rótulos podem manter o nome original do jogo</td><td>Público do cliente; o nome original evita ambiguidade no mapeamento.</td><td><span class="pill prop">proposta</span></td></tr>
-      <tr><td class="code">DC-11</td><td>Nome, pasta e repositório</td><td>"IAEmPS2" (provisório); pasta Projetos-SSD\iaemps2; repositório privado, branch e merge, nunca commit direto na principal</td><td>Mesmo esquema de trabalho dos outros projetos do cliente.</td><td><span class="pill prop">proposta</span></td></tr>
-      <tr><td class="code">DC-12</td><td>Origem do perfil</td><td>À mão, importado de fonte pública ou descoberta assistida; qualquer origem passa por validação contra o jogo em execução antes de entrar numa sessão</td><td>Perfil errado escreve no lugar errado; a validação é a mesma independente da origem.</td><td><span class="pill prop">proposta</span></td></tr>
+      <tr><td class="code">DC-05</td><td>Alvo</td><td>Qualquer jogo de PlayStation 2 no PCSX2; o PlayStation 2 é o objetivo, não o meio</td><td>Escolha do cliente, ciente de que um jogo de computador com modding daria mais alavancas.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
+      <tr><td class="code">DC-06</td><td>Ponte com o emulador</td><td>O canal oficial de comunicação do emulador; varredura de memória por valor nunca mais</td><td>Já oferece leitura e escrita, estado salvo, identificação do jogo e status; elimina os doze scripts do protótipo.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
+      <tr><td class="code">DC-07</td><td>Emulador</td><td>Só PCSX2; outros emuladores e consoles fora</td><td>Um emulador, um canal, uma versão própria para manter.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
+      <tr><td class="code">DC-13</td><td>Versão própria do emulador</td><td>Mínima: só o servidor do canal oficial ganha os comandos que faltam, pausar e velocidade; todo o resto igual ao original, com proposta de contribuição ao projeto original</td><td>O emulador é código aberto; uma extensão pequena acompanha as versões novas com pouco esforço e pode deixar de ser própria se for aceita.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
+      <tr><td class="code">DC-14</td><td>Fronteira de licença</td><td>O emulador modificado é distribuído com o código, na mesma licença do original; o mestre é programa separado, que fala com o emulador por rede local, com licença própria</td><td>Decisão de desenho tomada de propósito: o que estende o emulador herda a licença dele; o que fica fora não. A leitura detalhada da licença é tarefa do blueprint.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
     </tbody>
   </table>
+</section>
+
+<!-- ============ DECISÕES PROPOSTAS ============ -->
+<section class="cap">
+  <div class="kicker">Decisões propostas</div>
+  <h2>Seis que fecham com a aprovação deste documento</h2>
+  <p class="lead">Cada uma pode ser aceita, alterada ou cortada pelo cliente. O que for alterado entra aqui com a data.</p>
+
+  <table style="font-size:8.4pt" class="tight">
+    <thead><tr><th>Código</th><th>Decisão</th><th>Escolha</th><th>Por quê</th><th>Estado</th></tr></thead>
+    <tbody>
+      <tr><td class="code">DC-04</td><td>Papel da inteligência artificial</td><td>Mestre invisível que molda a partida</td><td>Não é jogador por inteligência artificial nem trainer com conversa; é o produto do protótipo.</td><td><span class="pill prop">proposta</span></td></tr>
+      <tr><td class="code">DC-08</td><td>O jogo é do jogador</td><td>O produto não distribui jogo nem BIOS; imagem de jogo nunca entra no repositório</td><td>Propriedade e licença são do jogador; o produto só vê a tela e fala com o emulador.</td><td><span class="pill prop">proposta</span></td></tr>
+      <tr><td class="code">DC-09</td><td>O jogador não pede ação</td><td>Configura tom e intensidade antes da sessão; durante, só pausa, reverte e encerra</td><td>Se o jogador escolhe o efeito, é trainer. Transparência com pausa e reversão é o limite que mantém o mestre.</td><td><span class="pill prop">proposta</span></td></tr>
+      <tr><td class="code">DC-10</td><td>Idioma</td><td>Produto em português do Brasil; rótulos de perfil podem manter o nome original do jogo</td><td>Público do cliente; o nome original evita ambiguidade no mapeamento.</td><td><span class="pill prop">proposta</span></td></tr>
+      <tr><td class="code">DC-11</td><td>Nome, pasta e repositório</td><td>"IAEmPS2" (provisório); pasta Projetos-SSD\iaemps2; repositório privado, branch e merge, nunca commit direto na principal</td><td>Mesmo esquema de trabalho dos outros projetos do cliente.</td><td><span class="pill prop">proposta</span></td></tr>
+      <tr><td class="code">DC-12</td><td>Origem do perfil de memória</td><td>À mão, importado de fonte pública ou descoberta assistida; qualquer origem passa por validação contra o jogo em execução antes de entrar numa sessão</td><td>Perfil errado age no lugar errado; a validação é a mesma independente da origem.</td><td><span class="pill prop">proposta</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="kicker" style="margin-top:14px">Fica para o blueprint técnico</div>
+  <ul class="clean" style="font-size:9.4pt">
+    <li>Linguagem e estrutura do repositório do mestre; o protótipo é em Python e isso é um ponto de partida, não uma decisão.</li>
+    <li>Tamanho exato da extensão do canal do emulador, e como propô-la ao projeto original para zerar o custo de manter uma versão própria.</li>
+    <li>Qual serviço de linguagem e qual modelo, decididos com medição de custo, latência e qualidade de leitura de tela e de decisão, nunca por preferência.</li>
+    <li>Ciclo de captura e decisão: frequência, resolução da captura, o que vai junto como estado.</li>
+    <li>Formato da sessão viva e, na fase 2, do perfil de memória.</li>
+  </ul>
 </section>
 
 <!-- ============ LACUNAS E FECHAMENTO ============ -->
 <section class="cap">
   <div class="kicker">Lacunas</div>
   <h2>O que ainda não está resolvido</h2>
-  <p class="lead">Lista republicada no fim de cada fase. Item fechado sai com a data e o documento em que foi resolvido. As três primeiras precisam de um dado do cliente ou de uma verificação na máquina dele.</p>
+  <p class="lead" style="margin-bottom:8px">Lista republicada no fim de cada fase. Duas foram fechadas nesta revisão, verificando o emulador instalado na máquina do cliente; a primeira só o cliente fecha.</p>
 
-  <table>
+  <table class="tight" style="font-size:8.3pt">
     <thead><tr><th>Código</th><th>Lacuna</th><th>Onde resolve</th><th>Risco se ficar aberta</th></tr></thead>
     <tbody>
-      <tr><td class="code">LC-01</td><td>Versão e serial de Final Fantasy XII em uso. Os deslocamentos do protótipo são relativos ao endereço do dinheiro; falta o endereço fixo desse valor na versão do cliente, que é um dado só.</td><td>Antes do esqueleto ambulante, com o emulador aberto</td><td>Esqueleto não anda.</td></tr>
-      <tr><td class="code">LC-02</td><td>Confirmar que o PCSX2 instalado expõe a memória pela interface oficial ou pelo símbolo exportado. Confirmado só no código-fonte do emulador, não no executável do cliente.</td><td>Primeira tarefa do módulo A</td><td>Ponte não funciona; volta a varredura.</td></tr>
-      <tr><td class="code">LC-03</td><td>Como identificar o jogo em execução (serial, soma de verificação) pela ponte, para casar com o perfil certo.</td><td>Casos de uso do módulo A</td><td>Perfil de um jogo escrevendo na memória de outro.</td></tr>
-      <tr><td class="code">LC-04</td><td>Cobertura real e termos de uso das fontes públicas de mapas, jogo a jogo.</td><td>Casos de uso do módulo B; levantamento na fase 2</td><td>"Qualquer jogo" vira "poucos jogos".</td></tr>
-      <tr><td class="code">LC-05</td><td>Como medir a qualidade do mestre sem gabarito. Proposta: bancada de estados sintéticos em que toda decisão tem de cumprir as regras de negócio, mais sessões jogadas; a diversão em si continua julgamento do jogador.</td><td>Blueprint, seção de testes do mestre</td><td>Sem medida, regressão passa despercebida.</td></tr>
-      <tr><td class="code">LC-06</td><td>Custo e latência por sessão no ciclo de decisão, e limite aceitável para o cliente.</td><td>Medição no esqueleto ambulante</td><td>Produto inviável de operar.</td></tr>
+      <tr><td class="code">LC-01</td><td>Jogo e BIOS na máquina do cliente. Ele não tem mais o jogo do protótipo nem outro; o emulador foi instalado nesta revisão, mas sem BIOS do console dele e sem um jogo que ele possua nada roda. Com alavancas universais, qual jogo pesa pouco.</td><td>Cliente, antes do esqueleto ambulante</td><td>Esqueleto não anda.</td></tr>
+      <tr><td class="code">LC-02<span class="pill ok">fechada 26/10</span></td><td>O emulador instalado expõe a memória pela interface oficial ou pelo símbolo exportado. Verificado no executável da versão 2.8.2: os três símbolos de memória são exportados e o servidor do canal oficial está embutido, com a opção nas configurações avançadas.</td><td>Verificação feita nesta revisão</td><td>Nenhum.</td></tr>
+      <tr><td class="code">LC-03<span class="pill ok">fechada 26/10</span></td><td>Como identificar o jogo em execução para casar com o perfil. O canal oficial devolve título, serial, soma de verificação e versão do jogo por comando próprio.</td><td>Código-fonte da versão 2.8.2</td><td>Nenhum.</td></tr>
+      <tr><td class="code">LC-04</td><td>Cobertura real e termos de uso das fontes públicas de mapas, jogo a jogo.</td><td>Casos de uso do módulo H; levantamento na fase 2</td><td>A camada de memória vale para poucos jogos.</td></tr>
+      <tr><td class="code">LC-05</td><td>Como medir a qualidade do mestre sem gabarito. Proposta: bancada de capturas e estados sintéticos em que toda decisão tem de cumprir as regras de negócio, mais sessões jogadas; a diversão em si continua julgamento do jogador.</td><td>Blueprint, seção de testes do mestre</td><td>Sem medida, regressão passa despercebida.</td></tr>
+      <tr><td class="code">LC-06</td><td>Custo e latência por sessão com captura de tela a cada ciclo, e limite aceitável para o cliente. Imagem custa mais que texto.</td><td>Medição no esqueleto ambulante</td><td>Produto inviável de operar.</td></tr>
       <tr><td class="code">LC-07</td><td>Levantamento do que já existe: produtos que alteram jogos em tempo real por evento externo, em emulador ou não. Nenhuma pesquisa feita ainda.</td><td>Antes da fase 2</td><td>Construir o que já existe.</td></tr>
-      <tr><td class="code">LC-08</td><td>Validação com outros jogadores antes do catálogo de perfis: medir interesse e qual jogo pedem primeiro.</td><td>Fim da fase 1, antes de qualquer trabalho da fase 2</td><td>Produto certo para uma pessoa, errado para o resto.</td></tr>
+      <tr><td class="code">LC-08</td><td>Validação com outros jogadores antes da fase 2: medir interesse e qual jogo pedem primeiro.</td><td>Fim da fase 1</td><td>Produto certo para uma pessoa, errado para o resto.</td></tr>
       <tr><td class="code">LC-09</td><td>Nome definitivo do produto.</td><td>Decisão do cliente, a qualquer momento</td><td>Nenhum.</td></tr>
+      <tr><td class="code">LC-10</td><td>Ambiente de compilação do emulador no Windows (C++, Qt, Visual Studio, dependências), tempo de compilação e custo de acompanhar as versões do projeto original. Nada medido ainda.</td><td>Primeiro card do blueprint</td><td>Versão própria cara demais de manter; volta a simular tecla de atalho.</td></tr>
     </tbody>
   </table>
 
