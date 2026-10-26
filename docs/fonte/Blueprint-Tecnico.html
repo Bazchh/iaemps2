@@ -111,7 +111,7 @@
         <li>Python 3.13 com tkinter, pillow, numpy, pydantic, httpx; captura e acesso a janelas instalados nesta rodada.</li>
         <li>Build Tools 2022 com a carga de trabalho C++, MSVC 14.44, SDK 10.0.26100, MSBuild, CMake e Ninja.</li>
         <li>Dependências do emulador para Windows publicadas pelo projeto em pacote pré-compilado de 164 MB.</li>
-        <li>Disco: 23 GB livres. É o risco a nomear antes de compilar o emulador.</li>
+        <li>Disco: 87 GB livres após limpeza feita pelo cliente; a compilação do emulador cabe com folga.</li>
       </ul>
     </div>
   </div>
@@ -664,7 +664,7 @@
       <tr><td>Versão</td><td>O binário responde à versão do canal com o sufixo da extensão, e à consulta de capacidades com a versão da extensão. A plataforma registra os dois na sessão.</td></tr>
       <tr><td>Acompanhar o original</td><td>A cada versão estável do projeto, rebase do commit de extensão e nova compilação. Como o diff é um arquivo, o conflito esperado é zero ou trivial.</td></tr>
       <tr><td>Proposta ao original</td><td>Depois que o esqueleto jogar com a versão própria, o commit vira uma proposta ao projeto original, nos termos de contribuição dele. Aceito, a versão própria deixa de existir.</td></tr>
-      <tr><td>Ferramentas que faltam na máquina do cliente</td><td>Nenhuma obrigatória: MSBuild, MSVC, SDK, CMake e Ninja estão instalados. O extrator de 7z do projeto não está, e o pacote de dependências é extraído pelo Python. O risco real é disco: 23 GB livres, e a árvore do projeto com dependências e objetos de compilação pode passar de 15 GB. O card S4-01 mede antes de prosseguir.</td></tr>
+      <tr><td>Ferramentas que faltam na máquina do cliente</td><td>Nenhuma obrigatória: MSBuild, MSVC, SDK, CMake e Ninja estão instalados. O extrator de 7z do projeto não está, e o pacote de dependências é extraído pelo Python. Disco não é mais risco: 87 GB livres após limpeza do cliente, e a árvore do projeto com dependências e objetos de compilação fica abaixo de 20 GB. O card S4-01 ainda mede o espaço ocupado, para registro.</td></tr>
     </tbody>
   </table>
 </section>
@@ -1077,7 +1077,7 @@
 
   <div class="warn"><b>O que este documento assume e precisa ser confirmado.</b>
     <ul class="clean" style="font-size:9.2pt">
-      <li>Que a máquina do cliente compila o emulador com 23 GB livres. O card S4-01 mede antes de qualquer mudança; se não couber, a compilação vai para outra máquina ou para o CI e o card termina com esse número (lacuna LC-10).</li>
+      <li>Que a receita de compilação do projeto roda na máquina do cliente com as ferramentas já instaladas. O card S4-01 mede espaço e tempo de máquina e grava o que faltou (lacuna LC-10); disco deixou de ser risco com 87 GB livres.</li>
       <li>Que a captura pela janela funciona também com o jogo em tela cheia sem borda. A prova foi em janela; o card S2-01 testa a outra (lacuna LC-13).</li>
       <li>Que as teclas Ctrl+Alt+Z, P e Q não colidem com nenhum atalho do emulador nem do jogo. Confirmar no esqueleto.</li>
       <li>Qual serviço de linguagem fica. O primeiro adaptador é o do provedor cujo acesso o cliente já tem; a escolha é da bancada, por número.</li>
