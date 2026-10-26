@@ -128,7 +128,7 @@ CSS = """
   .note { background:var(--bg-soft); border-radius:8px; padding:10px 12px; font-size:9.2pt; break-inside:avoid; }
   .capa .stats { margin:10px 0; } .capa .stat { padding:7px 12px; } .capa .stat .big { font-size:22pt; }
   .capa .grid3 .card { padding:7px 10px; } .capa .card p { font-size:8.7pt; line-height:1.35; }
-  .pend { display:grid; grid-template-columns:70px 90px 1fr; gap:8px; font-size:9pt; padding:6px 0; border-bottom:1px solid var(--line); }
+  .pend { display:grid; grid-template-columns:70px 90px 1fr; gap:8px; font-size:8.7pt; padding:4px 0; border-bottom:1px solid var(--line); }
 """
 
 # ---------- índices e contagens ----------
