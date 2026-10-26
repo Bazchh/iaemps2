@@ -1,15 +1,16 @@
-"""O programa de terminal. Na fundação (card S0-01) só responde com a versão e procura o canal do emulador."""
+"""O programa de terminal. Até o card S1-01: versão, e sondar o canal do emulador até o jogo rodar."""
 
 from __future__ import annotations
 
 import argparse
-import socket
 import sys
 from collections.abc import Sequence
 from pathlib import Path
 
 from iaemps2 import __version__
 from iaemps2.config import Config, ConfigInvalidaError, carregar
+from iaemps2.ponte.cliente import CanalError, Cliente, ComandoFalhouError
+from iaemps2.ponte.protocolo import Status
 
 SAIDA_OK = 0
 SAIDA_CONFIG = 1
@@ -26,15 +27,25 @@ def montar_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def canal_responde(config: Config) -> bool:
-    """Tenta abrir o socket do canal oficial. Só diz se alguém escuta; o protocolo é do card S1-01."""
+def sondar_canal(config: Config) -> str | None:
+    """Conecta ao canal oficial, espera o jogo rodar e devolve uma linha de estado; None se não há canal."""
+    cliente = Cliente(config.canal.host, config.canal.porta, config.canal.tempo_limite_s)
     try:
-        with socket.create_connection(
-            (config.canal.host, config.canal.porta), timeout=config.canal.tempo_limite_s
-        ):
-            return True
-    except OSError:
-        return False
+        cliente.conectar()
+        versao = cliente.versao()
+        status = cliente.esperar_jogo(limite_s=config.canal.espera_jogo_s)
+        if status != Status.RODANDO:
+            return f"{versao}: nenhum jogo rodando (status {status.name.lower()}) após {config.canal.espera_jogo_s:.0f} s."
+        ident = cliente.identificar()
+        return f"{versao}: {ident.titulo} ({ident.serial}, {ident.crc}, versão {ident.versao_jogo}), rodando."
+    except CanalError as erro:
+        if erro.classe == "porta_fechada":
+            return None
+        return f"canal com problema ({erro.classe}): {erro.detalhe}"
+    except ComandoFalhouError as erro:
+        return f"o emulador recusou um comando: {erro}"
+    finally:
+        cliente.fechar()
 
 
 def principal(argv: Sequence[str] | None = None) -> int:
@@ -47,11 +58,12 @@ def principal(argv: Sequence[str] | None = None) -> int:
     except ConfigInvalidaError as erro:
         print(f"configuração inválida: {erro}", file=sys.stderr)
         return SAIDA_CONFIG
-    if not canal_responde(config):
+    estado = sondar_canal(config)
+    if estado is None:
         print(
             f"canal não encontrado em {config.canal.host}:{config.canal.porta}. "
             "Abra o emulador com o canal oficial ligado (Configurações, Avançado, PINE) e carregue o jogo."
         )
         return SAIDA_SEM_CANAL
-    print(f"canal encontrado em {config.canal.host}:{config.canal.porta}. A ponte entra no card S1-01.")
+    print(f"canal em {config.canal.host}:{config.canal.porta}: {estado}")
     return SAIDA_OK
