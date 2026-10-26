@@ -1,4 +1,4 @@
-"""O programa de terminal. Até o card S1-01: versão, e sondar o canal do emulador até o jogo rodar."""
+"""O programa de terminal. Até o card S1-02: versão, e sondar o canal até o jogo rodar, identificando jogo e modo."""
 
 from __future__ import annotations
 
@@ -9,6 +9,7 @@ from pathlib import Path
 
 from iaemps2 import __version__
 from iaemps2.config import Config, ConfigInvalidaError, carregar
+from iaemps2.ponte import emulador
 from iaemps2.ponte.cliente import CanalError, Cliente, ComandoFalhouError
 from iaemps2.ponte.protocolo import Status
 
@@ -36,8 +37,12 @@ def sondar_canal(config: Config) -> str | None:
         status = cliente.esperar_jogo(limite_s=config.canal.espera_jogo_s)
         if status != Status.RODANDO:
             return f"{versao}: nenhum jogo rodando (status {status.name.lower()}) após {config.canal.espera_jogo_s:.0f} s."
-        ident = cliente.identificar()
-        return f"{versao}: {ident.titulo} ({ident.serial}, {ident.crc}, versão {ident.versao_jogo}), rodando."
+        jogo = emulador.identificar(cliente)
+        ident = jogo.identificacao
+        quem = f"{ident.titulo} ({ident.serial}, {ident.crc}, versão {ident.versao_jogo})"
+        if not jogo.identificado:
+            quem = f"{ident.titulo} (sem serial: não identificado)"
+        return f"{versao}: {quem}, rodando, modo {jogo.modo}."
     except CanalError as erro:
         if erro.classe == "porta_fechada":
             return None
