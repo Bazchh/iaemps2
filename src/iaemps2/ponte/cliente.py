@@ -30,6 +30,13 @@ class ComandoFalhouError(RuntimeError):
 
 
 @dataclass(frozen=True)
+class Velocidade:
+    modo: p.ModoVelocidade
+    alvo: float
+    restante_ms: int
+
+
+@dataclass(frozen=True)
 class Identificacao:
     titulo: str
     serial: str
@@ -163,6 +170,20 @@ class Cliente:
         crc, i = p.ler_texto(corpo, i)
         versao_jogo, _ = p.ler_texto(corpo, i)
         return Identificacao(titulo, serial, crc, versao_jogo)
+
+    # ---------- extensão da versão própria (códigos 0x81 a 0x83; falham no emulador original) ----------
+    def pausar(self, pausar: bool) -> None:
+        self.pedir(p.comando(p.Codigo.EXT_SET_PAUSED, bytes([1 if pausar else 0])))
+
+    def velocidade(self, modo: p.ModoVelocidade, escalar: float, duracao_ms: int) -> None:
+        self.pedir(
+            p.comando(p.Codigo.EXT_SET_SPEED, struct.pack("<BfI", int(modo), float(escalar), int(duracao_ms)))
+        )
+
+    def velocidade_atual(self) -> Velocidade:
+        corpo = self.pedir(p.comando(p.Codigo.EXT_GET_SPEED))
+        modo, alvo, restante = struct.unpack_from("<BfI", corpo, 0)
+        return Velocidade(p.ModoVelocidade(modo), float(alvo), int(restante))
 
     def esperar_jogo(self, limite_s: float, intervalo_s: float = 1.0) -> p.Status:
         """Sonda o status até "rodando" ou até o limite. "Desligado" nos primeiros segundos é carregamento normal."""
