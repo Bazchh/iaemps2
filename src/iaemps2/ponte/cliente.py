@@ -31,6 +31,44 @@ class ComandoFalhouError(RuntimeError):
 
 
 @dataclass(frozen=True)
+class Assinatura:
+    """Um lote de desenho do último quadro, como a camada de cena o vê (prova S7-00)."""
+
+    hash_textura: int
+    vertices: int
+    x0: int
+    y0: int
+    x1: int
+    y1: int
+    z_min: int
+    z_max: int
+    fallback: bool  # identidade pelo endereço da textura, não por hash
+    qualifica: bool  # desenho de mundo: alvo + profundidade + teste e escrita de profundidade
+
+    @property
+    def area(self) -> int:
+        return max(0, self.x1 - self.x0) * max(0, self.y1 - self.y0)
+
+
+@dataclass(frozen=True)
+class EstatisticasCena:
+    regra_existe: bool
+    quadros_total: int
+    quadros_vista: int
+    quadros_aplicada: int
+    camada_quadros: int
+    camada_ns_total: int
+    camada_ns_ultimo_quadro: int
+    desenhos_ultimo_quadro: int
+    qualificados_ultimo_quadro: int
+    com_hash_ultimo_quadro: int
+
+
+REGRA_ESCONDER = 1
+REGRA_QUADRADO = 2
+
+
+@dataclass(frozen=True)
 class Velocidade:
     modo: p.ModoVelocidade
     alvo: float
@@ -191,6 +229,45 @@ class Cliente:
         corpo = self.pedir(p.comando(p.Codigo.EXT_GET_SPEED))
         modo, alvo, restante = struct.unpack_from("<BfI", corpo, 0)
         return Velocidade(p.ModoVelocidade(modo), float(alvo), int(restante))
+
+    # ---------- camada de cena (prova S7-00; códigos 0x84 a 0x88) ----------
+    def cena_lista(self) -> tuple[int, list[Assinatura]]:
+        """(número do quadro, assinaturas do último quadro)."""
+        corpo = self.pedir(p.comando(p.Codigo.EXT_SCENE_LIST))
+        quadro, n = struct.unpack_from("<II", corpo, 0)
+        itens = []
+        for i in range(n):
+            h, nv, x0, y0, x1, y1, zmin, zmax, fb, q = struct.unpack_from("<QIhhhhIIBB", corpo, 8 + i * 32)
+            itens.append(Assinatura(h, nv, x0, y0, x1, y1, zmin, zmax, bool(fb), bool(q)))
+        return int(quadro), itens
+
+    def cena_regra(
+        self,
+        tipo: int,
+        hash_textura: int = 0,
+        retangulo: tuple[int, int, int, int] = (0, 0, 0, 0),
+        z: int = 0,
+        rgba: int = 0xFFFF00FF,
+        duracao_ms: int = 0,
+        apos_n: int = 1,
+    ) -> int:
+        """Grava uma regra (esconder ou quadrado injetado) com prazo; devolve o id."""
+        x0, y0, x1, y1 = retangulo
+        corpo = self.pedir(
+            p.comando(
+                p.Codigo.EXT_SCENE_RULE,
+                struct.pack("<BQhhhhIIII", tipo, hash_textura, x0, y0, x1, y1, z, rgba, duracao_ms, apos_n),
+            )
+        )
+        return int(struct.unpack_from("<I", corpo, 0)[0])
+
+    def cena_limpar(self, id_regra: int = 0) -> None:
+        self.pedir(p.comando(p.Codigo.EXT_SCENE_CLEAR, struct.pack("<I", id_regra)))
+
+    def cena_estatisticas(self, id_regra: int = 0) -> EstatisticasCena:
+        corpo = self.pedir(p.comando(p.Codigo.EXT_SCENE_STATS, struct.pack("<I", id_regra)))
+        campos = struct.unpack_from("<IIIIIQQIII", corpo, 0)
+        return EstatisticasCena(bool(campos[0]), *campos[1:])
 
     def esperar_jogo(self, limite_s: float, intervalo_s: float = 1.0) -> p.Status:
         """Sonda o status até "rodando" ou até o limite. "Desligado" nos primeiros segundos é carregamento normal."""
