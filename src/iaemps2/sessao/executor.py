@@ -9,11 +9,14 @@ repetida no ciclo; três seguidas tiram a alavanca do catálogo.
 
 from __future__ import annotations
 
+import functools
 import json
 import sqlite3
+import threading
 import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from typing import Any
 
 from iaemps2.catalogo import catalogo as cat
 from iaemps2.mestre.decisao import Veredito, situacao_mudou
@@ -23,6 +26,19 @@ from iaemps2.ponte.cliente import CanalError, Cliente, ComandoFalhouError
 from iaemps2.ponte.estados import FilaDeSlots, RecargaNaoConfirmadaError, SalvamentoNaoConfirmadoError
 from iaemps2.registro import banco
 from iaemps2.sessao.relogio import Contador
+
+
+def _sincronizado[**P, R](metodo: Callable[P, R]) -> Callable[P, R]:
+    """O laço e o relógio de fim chamam o executor de threads diferentes; um de cada vez."""
+
+    @functools.wraps(metodo)
+    def envolto(*args: P.args, **kwargs: P.kwargs) -> R:
+        executor: Any = args[0]
+        with executor._trava:
+            return metodo(*args, **kwargs)
+
+    return envolto
+
 
 COM_DURACAO = {"pausa", "camera_lenta", "turbo"}
 # O emulador aplica pausa e velocidade na thread da CPU dele, depois de responder ao canal; a confirmação
@@ -63,8 +79,10 @@ class Executor:
     aperto_dos_slots: dict[int, int] = field(default_factory=dict)
     situacao_id_atual: int | None = None  # a sessão informa a cada ciclo; vira contexto do slot salvo
     dormir: Callable[[float], None] = time.sleep  # entre releituras de confirmação
+    _trava: threading.RLock = field(default_factory=threading.RLock, repr=False)
 
     # ---------- estado do emulador para o registro ----------
+    @_sincronizado
     def estado_atual(self, situacao: Situacao | None) -> dict[str, object]:
         status = self.cliente.status()
         velocidade = 1.0
@@ -81,6 +99,7 @@ class Executor:
         }
 
     # ---------- D02 ----------
+    @_sincronizado
     def executar(
         self,
         veredito: Veredito,
@@ -230,6 +249,7 @@ class Executor:
         self.catalogo = cat.com_slots(self.catalogo, tuple(sorted(self.aperto_dos_slots)))
         return registro_id
 
+    @_sincronizado
     def salvar_periodico(self, situacao: Situacao | None) -> int | None:
         """O salvamento de rotina da intensidade (A05), fora do catálogo de decisões."""
         try:
@@ -238,6 +258,7 @@ class Executor:
             return None
 
     # ---------- fim das ações com duração ----------
+    @_sincronizado
     def encerrar_vencidos(self, agora_ms: int | None = None) -> list[int]:
         """Pausa termina pela plataforma; velocidade termina pelo vigia do emulador. Grava o fim de ambas."""
         agora = self.contador.agora_ms() if agora_ms is None else agora_ms
@@ -249,6 +270,7 @@ class Executor:
             encerradas.append(pendente.intervencao_id)
         return encerradas
 
+    @_sincronizado
     def encerrar_todas(self) -> list[int]:
         """D05 e E04: tudo que tem duração volta ao normal agora."""
         encerradas = [pendente.intervencao_id for pendente in self.pendentes]
@@ -270,6 +292,7 @@ class Executor:
         self.pendentes.remove(pendente)
 
     # ---------- D03 ----------
+    @_sincronizado
     def reverter(self, ciclo_id: int) -> Execucao | None:
         """Desfaz a última intervenção reversível pelo caminho próprio dela. None se não há o que reverter."""
         ultima = self.ultima_reversivel

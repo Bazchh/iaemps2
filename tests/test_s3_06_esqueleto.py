@@ -224,3 +224,32 @@ def test_encerrar_apos_prazo(tmp_path: Path) -> None:
         _avancar(s, agora, 7)
         assert s.laco.estado == Estado.ENCERRADA
         s.con.close()
+
+
+def test_pausa_termina_no_segundo_certo_sem_depender_do_ciclo(tmp_path: Path) -> None:
+    """Prova de fogo: pausas de 3 s duraram 9 e 11 s porque o fim só era visto entre ciclos, e o ciclo esperava
+    o serviço. O relógio de fim roda em thread própria."""
+    import threading
+    import time
+
+    agora = [0.0]
+    servico = ServicoFalso(respostas=[COMBATE], decisoes=[DEC % ("pausa", '{"duracao_s": 3}', "Pausa.")])
+    with Simulador(
+        "proprio", pasta_estados=tmp_path / "sstates", atraso_salvamento_s=0.1, relogio=lambda: agora[0]
+    ) as sim:
+        s = _sessao(tmp_path, sim, servico, Cenas(), agora)
+        s.iniciar()
+        for _ in range(3):
+            s.passo()
+        assert s.cliente.status().name == "PAUSADO"
+        relogio_de_fim = threading.Thread(target=s.vigiar_fins, daemon=True)
+        relogio_de_fim.start()
+        agora[0] += 4  # o prazo venceu; nenhum passo() é chamado
+        limite = time.monotonic() + 2
+        while s.cliente.status().name != "RODANDO" and time.monotonic() < limite:
+            time.sleep(0.05)
+        assert s.cliente.status().name == "RODANDO"
+        assert s.con.execute("select fim_ms from intervencoes").fetchone()[0] is not None
+        s.encerrada.set()
+        relogio_de_fim.join(timeout=2)
+        s.con.close()

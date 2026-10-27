@@ -16,6 +16,7 @@ from iaemps2.mestre.memoria import MemoriaCurta
 from iaemps2.olho.situacao import Situacao
 from iaemps2.servicos.base import Resposta, Servico
 
+JANELA_DA_MORTE_MS = 180_000  # morte mais velha que isso não pede recarga
 LIMITE_MOTIVO = 120
 
 
@@ -52,11 +53,34 @@ class PedidoDecidir:
             + json.dumps(self.catalogo, ensure_ascii=False)
             + ". Memória recente: "
             + json.dumps(self.memoria, ensure_ascii=False)
+            + self._aviso_de_morte()
             + (
                 f". Próxima janela de intervenção em {self.proxima_janela_ms} ms: se for maior que zero, escolha 'nada'."
                 if self.proxima_janela_ms > 0
                 else "."
             )
+        )
+
+    def _aviso_de_morte(self) -> str:
+        """Morte recente com a cena de volta e um estado guardado: recarregar é a resposta esperada; no tom
+        implacável, obrigatória. Sem isso o serviço ignorava a morte e só mexia na velocidade."""
+        mortes = [m["ha_ms"] for m in self.memoria.get("marcos", []) if m.get("tipo") == "morte"]
+        recarregar = next((a for a in self.catalogo if a.get("alavanca") == "recarregar"), None)
+        if (
+            not mortes
+            or min(mortes) > JANELA_DA_MORTE_MS
+            or not recarregar
+            or not recarregar.get("disponivel")
+        ):
+            return ""
+        if self.tom == Tom.IMPLACAVEL.value:
+            return (
+                f". O jogador morreu há {min(mortes) // 1000} s e a cena voltou: no tom implacável você DEVE escolher"
+                " 'recarregar' agora, com o motivo seco"
+            )
+        return (
+            f". O jogador morreu há {min(mortes) // 1000} s e a cena voltou: 'recarregar' um estado guardado é a"
+            " resposta esperada, salvo motivo forte"
         )
 
 
