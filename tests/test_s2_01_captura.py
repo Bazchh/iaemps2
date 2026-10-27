@@ -87,3 +87,12 @@ def test_emulador_real_captura_o_jogo_sem_menu() -> None:
     # sem a barra de menu clara no topo: a primeira linha não é cinza de menu
     topo = [img.getpixel((x, 1)) for x in range(0, 640, 40)]
     assert not all(isinstance(v, int) and 200 < v < 256 for v in topo)
+
+
+def test_nome_do_processo_do_emulador_por_prefixo() -> None:
+    # o instalado e o compilado são o mesmo emulador; outro programa com prefixo parecido não é
+    assert cap.e_o_emulador("pcsx2-qt.exe")
+    assert cap.e_o_emulador("PCSX2-QTX64-AVX2.EXE")
+    assert not cap.e_o_emulador("pcsx2-qt")  # sem .exe não é um processo do Windows
+    assert not cap.e_o_emulador("pcsx2.exe")
+    assert not cap.e_o_emulador(None)
