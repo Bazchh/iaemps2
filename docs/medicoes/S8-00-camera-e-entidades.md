@@ -37,6 +37,17 @@ Três de três quadros amostrados: acima do critério de 90%, com a ressalva de 
 inimigo andava devagar. A câmera, o alvo, a matriz e a escala entraram no primeiro perfil de memória do jogo
 (`perfis/memoria/SLUS-21134.json`), junto com a vida do jogador e da parceira.
 
+## Rodada dos tiros (vida do inimigo)
+
+Três fotos com o cliente imóvel: antes do primeiro tiro, depois do primeiro, depois do segundo. O inimigo
+revidou entre as fotos: a vida do jogador caiu de 1200 para 1048 e 915, e essa queda apareceu também como
+ponto flutuante em outro endereço (0x0041B5C4), que deve pertencer ao objeto do personagem, não ao bloco de
+estado do jogo. Candidatos a vida do inimigo, em ponto flutuante, caindo por valor parecido a cada tiro:
+2040 → 1530 → 989 (duas cópias), 2337 → 2067 → 1823, 1635 → 1140 → 743. Nenhum deles tem uma posição
+ao lado: a região em que moram (perto de 0x0184 0000 a 0x0186 0000) guarda valores que alternam entre poucos
+pontos fixos, mais parecidos com dados de animação do que com uma lista de entidades. Munição: seis
+candidatos que caem de um em um por tiro, a confirmar contra a tela.
+
 ## O que ainda não fechou
 
 - **Projeção.** A posição do jogador pela 4x4 da câmera cai com divisor perto de zero: a matriz não é um
