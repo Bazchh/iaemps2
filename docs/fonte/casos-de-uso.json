@@ -3,11 +3,11 @@
   "subtitulo": "mestre invisível por inteligência artificial para jogos de PlayStation 2 em emulador",
   "titulo": "Casos de Uso",
   "kicker": "Especificação funcional · outubro de 2026",
-  "entrega": "Entrega 6: módulo K (Cena, fase 4) detalhado, sobre a fase 1 jogada e os módulos A a G. H, I e J seguem no índice com código fixo.",
-  "intro": "Tudo o que o mestre invisível precisa fazer, descrito um a um: quem usa, o que acontece passo a passo, o que fazer quando algo dá errado e o que ganhamos com cada um. Documento complementar ao Mapa do Projeto (revisão 6, aprovado) e ao Blueprint Técnico.",
+  "entrega": "Entrega 7: módulo H (perfil de memória) e módulo I detalhados; I01 antecipado para a fase 2 (DC-22). A fase 2 fica inteira especificada.",
+  "intro": "Tudo o que o mestre invisível precisa fazer, descrito um a um: quem usa, o que acontece passo a passo, o que fazer quando algo dá errado e o que ganhamos com cada um. Documento complementar ao Mapa do Projeto (revisão 7) e ao Blueprint Técnico.",
   "rodape": "Casos de uso · IAEmPS2",
   "legenda_motor": "comando ao emulador",
-  "mapa_legenda": "Quem usa o quê. Os módulos A a G são o mestre jogável da fase 1; H põe o mundo em jogo na fase 2; I e J dão as mãos ao mestre na fase 3; K dá a cena ao mestre na fase 4.",
+  "mapa_legenda": "Quem usa o quê. Os módulos A a G são o mestre jogável da fase 1; H põe o mundo em jogo na fase 2, com o mapa de entidades de I antecipado; I e J dão as mãos ao mestre na fase 3; K dá a cena ao mestre na fase 4.",
   "fechamento_lead": "Fase 1, o ritmo: mestre jogável em qualquer jogo. Fase 2, o mundo: perfil de memória e outros jogadores. Fase 3, as mãos: entidades e controle. Fase 4, a cena: o espaço 3D redesenhado em tempo real.",
   "fases": {
     "1": {
@@ -18,7 +18,7 @@
     "2": {
       "nome": "o mundo muda: perfil de memória e outros jogadores",
       "cor": "f2",
-      "resumo": "O perfil de memória do jogo de abertura, com ações de mundo entrando no mesmo catálogo; depois perfis compartilháveis e instalação para outros jogadores."
+      "resumo": "O perfil de memória do jogo de abertura, começando pela câmera e pelo mapa de entidades (o que a cena precisa), depois as ações de mundo entrando no mesmo catálogo; depois perfis compartilháveis e instalação para outros jogadores."
     },
     "3": {
       "nome": "entidades e controle",
@@ -2692,15 +2692,73 @@
       "letra": "H",
       "nome": "Perfil de memória",
       "fase": 2,
-      "detalhado": false,
-      "resumo": "A camada que muda o mundo, por jogo: inimigo que aparece, recurso que some, item onde não existia. Endereços, faixas, ações de mundo.",
+      "detalhado": true,
+      "resumo": "A camada que muda o mundo, por jogo: o que o jogo guarda enquanto roda (câmera, posição e vida de cada entidade, recursos, flags), com nome, tipo, faixa e significado. Criado à mão, importado de fonte pública ou descoberto com assistência; validado contra o jogo em execução antes de entrar numa sessão; e as ações de mundo que ele permite, no mesmo catálogo e com as mesmas regras.",
       "casos": [
         {
           "codigo": "H01",
           "nome": "Criar perfil de memória à mão",
           "ator": "Mapeador",
           "fase": 2,
-          "prioridade": "Essencial"
+          "prioridade": "Essencial",
+          "apoio": [
+            "Emulador"
+          ],
+          "objetivo": "Deixar escrito, por jogo e versão, o que cada endereço da memória significa, com tipo, faixa e o que nunca se toca, para que a plataforma só leia e escreva o que está declarado.",
+          "fluxo": [
+            {
+              "t": "Mapeador abre o perfil do jogo",
+              "tipo": "ator"
+            },
+            {
+              "t": "Declara variável: nome, endereço, tipo, faixa, significado",
+              "tipo": "ator"
+            },
+            {
+              "t": "Plataforma lê o valor atual pelo canal",
+              "tipo": "motor"
+            },
+            {
+              "t": "Mapeador confirma que o valor faz sentido",
+              "tipo": "ator"
+            },
+            {
+              "t": "Perfil gravado com versão e origem",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Jogo identificado por serial e soma de verificação (caso de uso A02).",
+            "Emulador com o jogo rodando, de preferência numa cena conhecida (estado salvo do mestre)."
+          ],
+          "gatilho": "Um jogo novo vai ganhar ações de mundo, ou uma variável nova é necessária para um caso de uso.",
+          "principal": [
+            "O mapeador declara cada variável com nome, endereço, tipo (inteiro de 1, 2 ou 4 bytes, ponto flutuante, vetor), faixa válida e significado em uma linha; variáveis compostas (câmera, entidade) declaram os campos e o passo entre entidades.",
+            "Para cada variável declarada a plataforma lê o valor atual pelo canal e mostra ao mapeador, que confirma ou corrige antes de gravar.",
+            "O mapeador declara também a lista do que nunca se toca: endereços de código, de salvamento e de qualquer coisa que corrompa o jogo.",
+            "O perfil é gravado por serial e soma de verificação, com versão, data e a origem de cada variável (mão, fonte pública, descoberta), sem nenhuma imagem nem dado do jogo além dos endereços e valores de exemplo."
+          ],
+          "alternativos": [
+            {
+              "t": "Variável vinda de fonte pública",
+              "d": "O mapeador cola o endereço e a descrição da fonte, marca a origem e passa pela mesma leitura ao vivo (caso de uso H02)."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Endereço fora da memória do jogo",
+              "d": "A plataforma recusa antes de gravar: a memória principal do PlayStation 2 tem 32 MB e todo endereço do perfil tem de caber nela."
+            },
+            {
+              "t": "Valor lido não faz sentido",
+              "d": "O mapeador não confirma; a variável fica gravada como suspeita e não entra em sessão até a validação (caso de uso H04)."
+            }
+          ],
+          "resultado": "Perfil versionado com variáveis nomeadas, tipadas, com faixa e origem, e a lista do intocável.",
+          "regras": [
+            "RN-06",
+            "RN-09"
+          ]
         },
         {
           "codigo": "H02",
@@ -2709,7 +2767,59 @@
           "fase": 2,
           "prioridade": "Importante",
           "apoio": [
-            "Fontes de mapas"
+            "Fontes de mapas",
+            "Emulador"
+          ],
+          "objetivo": "Aproveitar o que a comunidade já descobriu sobre o jogo (listas de códigos e endereços) sem copiar nada que não seja um fato: endereço, tipo e significado.",
+          "fluxo": [
+            {
+              "t": "Mapeador aponta a fonte",
+              "tipo": "ator"
+            },
+            {
+              "t": "Plataforma extrai endereços e descrições",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Lê cada endereço ao vivo",
+              "tipo": "motor"
+            },
+            {
+              "t": "Mapeador aceita os que fazem sentido",
+              "tipo": "ator"
+            },
+            {
+              "t": "Variáveis no perfil com origem pública",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Perfil do jogo aberto (caso de uso H01).",
+            "Fonte em formato de lista de códigos ou de endereços, para o serial e a versão certos."
+          ],
+          "gatilho": "O mapeador quer começar pelo que já existe, ou uma variável procurada já é conhecida publicamente.",
+          "principal": [
+            "A plataforma reconhece listas de códigos de cheat em formato bruto (endereço e valor) e tira delas o endereço, o tamanho da escrita e a descrição; códigos que alteram código do jogo, em vez de dados, são marcados como tal e não viram variável.",
+            "Para cada candidato a plataforma lê o valor ao vivo e o mostra ao lado da descrição; o mapeador aceita, corrige o tipo ou descarta.",
+            "O que entra no perfil guarda só o fato (endereço, tipo, significado, faixa) e a referência da fonte; a lista de códigos em si não é copiada.",
+            "Serial e versão da fonte são conferidos contra o jogo em execução; fonte de outra região ou versão é recusada."
+          ],
+          "alternativos": [
+            {
+              "t": "Fonte com endereços de outra versão do jogo",
+              "d": "A plataforma avisa e oferece a busca por valor (caso de uso H03) a partir do valor que a fonte descreve."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Termos de uso da fonte desconhecidos",
+              "d": "Só fatos entram no perfil; a referência fica registrada para o cliente decidir (lacuna LC-04)."
+            }
+          ],
+          "resultado": "Variáveis conhecidas pela comunidade no perfil, conferidas ao vivo, com origem marcada.",
+          "regras": [
+            "RN-06",
+            "RN-09"
           ]
         },
         {
@@ -2717,10 +2827,75 @@
           "nome": "Descobrir variáveis com assistência",
           "ator": "Mapeador",
           "fase": 2,
-          "prioridade": "Importante",
+          "prioridade": "Essencial",
           "apoio": [
-            "Serviço de linguagem",
-            "Emulador"
+            "Emulador",
+            "Serviço de linguagem"
+          ],
+          "objetivo": "Achar na memória do jogo o que ninguém publicou: câmera, posição de cada entidade, vida de inimigo, pela comparação de fotos da memória tiradas em momentos escolhidos, com o jogo pausado.",
+          "fluxo": [
+            {
+              "t": "Mapeador escolhe o que procurar",
+              "tipo": "ator"
+            },
+            {
+              "t": "Pausa, foto da memória, retoma, repete",
+              "tipo": "motor"
+            },
+            {
+              "t": "Plataforma compara fotos e lista candidatos",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Mapeador age no jogo entre fotos",
+              "tipo": "ator"
+            },
+            {
+              "t": "Candidato confirmado vira variável",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Versão própria do emulador (pausa pelo canal).",
+            "Perfil do jogo aberto."
+          ],
+          "gatilho": "Uma variável necessária não está no perfil nem em fonte pública.",
+          "principal": [
+            "A plataforma pausa o jogo pelo canal, fotografa a memória inteira em lotes de leituras, e retoma; uma foto sem pausa mistura instantes e não serve para comparar.",
+            "O mapeador faz no jogo o movimento que muda só o que procura (andar sem virar a câmera; virar sem andar; levar dano) e pede fotos nos pontos de parada.",
+            "A plataforma compara as fotos: números que mudam aos poucos entre fotos onde houve movimento e ficam iguais onde não houve; estruturas repetidas com passo constante (lista de entidades); matrizes com linhas unitárias (câmera, ossos).",
+            "Para cada candidato a plataforma mostra os valores foto a foto e, quando o perfil de cena já existe, projeta a posição candidata pela câmera candidata e confere se cai na caixa do que se moveu na tela (caso de uso H04).",
+            "O mapeador confirma o candidato, dá nome, tipo e faixa, e a variável entra no perfil com origem \"descoberta\"."
+          ],
+          "alternativos": [
+            {
+              "t": "Busca por valor conhecido",
+              "d": "Quando o valor é visível na tela (munição, pesetas), a plataforma filtra os endereços que têm exatamente aquele valor e que mudam quando ele muda."
+            },
+            {
+              "t": "Cadeia de ponteiros",
+              "d": "Quando o endereço achado muda de uma partida para outra, a plataforma procura quem aponta para ele e grava a cadeia, não o endereço fixo."
+            },
+            {
+              "t": "Sugestão do serviço de linguagem",
+              "d": "O serviço pode sugerir nomes e faixas a partir dos valores e do contexto; a confirmação é sempre do mapeador."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Candidatos demais",
+              "d": "A plataforma pede mais uma rodada de fotos com outro movimento, até a lista caber na tela do mapeador."
+            },
+            {
+              "t": "Nenhum candidato",
+              "d": "O que se procura não está na memória principal como número simples; fica registrado como não encontrado, para o nível de código da engenharia reversa."
+            }
+          ],
+          "resultado": "Variável encontrada, confirmada por movimento controlado e, quando possível, por projeção na tela.",
+          "regras": [
+            "RN-06",
+            "RN-08",
+            "RN-09"
           ]
         },
         {
@@ -2731,6 +2906,59 @@
           "prioridade": "Essencial",
           "apoio": [
             "Emulador"
+          ],
+          "objetivo": "Garantir que nenhuma variável do perfil age no lugar errado: todo perfil passa por leituras ao vivo e, para câmera e entidades, pela prova de projeção na tela, antes de uma sessão usá-lo.",
+          "fluxo": [
+            {
+              "t": "Sessão vai abrir com perfil",
+              "tipo": "ator"
+            },
+            {
+              "t": "Confere serial, soma e versão do perfil",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Lê cada variável e confere a faixa",
+              "tipo": "motor"
+            },
+            {
+              "t": "Projeta entidades pela câmera e confere na cena",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Perfil validado ou marcado por variável",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Jogo rodando e identificado.",
+            "Perfil com pelo menos uma variável."
+          ],
+          "gatilho": "Abertura de sessão com perfil, perfil novo ou alterado, ou divergência detectada numa leitura (caso de uso A08).",
+          "principal": [
+            "A plataforma confere que o perfil é do mesmo serial e soma de verificação; versão diferente do jogo invalida o perfil inteiro.",
+            "A plataforma lê cada variável pelo canal e confere tipo e faixa; valor fora da faixa marca a variável como suspeita.",
+            "Para a câmera e as entidades a plataforma projeta a posição de cada entidade pela câmera lida e confere, por alguns quadros, se cai dentro da caixa que a camada de cena desenha para algo que se move; abaixo do limite configurado, câmera e entidades ficam suspeitas.",
+            "Variável suspeita não entra em sessão; as ações de mundo que dependem dela ficam indisponíveis no catálogo, e o mapeador é avisado.",
+            "O resultado da validação fica registrado no perfil, com data e versão do jogo."
+          ],
+          "alternativos": [
+            {
+              "t": "Validação só de leitura",
+              "d": "Sem perfil de cena, câmera e entidades validam só por leitura e faixa; a projeção fica pendente e as ações de cena de nível 2 não abrem."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Endereço que muda entre partidas",
+              "d": "A plataforma segue a cadeia de ponteiros declarada; sem cadeia, a variável é marcada como suspeita e o mapeador é chamado (caso de uso H03)."
+            }
+          ],
+          "resultado": "Perfil validado variável por variável, com câmera e entidades provadas na tela.",
+          "regras": [
+            "RN-06",
+            "RN-08",
+            "RN-10"
           ]
         },
         {
@@ -2738,14 +2966,106 @@
           "nome": "Definir ações de mundo e proibições",
           "ator": "Mapeador",
           "fase": 2,
-          "prioridade": "Essencial"
+          "prioridade": "Essencial",
+          "objetivo": "Transformar variáveis em alavancas que o mestre pode puxar, cada uma com faixa, duração, reversão e o que nunca pode acontecer, para que o mundo mude sem derrotar o jogador.",
+          "fluxo": [
+            {
+              "t": "Mapeador escolhe variáveis validadas",
+              "tipo": "ator"
+            },
+            {
+              "t": "Declara ação: escrita, faixa, duração, volta",
+              "tipo": "ator"
+            },
+            {
+              "t": "Plataforma confere contra as regras de mesa",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Ação entra no catálogo do jogo",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Variáveis validadas (caso de uso H04)."
+          ],
+          "gatilho": "O mapeador quer que o mestre possa mexer no mundo daquele jogo.",
+          "principal": [
+            "Cada ação declara: variável alvo, operação (fixar, somar, trocar), faixa permitida por intensidade, duração e como se desfaz (valor anterior, valor padrão, ou nada a desfazer).",
+            "O mapeador declara proibições por ação: nunca abaixo de tanto de vida, nunca durante carregamento, nunca em tela de sistema; a plataforma acrescenta as suas (RN-01, RN-03).",
+            "A plataforma confere que toda ação tem volta e que nenhuma pode derrotar o jogador sozinha; ação sem volta ou que pode matar é recusada.",
+            "A ação entra no catálogo do jogo com versão, e o mestre passa a vê-la como qualquer outra alavanca."
+          ],
+          "alternativos": [
+            {
+              "t": "Ação sobre entidade",
+              "d": "Alvo é uma entidade do mapa (vida ou posição de um inimigo); a ação declara como escolher a entidade (mais próxima, na mira, fora da tela)."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Ação que o jogador desfez em sessão",
+              "d": "O catálogo registra; três reversões seguidas da mesma ação a tiram da sessão (caso de uso D01)."
+            }
+          ],
+          "resultado": "Catálogo de ações de mundo do jogo, com faixas, durações, voltas e proibições.",
+          "regras": [
+            "RN-01",
+            "RN-02",
+            "RN-03",
+            "RN-06"
+          ]
         },
         {
           "codigo": "H06",
           "nome": "Publicar e importar perfil",
           "ator": "Mapeador",
           "fase": 2,
-          "prioridade": "Importante"
+          "prioridade": "Importante",
+          "objetivo": "Levar o perfil de um jogo para outros jogadores e receber perfis feitos por outros, sem levar nada do jogo junto e sem confiar em perfil não validado.",
+          "fluxo": [
+            {
+              "t": "Mapeador publica o perfil",
+              "tipo": "ator"
+            },
+            {
+              "t": "Plataforma empacota só fatos e versão",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Outro jogador importa",
+              "tipo": "ator"
+            },
+            {
+              "t": "Validação local antes de usar",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Perfil disponível para sessão",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Perfil validado localmente."
+          ],
+          "gatilho": "O mapeador quer compartilhar, ou um jogador quer o perfil de um jogo que não mapeou.",
+          "principal": [
+            "O pacote leva o perfil (variáveis, ações, proibições, perfil de cena), a versão, o serial e a soma de verificação do jogo, e a licença; nunca leva imagem, estado salvo nem memória do jogo.",
+            "Na importação a plataforma confere serial e soma, e roda a validação completa (caso de uso H04) antes de liberar o perfil para sessão.",
+            "Perfis importados ficam marcados como tal, com a origem, e podem ser sobrescritos por versão mais nova com o mesmo caminho."
+          ],
+          "alternativos": [],
+          "excecoes": [
+            {
+              "t": "Perfil para outra versão do jogo",
+              "d": "Recusado na importação, com a versão esperada e a encontrada."
+            }
+          ],
+          "resultado": "Perfil trocado entre jogadores com validação local obrigatória.",
+          "regras": [
+            "RN-06",
+            "RN-09"
+          ]
         },
         {
           "codigo": "H07",
@@ -2755,6 +3075,64 @@
           "prioridade": "Essencial",
           "apoio": [
             "Emulador"
+          ],
+          "objetivo": "Puxar uma alavanca de mundo decidida pelo mestre pelo mesmo caminho das outras: conferir, escrever pelo canal, reler, registrar, desfazer no prazo.",
+          "fluxo": [
+            {
+              "t": "Mestre decide ação de mundo",
+              "tipo": "llm"
+            },
+            {
+              "t": "Plataforma confere catálogo, proibições e situação",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Lê o valor atual e escreve pelo canal",
+              "tipo": "motor"
+            },
+            {
+              "t": "Relê e confirma",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Registrada; desfeita no prazo",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Ação no catálogo do jogo (caso de uso H05), variáveis validadas (caso de uso H04)."
+          ],
+          "gatilho": "Decisão validada do mestre com uma ação de mundo.",
+          "principal": [
+            "A plataforma confere a decisão como qualquer outra (caso de uso C02) e as proibições da ação contra a situação e o estado lido na hora.",
+            "A plataforma lê o valor atual da variável (caso de uso A08), guarda como estado antes, e escreve o novo valor dentro da faixa.",
+            "A plataforma relê e confirma; valor diferente do escrito é falha registrada e a ação não conta.",
+            "No prazo, a plataforma desfaz pela volta declarada; reverter pelo jogador desfaz antes do prazo.",
+            "Tudo fica no registro: variável, endereço, valor antes, valor depois, motivo, prazo e volta."
+          ],
+          "alternativos": [
+            {
+              "t": "Ação sobre entidade escolhida",
+              "d": "A plataforma escolhe a entidade pela regra da ação (mais próxima, na mira) usando as posições lidas e a câmera, e registra qual foi."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "O jogo sobrescreve o valor antes do prazo",
+              "d": "A releitura periódica detecta; a plataforma registra que o jogo venceu e não insiste."
+            },
+            {
+              "t": "Proibição batida na hora",
+              "d": "Vida abaixo do mínimo, tela fora de jogo: a ação é descartada e registrada, sem escrever."
+            }
+          ],
+          "resultado": "Mundo alterado dentro da faixa, confirmado, registrado e desfeito no prazo; jogador nunca derrotado pela ação.",
+          "regras": [
+            "RN-01",
+            "RN-02",
+            "RN-03",
+            "RN-04",
+            "RN-06"
           ]
         }
       ]
@@ -2763,17 +3141,70 @@
       "letra": "I",
       "nome": "Entidades e mundo",
       "fase": 3,
-      "detalhado": false,
-      "resumo": "Posição de inimigos e personagens: aproximar, afastar, reunir. Exige mapa de entidades por jogo.",
+      "detalhado": true,
+      "resumo": "Posição de inimigos e personagens: saber onde cada um está (mapa de entidades, antecipado para a fase 2 pela DC-22, porque a cena e a câmera precisam dele) e, na fase 3, aproximar, afastar ou reunir.",
       "casos": [
         {
           "codigo": "I01",
           "nome": "Mapear entidades do jogo",
           "ator": "Mapeador",
-          "fase": 3,
-          "prioridade": "Importante",
+          "fase": 2,
+          "prioridade": "Essencial",
           "apoio": [
             "Emulador"
+          ],
+          "objetivo": "Achar e declarar no perfil a lista de entidades do jogo (jogador, inimigos, parceiros) com posição, tipo e vida, e a câmera, para que o mestre saiba onde cada um está e a cena possa mirar por posição.",
+          "fluxo": [
+            {
+              "t": "Mapeador anda, para, vira a câmera, para",
+              "tipo": "ator"
+            },
+            {
+              "t": "Foto da memória a cada parada, com pausa",
+              "tipo": "motor"
+            },
+            {
+              "t": "Plataforma separa câmera de jogador e acha a lista",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Projeção confere na tela",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Câmera e entidades no perfil",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Versão própria do emulador com pausa e camada de cena.",
+            "Perfil do jogo aberto."
+          ],
+          "gatilho": "Jogo novo, ou área nova em que a lista de entidades muda de lugar.",
+          "principal": [
+            "O mapeador faz dois movimentos separados: andar sem virar a câmera e virar a câmera sem andar; a plataforma fotografa a memória pausada em cada parada (caso de uso H03).",
+            "A plataforma separa: números que mudam nos dois movimentos (jogador e câmera que o segue) dos que mudam só ao virar (câmera); matrizes com linhas unitárias são candidatas a câmera.",
+            "Com um inimigo em cena, a plataforma procura estruturas repetidas com passo constante que contenham uma posição que anda sozinha: é a lista de entidades, e o passo é o tamanho de cada entidade.",
+            "A plataforma projeta cada posição candidata pela câmera candidata e confere se cai na caixa do que se move na tela (camada de cena) em quase todos os quadros; o par que passa vira câmera e lista no perfil.",
+            "Dentro da entidade o mapeador nomeia os campos que confirma: posição, tipo, vida, e o que mais o jogo expõe."
+          ],
+          "alternativos": [
+            {
+              "t": "Lista que muda de endereço entre áreas",
+              "d": "A plataforma grava a cadeia de ponteiros até a lista, não o endereço fixo (caso de uso H03)."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Projeção não bate",
+              "d": "Câmera ou lista erradas; a plataforma pede outra rodada de movimentos, e nada entra no perfil sem a projeção passar."
+            }
+          ],
+          "resultado": "Câmera e lista de entidades no perfil, provadas pela projeção na tela.",
+          "regras": [
+            "RN-06",
+            "RN-08",
+            "RN-09"
           ]
         },
         {
@@ -2781,9 +3212,51 @@
           "nome": "Aproximar, afastar ou reunir entidades",
           "ator": "Plataforma",
           "fase": 3,
-          "prioridade": "Importante",
+          "prioridade": "Desejável",
           "apoio": [
             "Emulador"
+          ],
+          "objetivo": "Mover inimigos no mapa como ação de mundo: trazer um para perto, afastar, juntar vários, dentro das regras de mesa.",
+          "fluxo": [
+            {
+              "t": "Mestre decide mover",
+              "tipo": "llm"
+            },
+            {
+              "t": "Plataforma escolhe a entidade e o destino",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Escreve a posição pelo canal",
+              "tipo": "motor"
+            },
+            {
+              "t": "Relê e confirma; registrada",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Lista de entidades validada (caso de uso I01).",
+            "Ação de mover no catálogo do jogo (caso de uso H05) com proibições."
+          ],
+          "gatilho": "Decisão validada do mestre com uma ação de posição.",
+          "principal": [
+            "A plataforma escolhe a entidade pela regra da ação e calcula o destino relativo ao jogador, sempre fora do alcance imediato (nunca em cima dele).",
+            "A plataforma escreve a posição pelo canal (caso de uso A08), relê e confirma; o jogo pode recusar (colisão, roteiro) e isso é registrado.",
+            "A ação é registrada com entidade, posição antes e depois, e não tem volta automática: o inimigo segue dali."
+          ],
+          "alternativos": [],
+          "excecoes": [
+            {
+              "t": "Destino dentro de parede ou fora do mapa",
+              "d": "Sem mapa de colisão (lacuna LC-17) a plataforma só move ao longo de posições que a própria entidade já ocupou; fora disso, recusa."
+            }
+          ],
+          "resultado": "Entidade movida dentro das regras, confirmada e registrada.",
+          "regras": [
+            "RN-01",
+            "RN-02",
+            "RN-06"
           ]
         }
       ]
@@ -3266,14 +3739,29 @@
       "texto": "De onde vem a câmera: campo do perfil de memória; K04 e K05 ficam indisponíveis até ele existir."
     },
     {
-      "codigo": "LC-15",
-      "estado": "aberta",
-      "texto": "Identidade estável de objeto entre quadros; K01 define o comportamento com grupos e desconhecidos; a prova S7-00 mede."
-    },
-    {
       "codigo": "LC-16",
       "estado": "aberta",
       "texto": "Convenção de profundidade por jogo; K04 trata o sintoma (forma colada na tela) desativando a ação."
+    },
+    {
+      "codigo": "DC-22",
+      "estado": "detalhada",
+      "texto": "Fase 2 adiantada, começando pela câmera e pelo mapa de entidades: detalhada em H03, H04 e I01; os números vêm do card S8-00 do Blueprint."
+    },
+    {
+      "codigo": "LC-15",
+      "estado": "resolvida",
+      "texto": "Identidade de objeto: não pelo desenho; pela posição da entidade projetada pela câmera (I01, H04)."
+    },
+    {
+      "codigo": "LC-04",
+      "estado": "aberta",
+      "texto": "Fontes públicas: H02 define o que entra (só fatos); termos de uso ainda por conferir."
+    },
+    {
+      "codigo": "LC-17",
+      "estado": "aberta",
+      "texto": "Nível 3 (modelos e colisão): I02 já esbarra nela ao mover entidades sem mapa de colisão."
     }
   ]
 }

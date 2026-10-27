@@ -116,7 +116,7 @@
     </div>
   </div>
 
-  <p style="font-size:8.8pt;color:var(--muted);margin-top:12px;border-top:1px solid var(--line);padding-top:8px">Versão 1.1 · outubro de 2026 · emulador PCSX2, versão própria a partir da etiqueta corrente · Resident Evil 4 (SLUS-21134, versão 1.01) · acompanha o Mapa do Projeto (revisão 6) e os Casos de Uso (entrega 6). A 1.1 acrescenta a camada de cena (fase 4) ao capítulo 6 e a etapa S7 ao roadmap; o resto é a 1.0 aprovada</p>
+  <p style="font-size:8.8pt;color:var(--muted);margin-top:12px;border-top:1px solid var(--line);padding-top:8px">Versão 1.1 · outubro de 2026 · emulador PCSX2, versão própria a partir da etiqueta corrente · Resident Evil 4 (SLUS-21134, versão 1.01) · acompanha o Mapa do Projeto (revisão 7) e os Casos de Uso (entrega 7). A 1.1 acrescentou a camada de cena (fase 4) ao capítulo 6 e a etapa S7 ao roadmap; a 1.2 acrescenta o perfil de memória e a descoberta de endereços ao capítulo 6 e a etapa S8 (fase 2 adiantada, DC-22); o resto é a 1.0 aprovada</p>
 </section>
 
 <!-- ============ CAP 1 ESCOPO ============ -->
@@ -683,6 +683,22 @@
     </tbody>
   </table>
   <div class="note"><b>Lacuna LC-15, identidade entre quadros.</b> A mesma textura veste vários objetos (todas as caixas de um corredor), e a caixa envolvente de um objeto muda quando a câmera gira. A prova medida (S7-00) mede quanto a assinatura "hash + vértices + caixa" é estável num objeto parado e num objeto que se move; se não bastar, entra a posição vinda do perfil de memória, que é a resposta definitiva. <b>Lacuna LC-16, profundidade.</b> A prova mede, no jogo de abertura, a faixa e o sentido da profundidade que chega ao renderizador, para o nível 2 projetar certo; cada jogo terá o seu valor no perfil de cena.</div>
+
+  <h4>O perfil de memória (fase 2, DC-22): o que o jogo guarda e como se descobre</h4>
+  <p>A memória principal do PlayStation 2 tem 32 MB e o canal já lê e escreve qualquer endereço dela (códigos 0 a 7). O que falta é saber o que cada endereço significa, e isso é o perfil de memória: por jogo, por versão, versionado, só fatos. A prova de 27/10 mediu o caminho: uma foto da memória inteira pelo canal, em lotes de 50 mil leituras de 8 bytes, leva 3,4 s; os endereços públicos de vida do jogador e da parceira do jogo de abertura foram lidos ao vivo e batem (1200 de 1200 e 600 de 600); e a comparação de quatro fotos numa cena parada já devolveu as matrizes de ossos do personagem animado. Câmera e lista de entidades exigem movimento controlado, que é o card S8-00.</p>
+  <table style="font-size:8.8pt">
+    <thead><tr><th>Peça</th><th>Onde mora</th><th>O que faz</th></tr></thead>
+    <tbody>
+      <tr><td>Perfil de memória (esquema v1)</td><td>Repositório, <code>perfis/memoria/&lt;serial&gt;.json</code>, versionado como o perfil de cena</td><td>Cabeçalho: serial, soma de verificação, versão do jogo, versão do perfil, data. Variáveis: nome, endereço (ou cadeia de ponteiros), tipo (u8, u16, u32, s32, f32, vec3, mat4), faixa, significado em uma linha, origem (mão, fonte pública com referência, descoberta com data), estado da validação. Compostas: câmera (matriz ou posição mais alvo, com a convenção de eixos) e lista de entidades (endereço do primeiro, passo, quantidade máxima, campos por entidade). Intocável: faixas de endereço proibidas. Ações de mundo: variável, operação, faixa por intensidade, duração, volta, proibições.</td></tr>
+      <tr><td>Foto da memória</td><td>Plataforma, só fora de sessão (bancada e ferramenta do mapeador)</td><td>Pausa pelo canal (0x81), 32 MB em lotes de 50 mil leituras de 8 bytes, retoma. Sem a pausa a foto mistura instantes e a comparação mente. Dentro de uma sessão nunca se fotografa: lê-se variável por variável (A08).</td></tr>
+      <tr><td>Comparação de fotos</td><td>Plataforma</td><td>Entre fotos com movimento: números de ponto flutuante finitos, pequenos, que mudam aos poucos; entre fotos sem movimento: os que ficam iguais. Agrupamento por vizinhança revela vetores (3 ou 4 floats) e matrizes (linhas unitárias, 1.0 no fim). Passo constante entre blocos iguais revela a lista de entidades e o tamanho de cada uma. Busca por valor conhecido para o que aparece na tela.</td></tr>
+      <tr><td>Separar câmera de jogador</td><td>Plataforma + mapeador</td><td>Dois movimentos: andar sem virar e virar sem andar. O que muda nos dois é o jogador (e a câmera que o segue); o que muda só ao virar é a câmera. Um inimigo andando sozinho dá a entidade que não é o jogador.</td></tr>
+      <tr><td>Validação por projeção</td><td>Plataforma, com a camada de cena</td><td>Posição da entidade projetada pela câmera candidata tem de cair dentro da caixa do que a camada de cena vê se mover, em quase todos os quadros amostrados. É o critério que fecha câmera e entidades juntas, e o que a RN-11 e a cena de nível 2 passam a usar (LC-14, LC-15).</td></tr>
+      <tr><td>Cadeia de ponteiros</td><td>Perfil</td><td>Endereço que muda entre áreas ou partidas é gravado como cadeia: endereço fixo que guarda um endereço, e assim até o alvo. A plataforma resolve a cadeia a cada leitura e marca a variável como suspeita se um elo sair da memória.</td></tr>
+      <tr><td>Ações de mundo</td><td>Catálogo, por jogo</td><td>Entram pelo mesmo caminho das universais: faixa por intensidade, duração, volta declarada, proibições do mapeador mais as regras de mesa; a execução lê antes, escreve, relê e registra (A08, H07). Nenhuma ação sem volta, nenhuma que possa derrotar sozinha.</td></tr>
+    </tbody>
+  </table>
+  <div class="note"><b>Três níveis de engenharia reversa, um por vez.</b> Este capítulo cobre o nível 1 (memória). O nível 2 (código: funções do jogo, pelo depurador do emulador) entra quando uma ação de mundo precisar de algo que a memória não dá, como criar um inimigo. O nível 3 (formatos de modelos, colisão e fases) é a lacuna LC-17 e será fase própria.</div>
 </section>
 
 <!-- ============ CAP 7 FLUXOS ============ -->
@@ -775,7 +791,7 @@
 <!-- ============ CAP 8 ROADMAP ============ -->
 <section style="margin-top:14px">
   <div class="kicker">Capítulo 8</div>
-  <h2>O roadmap em 30 cards</h2>
+  <h2>O roadmap em 35 cards</h2>
   <p class="lead">Daqui para frente o documento vira backlog. Cada card tem um identificador permanente, um motivo de existir, a lista do que entra no repositório e um critério de aceite escrito como teste. A ordem é de execução, não de importância. Não há estimativa de esforço: o que mede o avanço é card fechado com critério provado.</p>
 
   <table>
@@ -789,12 +805,13 @@
       <tr><td><b>S5 Robustez</b></td><td>Falhas classificadas, retomada, custo com teto, exportação e reprodução.</td><td class="code">4</td></tr>
       <tr><td><b>S6 Bancada e sessão jogada</b></td><td>Bancada no CI com casos sintéticos, comparação de serviços, e a sessão de aceite da fase 1.</td><td class="code">2</td></tr>
       <tr><td><b>S7 Camada de cena</b></td><td>A prova medida que decide a fase 4 (DC-21), depois assinaturas pelo canal, as ações de nível 1 no catálogo com perfil de cena e RN-11, e o nível 2 quando a fase 2 entregar a câmera.</td><td class="code">4</td></tr>
+      <tr><td><b>S8 Perfil de memória</b></td><td>A prova medida com o cliente no controle (câmera e entidades do jogo de abertura, validadas por projeção), o perfil de memória v1 com leitura e escrita pelo canal, a validação automática, as ações de mundo no catálogo e a ferramenta do mapeador.</td><td class="code">5</td></tr>
     </tbody>
   </table>
 
   <div class="seq" style="margin-top:12px">
     <div class="lbl">Quem depende de quem</div>
-    <svg viewBox="0 0 800 250" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Consolas, monospace" font-size="7.5">
+    <svg viewBox="0 0 900 250" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Consolas, monospace" font-size="7.5">
       <g font-weight="700" font-size="8">
         <rect x="6" y="6" width="90" height="16" rx="3" fill="#5b6577"/><text x="51" y="17" text-anchor="middle" fill="#fff">S0</text>
         <rect x="106" y="6" width="90" height="16" rx="3" fill="#1f4fd1"/><text x="151" y="17" text-anchor="middle" fill="#fff">S1</text>
@@ -804,6 +821,7 @@
         <rect x="506" y="6" width="90" height="16" rx="3" fill="#6b3fd1"/><text x="551" y="17" text-anchor="middle" fill="#fff">S5</text>
         <rect x="606" y="6" width="88" height="16" rx="3" fill="#1f9d55"/><text x="650" y="17" text-anchor="middle" fill="#fff">S6</text>
         <rect x="706" y="6" width="88" height="16" rx="3" fill="#8a3fc9"/><text x="750" y="17" text-anchor="middle" fill="#fff">S7 cena</text>
+        <rect x="806" y="6" width="88" height="16" rx="3" fill="#e08a1e"/><text x="850" y="17" text-anchor="middle" fill="#fff">S8 memória</text>
       </g>
       <g fill="#fff" stroke="#9aa4b5" stroke-width="0.8">
         <rect x="6" y="32" width="90" height="18" rx="3"/><rect x="6" y="62" width="90" height="18" rx="3"/><rect x="6" y="92" width="90" height="18" rx="3"/><rect x="6" y="122" width="90" height="18" rx="3"/>
@@ -814,6 +832,7 @@
         <rect x="506" y="32" width="90" height="18" rx="3"/><rect x="506" y="62" width="90" height="18" rx="3"/><rect x="506" y="92" width="90" height="18" rx="3"/><rect x="506" y="122" width="90" height="18" rx="3"/>
         <rect x="606" y="32" width="88" height="18" rx="3"/><rect x="606" y="62" width="88" height="18" rx="3" stroke="#1f9d55" stroke-width="1.6"/>
         <rect x="706" y="32" width="88" height="18" rx="3" stroke="#8a3fc9" stroke-width="1.6"/><rect x="706" y="62" width="88" height="18" rx="3"/><rect x="706" y="92" width="88" height="18" rx="3"/><rect x="706" y="122" width="88" height="18" rx="3" stroke-dasharray="3 2"/>
+        <rect x="806" y="32" width="88" height="18" rx="3" stroke="#e08a1e" stroke-width="1.6"/><rect x="806" y="62" width="88" height="18" rx="3"/><rect x="806" y="92" width="88" height="18" rx="3"/><rect x="806" y="122" width="88" height="18" rx="3"/><rect x="806" y="152" width="88" height="18" rx="3"/>
       </g>
       <g fill="#0f1b33" text-anchor="middle">
         <text x="51" y="44">S0-01 repo</text><text x="51" y="74">S0-02 sessão viva</text><text x="51" y="104">S0-03 simulador</text><text x="51" y="134">S0-04 CI e log</text>
@@ -824,15 +843,16 @@
         <text x="551" y="44">S5-01 falhas</text><text x="551" y="74">S5-02 retomar</text><text x="551" y="104">S5-03 custo</text><text x="551" y="134">S5-04 exportar</text>
         <text x="650" y="44">S6-01 bancada</text><text x="650" y="74" font-weight="700">S6-02 aceite</text>
         <text x="750" y="44" font-weight="700">S7-00 prova</text><text x="750" y="74">S7-01 assinaturas</text><text x="750" y="104">S7-02 nível 1</text><text x="750" y="134">S7-03 nível 2</text>
+        <text x="850" y="44" font-weight="700">S8-00 câmera+entid.</text><text x="850" y="74">S8-01 perfil v1 e A08</text><text x="850" y="104">S8-02 validação</text><text x="850" y="134">S8-03 ações de mundo</text><text x="850" y="164">S8-04 ferramenta</text>
       </g>
       <g stroke="#9aa4b5" stroke-width="1.1" fill="none" marker-end="url(#a)">
         <defs><marker id="a" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#9aa4b5"/></marker></defs>
         <path d="M96,14 H105"/><path d="M196,14 H205"/><path d="M296,14 H305"/><path d="M396,14 H405"/>
         <path d="M351,200 V214 H451 V146"/><path d="M451,214 H551 V146"/><path d="M551,214 H650 V86"/>
         <path d="M496,131 H506 V131" stroke-dasharray="3 2"/><path d="M596,131 H606 V76" stroke-dasharray="3 2"/>
-        <path d="M451,146 V228 H750 V146" stroke-dasharray="3 2"/>
+        <path d="M451,146 V228 H750 V146" stroke-dasharray="3 2"/><path d="M750,146 V228 H850 V176" stroke-dasharray="3 2"/><path d="M806,41 H798 V131" stroke-dasharray="3 2"/>
       </g>
-      <text x="400" y="236" text-anchor="middle" fill="#5b6577" font-family="Segoe UI, Arial" font-size="8">S0 a S3 são sequenciais; S4, S5 e S6 partem do esqueleto e andam em paralelo; S6-02 fecha depois de S4-04 e S5-04. S7 parte da versão própria: S7-00 é o portão da fase 4, S7-03 espera a câmera da fase 2.</text>
+      <text x="450" y="236" text-anchor="middle" fill="#5b6577" font-family="Segoe UI, Arial" font-size="8">S0 a S3 são sequenciais; S4, S5 e S6 partem do esqueleto. S7 parte da versão própria. S8 (fase 2, adiantada pela DC-22) parte de S7-01: S8-00 entrega a câmera e as entidades que S7-03 espera; S5-02 a S5-04 e S6-02 ficam para depois de S8.</text>
     </svg>
   </div>
   <div class="note"><b>Como usar estes cards.</b> Cada card vira um item no quadro, com o identificador no título. O critério de aceite é copiado como está: é a definição de terminado e deve ser executado por outra pessoa, não pelo autor; no caso deste projeto, pelo cliente, que também é o jogador. Trabalho novo entra como card novo, com código próprio.</div>
@@ -1066,6 +1086,41 @@
       <p class="why">A cena ganha o que não existia, com profundidade certa. Depende da fase 2 entregar o campo "câmera".</p>
       <ul><li>Código 0x87 (câmera do quadro) e a projeção dos vértices novos para o espaço de tela do emulador com a convenção de profundidade medida no S7-00.</li><li>Ação "acrescentar" no catálogo, com formas simples (bloco, placa, luz falsa por vértice colorido) e prazo.</li><li>Prova no jogo de abertura: um bloco posto no corredor é tapado pela parede quando a câmera passa atrás dela.</li></ul>
     </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> o perfil de memória com a câmera validada, <b>quando</b> o mestre acrescenta um bloco a 2 m do jogador, <b>então</b> o bloco fica parado no mundo enquanto a câmera gira, é ocluído corretamente, e some no prazo; tudo registrado.</div></div>
+  </div>
+
+  <div class="etapa">
+    <div class="eh"><div><span class="k">ETAPA S8</span><b>Perfil de memória (fase 2, adiantada)</b></div><span>5 cards</span></div>
+    <div class="ed">A engenharia reversa do jogo no nível 1, memória. Começa pela prova medida com o cliente no controle, porque câmera e entidades só aparecem com movimento; a validação por projeção na tela é o portão de cada perfil.</div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S8-00</span><b>Prova medida: câmera e lista de entidades do jogo de abertura</b><span class="pill uc">UC-H03 UC-I01</span></div>
+      <p class="why">Fechar LC-14 e a metade que falta de LC-15 com número, e provar o método de descoberta antes do perfil existir.</p>
+      <ul><li>Fotos da memória pausada pelo canal em cada parada de um roteiro de um minuto com o cliente: andar sem virar, parar; virar sem andar, parar; inimigo andando sozinho.</li><li>Comparação das fotos: candidatos a jogador, câmera (matriz com linhas unitárias) e lista de entidades (passo constante); vida do jogador como variável de controle, já conferida.</li><li>Projeção de cada entidade candidata pela câmera candidata contra as caixas da camada de cena, por alguns segundos.</li><li>Medição gravada no repositório, sem imagem nem foto da memória.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> o roteiro de movimentos feito pelo cliente, <b>quando</b> a comparação roda, <b>então</b> existe um par câmera e lista de entidades cuja projeção cai na caixa do inimigo que se move em pelo menos 90% dos quadros amostrados, com o passo entre entidades e os campos de posição anotados; ou o registro diz quais candidatos sobraram e por que não bastou.</div></div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S8-01</span><b>Perfil de memória v1 e leitura e escrita pelo canal</b><span class="pill uc">UC-H01 UC-H02 UC-A08</span></div>
+      <p class="why">O esquema do perfil, o primeiro perfil do jogo de abertura e o acesso por nome, com faixa e releitura.</p>
+      <ul><li>Esquema v1 com validação por tipo: variáveis, compostas (câmera, entidades), cadeias de ponteiros, intocável, ações de mundo.</li><li>Perfil do jogo de abertura com o que já está provado: vida do jogador e da parceira (fonte pública conferida), câmera e entidades (S8-00).</li><li>Leitura e escrita por nome pelo canal: faixa conferida, releitura, registro com antes e depois; nome fora do perfil é recusado.</li><li>Importação de lista de códigos em formato bruto, extraindo só endereço, tamanho e descrição, com referência da fonte.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> o perfil do jogo de abertura, <b>quando</b> a plataforma escreve a vida do jogador dentro da faixa e relê, <b>então</b> o valor confere, o registro tem antes e depois, e uma escrita fora da faixa ou num nome desconhecido é recusada antes de qualquer comando.</div></div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S8-02</span><b>Validação automática do perfil, com projeção</b><span class="pill uc">UC-H04</span></div>
+      <p class="why">Nenhum perfil age no lugar errado: toda abertura de sessão com perfil passa por leitura, faixa e, para câmera e entidades, pela projeção na tela.</p>
+      <ul><li>Validação por serial, soma e versão; leitura de cada variável com faixa; variável suspeita bloqueia as ações que dependem dela.</li><li>Projeção das entidades pela câmera contra as caixas da camada de cena por alguns quadros, com limite configurado.</li><li>Resultado gravado no perfil com data; o simulador do canal ganha uma memória de mentira com câmera e entidades para o teste.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> um perfil com a câmera deslocada de propósito, <b>quando</b> a sessão abre, <b>então</b> câmera e entidades ficam suspeitas, as ações de mundo que dependem delas somem do catálogo e o painel avisa; com o perfil certo, tudo entra.</div></div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S8-03</span><b>Ações de mundo no catálogo</b><span class="pill uc">UC-H05 UC-H07</span></div>
+      <p class="why">O mestre passa a mudar o mundo: vida, munição, e o que o perfil permitir, com volta e proibições.</p>
+      <ul><li>Declaração de ações no perfil: operação, faixa por intensidade, duração, volta, proibições; a plataforma recusa ação sem volta ou que possa derrotar sozinha.</li><li>Execução pelo executor: ler antes, escrever, reler, registrar, desfazer no prazo pelo relógio de fim; reversão pelo jogador.</li><li>Primeiras ações do jogo de abertura: tirar e devolver vida dentro de faixa segura, tirar munição; ações sobre entidade (vida de um inimigo) quando a lista estiver validada.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> uma situação de combate, <b>quando</b> o mestre decide baixar a vida do jogador até o mínimo da faixa por 20 s, <b>então</b> o valor cai, é relido igual, volta sozinho no prazo, nunca abaixo do mínimo, e o registro tem antes, depois, motivo e volta.</div></div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S8-04</span><b>Ferramenta do mapeador para a memória</b><span class="pill uc">UC-H01 UC-H03 UC-H06</span></div>
+      <p class="why">O que o S8-00 fez à mão vira ferramenta repetível para qualquer jogo.</p>
+      <ul><li>Roteiro guiado: o que fazer no jogo entre fotos, com pausa e foto pelo canal a cada parada.</li><li>Candidatos mostrados foto a foto, com busca por valor, agrupamento, cadeia de ponteiros e projeção; o mapeador confirma, nomeia e grava.</li><li>Publicar e importar perfil com validação local obrigatória.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> um segundo jogo do cliente, <b>quando</b> o mapeador segue o roteiro, <b>então</b> sai um perfil com pelo menos a câmera e a posição do jogador validados por projeção, sem ninguém editar endereço à mão.</div></div>
   </div>
 </section>
 
