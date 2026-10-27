@@ -17,13 +17,13 @@ SAIDA = Path(sys.argv[2]) if len(sys.argv) > 2 else AQUI / "Casos-de-Uso.html"
 D = json.loads(ENTRADA.read_text(encoding="utf-8"))
 
 PRIORIDADE_CLASSE = {"Essencial": "ess", "Importante": "imp", "Desejável": "des"}
-FASE_CLASSE = {1: "p1", 2: "p2", 3: "p3"}
+FASE_CLASSE = {1: "p1", 2: "p2", 3: "p3", 4: "p4"}
 TIPO_CLASSE = {"ator": "st-ator", "sistema": "st-sis", "llm": "st-llm", "motor": "st-motor",
                "fim": "st-fim", "atencao": "st-aten", "falha": "st-falha"}
 
 CSS = """
   :root { --ink:#0f1b33; --text:#222a38; --muted:#5b6577; --line:#d7dde8; --accent:#1f4fd1;
-    --bg-soft:#f3f5f9; --f1:#1f4fd1; --f2:#e08a1e; --f3:#1f9d55; --red:#c53030; --amber:#c77d0a; --green:#1f9d55; }
+    --bg-soft:#f3f5f9; --f1:#1f4fd1; --f2:#e08a1e; --f3:#1f9d55; --f4:#8a3fc9; --red:#c53030; --amber:#c77d0a; --green:#1f9d55; }
   * { box-sizing:border-box; }
   html, body { margin:0; padding:0; background:#fff; color:var(--text);
     font-family:"Segoe UI", Arial, sans-serif; font-size:10pt; line-height:1.42; }
@@ -47,11 +47,12 @@ CSS = """
   .card .code { font-family:Consolas, monospace; font-size:8pt; letter-spacing:0.12em; color:var(--muted); text-transform:uppercase; }
   .card .meta { font-family:Consolas, monospace; font-size:8pt; color:var(--accent); margin:2px 0 5px; }
   .card p { font-size:9.2pt; margin:0; }
-  .f1 { border-top-color:var(--f1); } .f2 { border-top-color:var(--f2); } .f3 { border-top-color:var(--f3); }
+  .f1 { border-top-color:var(--f1); } .f2 { border-top-color:var(--f2); } .f3 { border-top-color:var(--f3); } .f4 { border-top-color:var(--f4); }
   .pill { display:inline-block; font-family:Consolas, monospace; font-size:7.5pt; padding:1px 7px; border-radius:10px; border:1px solid; margin-left:3px; vertical-align:middle; white-space:nowrap; }
   .pill.p1 { color:var(--f1); border-color:var(--f1); background:#eaf0ff; }
   .pill.p2 { color:var(--f2); border-color:var(--f2); background:#fff4e5; }
   .pill.p3 { color:var(--f3); border-color:var(--f3); background:#e8f7ee; }
+  .pill.p4 { color:var(--f4); border-color:var(--f4); background:#f3e9fb; }
   .pill.ess { color:var(--red); border-color:var(--red); background:#fdecec; }
   .pill.imp { color:var(--amber); border-color:var(--amber); background:#fff6e0; }
   .pill.des { color:var(--muted); border-color:var(--line); background:#f3f5f9; }
@@ -118,7 +119,7 @@ CSS = """
   .seq { background:var(--bg-soft); border:1px solid var(--line); border-radius:10px; padding:8px 12px; margin:-6px 0 14px; break-inside:avoid; }
   .seq .cap-txt { font-size:8.8pt; color:var(--muted); margin-top:2px; }
   .phase { border:1px solid var(--line); border-left:4px solid var(--line); border-radius:8px; padding:6px 11px; margin-bottom:6px; break-inside:avoid; }
-  .phase.p1 { border-left-color:var(--f1); } .phase.p2 { border-left-color:var(--f2); } .phase.p3 { border-left-color:var(--f3); }
+  .phase.p1 { border-left-color:var(--f1); } .phase.p2 { border-left-color:var(--f2); } .phase.p3 { border-left-color:var(--f3); } .phase.p4 { border-left-color:var(--f4); }
   .phase h3 { display:flex; justify-content:space-between; }
   .phase h3 span { font-family:Consolas, monospace; font-size:8pt; color:var(--accent); font-weight:normal; }
   .phase p { font-size:9.2pt; margin:2px 0 4px; }
@@ -148,7 +149,7 @@ for m, c in casos_todos:
     for ap in c.get("apoio", []):
         apoio_de[ap].append(c["codigo"])
 ess = sum(1 for m, c in casos_todos if c["prioridade"] == "Essencial")
-por_fase = {f: sum(1 for m, c in casos_todos if c["fase"] == f) for f in (1, 2, 3)}
+por_fase = {f: sum(1 for m, c in casos_todos if c["fase"] == f) for f in (1, 2, 3, 4)}
 
 
 def rotulo_ator(a):
@@ -246,7 +247,7 @@ def mapa_geral():
     mods = D["modulos"]
     W, rowh = 700, 58
     H = 50 + len(mods) * rowh + 30
-    cor = {1: "#1f4fd1", 2: "#e08a1e", 3: "#1f9d55"}
+    cor = {1: "#1f4fd1", 2: "#e08a1e", 3: "#1f9d55", 4: "#8a3fc9"}
     out = [f'<svg viewBox="0 0 {W} {H}" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">']
     out.append('<text x="60" y="22" font-size="7.5" fill="#5b6577" font-family="Consolas, monospace" letter-spacing="1.5">ATORES</text>')
     out.append('<text x="350" y="22" text-anchor="middle" font-size="7.5" fill="#5b6577" font-family="Consolas, monospace" letter-spacing="1.5">MÓDULOS DO SISTEMA</text>')
@@ -449,7 +450,7 @@ def cap_modulo(m):
 
 def fechamento():
     blocos = []
-    for f in (1, 2, 3):
+    for f in (1, 2, 3, 4):
         fase = D["fases"][str(f)]
         chips = "".join(f'<span class="chip"><span class="mono">UC-{e(c["codigo"])}</span> {e(c["nome"])}</span>' for m, c in casos_todos if c["fase"] == f)
         blocos.append(f'<div class="phase {FASE_CLASSE[f]}"><h3>Fase {f} · {e(fase["nome"])}<span>{por_fase[f]} casos de uso</span></h3><p>{e(fase["resumo"])}</p>{chips}</div>')
