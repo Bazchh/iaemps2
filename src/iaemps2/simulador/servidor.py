@@ -11,6 +11,7 @@ só embrulha isso. Os testes usam o núcleo direto e o servidor pela porta efêm
 
 from __future__ import annotations
 
+import contextlib
 import socket
 import struct
 import threading
@@ -89,6 +90,7 @@ class Simulador:
         self._servidor: socket.socket | None = None
         self._thread: threading.Thread | None = None
         self._parar = threading.Event()
+        self._conexoes: list[socket.socket] = []  # parar() derruba todas, como um emulador que morre
         self.porta: int | None = None
 
     # ---------------- núcleo puro ----------------
@@ -303,6 +305,12 @@ class Simulador:
         self._parar.set()
         if self._servidor is not None:
             self._servidor.close()
+        for conexao in list(self._conexoes):
+            with contextlib.suppress(OSError):
+                conexao.shutdown(socket.SHUT_RDWR)
+            with contextlib.suppress(OSError):
+                conexao.close()
+        self._conexoes.clear()
         if self._thread is not None:
             self._thread.join(timeout=2)
 
@@ -323,6 +331,7 @@ class Simulador:
                 continue
             except OSError:
                 break
+            self._conexoes.append(cliente)
             threading.Thread(target=self._atender, args=(cliente,), daemon=True).start()
 
     def _atender(self, cliente: socket.socket) -> None:

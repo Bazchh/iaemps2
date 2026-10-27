@@ -64,9 +64,10 @@ class Resposta:
 class ServicoError(RuntimeError):
     """Falha do serviço, com a classe do contrato 4: fora_do_ar, limite, recusa, formato."""
 
-    def __init__(self, classe: str, detalhe: str) -> None:
+    def __init__(self, classe: str, detalhe: str, espera_s: float | None = None) -> None:
         super().__init__(f"{classe}: {detalhe}")
         self.classe = classe
+        self.espera_s = espera_s  # "limite": quanto o serviço pediu para esperar, se informou
         self.detalhe = detalhe
 
 

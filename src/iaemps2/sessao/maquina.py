@@ -43,6 +43,7 @@ class Evento(StrEnum):
     FALHA_EMULADOR = "falha_emulador"
     FALHA_REGISTRO = "falha_registro"
     RECUPEROU = "recuperou"
+    FALHA_PROLONGADA = "falha_prolongada"  # acima do limite de falhas seguidas: o mestre se pausa
     CENA_VOLTOU = "cena_voltou"
 
 
@@ -206,6 +207,12 @@ _LINHAS: list[tuple[tuple[Estado, ...], Evento, Estado | str, tuple[Efeito, ...]
         Evento.RECUPEROU,
         Estado.OBSERVANDO,
         (E.GRAVAR_VOLTA, E.INTERVALO_COMO_VENCIDO, E.INICIAR_CICLO),
+    ),
+    (
+        (Estado.SILENCIADA,),
+        Evento.FALHA_PROLONGADA,
+        Estado.PAUSADA_JOGADOR,
+        (E.GRAVAR_FALHA_VISIVEL, E.GRAVAR_MARCO, E.OVERLAY_MESTRE_PAUSADO),
     ),
     (
         (Estado.SILENCIADA,),

@@ -24,7 +24,7 @@ from iaemps2.config import Config
 from iaemps2.mestre import memoria, mestre
 from iaemps2.mestre.decisao import Veredito
 from iaemps2.olho import olho
-from iaemps2.olho.captura import Captura, JanelaAusenteError, Retangulo
+from iaemps2.olho.captura import Captura, JanelaAusenteError, Retangulo, e_o_emulador
 from iaemps2.olho.diferenca import Comparador
 from iaemps2.olho.situacao import Situacao, e_marco_de_morte
 from iaemps2.ponte import protocolo as p
@@ -89,6 +89,13 @@ class Pendencia:
     decisao_id: int | None = None
 
 
+def emulador_vivo() -> bool:
+    """O processo do emulador existe? É o que distingue fechado de travado e de canal caído (G03)."""
+    import psutil
+
+    return any(e_o_emulador(proc.info["name"]) for proc in psutil.process_iter(["name"]))
+
+
 @dataclass
 class Sessao:
     config: Config
@@ -106,6 +113,7 @@ class Sessao:
     tom: cat.Tom = cat.TOM_PADRAO
     intensidade: cat.Intensidade = cat.INTENSIDADE_PADRAO
     encerrar_apos_s: float | None = None
+    processo_vivo: Callable[[], bool] = emulador_vivo
 
     fila: FilaDeEventos = field(default_factory=FilaDeEventos)
     comparador: Comparador = field(init=False)
@@ -121,6 +129,9 @@ class Sessao:
     ultimo_salvamento_ms: int = 0
     falhas_seguidas_do_servico: int = 0
     proxima_tentativa_ms: int = 0
+    origem_do_silencio: str | None = None  # servico | emulador: quem calou o mestre decide como ele volta
+    formato_seguidos: int = 0  # resposta fora do contrato: a segunda seguida silencia (contrato 4)
+    travado_desde_ms: int | None = None
     encerrada: threading.Event = field(default_factory=threading.Event)
 
     def __post_init__(self) -> None:
@@ -180,7 +191,7 @@ class Sessao:
                 for id_ in self.executor.encerrar_vencidos():
                     log.evento("intervencao.fim", intervencao=id_)
             except Exception as erro:  # RN-10
-                self._falha("emulador", type(erro).__name__, str(erro))
+                self._falha("emulador", type(erro).__name__, str(erro), processar=False)
 
     def passo(self) -> None:
         """Um ciclo: gestos pendentes, um passo pelo estado, fim das ações com duração, gestos de novo."""
@@ -207,6 +218,10 @@ class Sessao:
                 proxima_janela_ms=self.intervalo.faltam_ms(),
                 pausado=self.laco.estado == Estado.PAUSADA_JOGADOR,
             )
+        except (
+            sqlite3.OperationalError
+        ) as erro:  # disco cheio, pasta sem permissão: nada executa sem registro
+            self._falha("registro", "sem_escrita", str(erro))
         except Exception as erro:  # RN-10: nada morre em silêncio
             self._falha(
                 "emulador" if isinstance(erro, CanalError | ComandoFalhouError) else "servico",
@@ -236,7 +251,14 @@ class Sessao:
 
     def _observar(self) -> None:
         with log.contexto(sessao=self.sessao_id, ciclo=self.ciclo_numero + 1):
-            self.contador.agora_ms()
+            try:
+                self.cliente.status()  # canal morto é visto a cada ciclo, não só quando há ação (G03)
+            except (CanalError, ComandoFalhouError) as erro:
+                ciclo = self._novo_ciclo(lacuna="sem canal com o emulador")
+                banco.fechar_ciclo(self.con, ciclo, self.contador.agora_ms())
+                classe = erro.classe if isinstance(erro, CanalError) else "comando_falhou"
+                self._falha("emulador", classe, str(erro))
+                return
             try:
                 captura = self.capturar(self.painel.area_atual)
             except JanelaAusenteError as erro:
@@ -305,8 +327,9 @@ class Sessao:
                 )
             if obs.situacao is None:
                 banco.fechar_ciclo(self.con, ciclo, self.contador.agora_ms())
-                self.fila.enfileirar(Evento.SITUACAO_INVALIDA, origem="servico", motivo=obs.invalida_motivo)
+                self._fora_do_contrato(obs.invalida_motivo or "resposta fora do contrato")
                 return
+            self.formato_seguidos = 0
             assert obs.resposta is not None
             situacao_id = banco.gravar_situacao(
                 self.con,
@@ -479,26 +502,120 @@ class Sessao:
             log.evento("estado.salvo", slots=self.executor.slots.ocupados())
 
     def _tentar_recuperar(self) -> None:
-        if self.contador.agora_ms() < self.proxima_tentativa_ms:
+        """Silenciada: quem calou decide a volta. Serviço: espera o intervalo e tenta o ciclo de novo (a contagem
+        só zera numa descrição válida, então o intervalo cresce de verdade). Emulador: fechado, travado ou
+        canal caído, pelo processo e pelo socket (G03)."""
+        agora = self.contador.agora_ms()
+        if self.origem_do_silencio == "emulador":
+            self._tentar_reconectar(agora)
+            return
+        if agora < self.proxima_tentativa_ms:
             return
         try:
             self.cliente.status()
-        except (CanalError, ComandoFalhouError):
-            self.proxima_tentativa_ms = self.contador.agora_ms() + min(
-                30_000, 2_000 * (2**self.falhas_seguidas_do_servico)
-            )
+        except (CanalError, ComandoFalhouError) as erro:
+            self.origem_do_silencio = "emulador"  # o emulador também sumiu enquanto o serviço estava fora
+            self._classificar_emulador(erro, agora)
             return
         self.fila.enfileirar(Evento.RECUPEROU, origem="plataforma")
 
-    # ---------- falhas (RN-10) ----------
-    def _falha_do_servico(self, erro: ServicoError) -> None:
-        self.falhas_seguidas_do_servico += 1
-        self.proxima_tentativa_ms = self.contador.agora_ms() + min(
-            30_000, 2_000 * (2**self.falhas_seguidas_do_servico)
-        )
-        self._falha("servico", erro.classe, erro.detalhe)
+    def _tentar_reconectar(self, agora: int) -> None:
+        if not self.processo_vivo():
+            self._queda("fechado", "o processo do emulador não existe mais")
+            return
+        if agora < self.proxima_tentativa_ms:
+            return
+        try:
+            self.cliente.status()
+        except (CanalError, ComandoFalhouError) as erro:
+            self._classificar_emulador(erro, agora)
+            return
+        self.travado_desde_ms = None
+        self._conferir_emulador_ao_voltar()
+        self.fila.enfileirar(Evento.RECUPEROU, origem="plataforma")
 
-    def _falha(self, origem: str, classe: str, detalhe: str) -> None:
+    def _classificar_emulador(self, erro: Exception, agora: int) -> None:
+        classe = erro.classe if isinstance(erro, CanalError) else "comando_falhou"
+        if classe == "travado":
+            if self.travado_desde_ms is None:
+                self.travado_desde_ms = agora
+            parado_ms = agora - self.travado_desde_ms
+            if parado_ms >= self.config.emulador.limite_travado_s * 1000:
+                self._queda(
+                    "fechado", f"travado por {parado_ms // 1000} s, além do limite: tratado como fechado"
+                )
+                return
+            self.painel.atualizar(falha=f"emulador travado há {parado_ms // 1000} s; esperando")
+        else:
+            self.travado_desde_ms = None
+            self.painel.atualizar(falha=f"emulador: {classe}; tentando reconectar")
+        self.proxima_tentativa_ms = agora + 2_000
+
+    def _queda(self, classe: str, detalhe: str) -> None:
+        """Emulador fechado: a sessão encerra com resumo, marcando que o emulador caiu antes (E04 via G03)."""
+        self._falha("emulador", classe, detalhe)
+
+    def _conferir_emulador_ao_voltar(self) -> None:
+        """G03, exceção: ao reconectar, o jogo nunca fica alterado. Velocidade fora do normal sem ação em vigor
+        volta ao normal e fica registrado. Pausa não é tocada: pode ser do jogador."""
+        if self.jogo.modo != "completo":
+            return
+        try:
+            atual = self.cliente.velocidade_atual()
+        except (CanalError, ComandoFalhouError):
+            return
+        em_vigor = {pend.alavanca for pend in self.executor.pendentes}
+        if atual.modo != p.ModoVelocidade.NORMAL and not em_vigor & {"camera_lenta", "turbo"}:
+            with contextlib.suppress(CanalError, ComandoFalhouError):
+                self.cliente.velocidade(p.ModoVelocidade.NORMAL, 1.0, 0)
+            with contextlib.suppress(Exception):
+                banco.gravar_falha(
+                    self.con,
+                    {
+                        "ciclo_id": self.ciclo_id,
+                        "ocorrido_ms": self.contador.agora_ms(),
+                        "origem": "emulador",
+                        "classe": "velocidade_restaurada",
+                        "detalhe": f"ao reconectar, velocidade em {atual.modo.name.lower()} ({atual.alvo}) sem ação em vigor",
+                        "visivel": 0,
+                    },
+                )
+            log.evento("velocidade.restaurada", modo=atual.modo.name.lower(), alvo=atual.alvo)
+
+    # ---------- falhas (RN-10, contrato 4) ----------
+    def _falha_do_servico(self, erro: ServicoError) -> None:
+        """Classifica: recusa segue no ciclo seguinte sem a mesma imagem; formato silencia na segunda seguida;
+        fora do ar e limite silenciam com intervalo crescente (ou o informado)."""
+        if erro.classe == "recusa":
+            self.comparador.esquecer()  # a próxima captura vai inteira; nunca a mesma imagem de novo
+            self._falha("servico", "recusa", erro.detalhe, silenciar=False)
+            return
+        if erro.classe == "formato":
+            self._fora_do_contrato(erro.detalhe)
+            return
+        self._silenciar_servico(erro.classe, erro.detalhe, erro.espera_s)
+
+    def _fora_do_contrato(self, motivo: str) -> None:
+        self.formato_seguidos += 1
+        if self.formato_seguidos < 2:
+            self.fila.enfileirar(Evento.SITUACAO_INVALIDA, origem="servico", motivo=motivo)
+            return
+        self._silenciar_servico("formato", motivo, None)
+
+    def _silenciar_servico(self, classe: str, detalhe: str, espera_s: float | None) -> None:
+        self.falhas_seguidas_do_servico += 1
+        espera_ms = (
+            int(espera_s * 1000) if espera_s else min(30_000, 2_000 * (2**self.falhas_seguidas_do_servico))
+        )
+        self.proxima_tentativa_ms = self.contador.agora_ms() + espera_ms
+        self._falha("servico", classe, detalhe)
+        if self.falhas_seguidas_do_servico >= self.config.servico.limite_falhas_seguidas:
+            self.fila.enfileirar(Evento.FALHA_PROLONGADA, origem="plataforma", classe=classe)
+            self.laco.processar_todos()
+
+    def _falha(
+        self, origem: str, classe: str, detalhe: str, *, silenciar: bool = True, processar: bool = True
+    ) -> None:
         with contextlib.suppress(Exception):
             banco.gravar_falha(
                 self.con,
@@ -513,10 +630,17 @@ class Sessao:
             )
         self.painel.atualizar(falha=f"{classe}: {detalhe[:80]}", enviando=False)
         log.falha("falha", origem=origem, classe=classe, detalhe=detalhe[:200])
-        evento = Evento.FALHA_EMULADOR if origem == "emulador" else Evento.FALHA_SERVICO
+        if not silenciar:
+            return
+        evento = {"emulador": Evento.FALHA_EMULADOR, "registro": Evento.FALHA_REGISTRO}.get(
+            origem, Evento.FALHA_SERVICO
+        )
+        if origem in ("emulador", "servico") and self.origem_do_silencio is None:
+            self.origem_do_silencio = origem
         try:
             self.laco.fila.enfileirar(evento, origem="plataforma", classe=classe)
-            self.laco.processar_todos()
+            if processar:
+                self.laco.processar_todos()
         except Exception:
             pass
 
@@ -558,15 +682,28 @@ class Sessao:
         elif efeito == Efeito.CANCELAR_EXECUCAO:
             self.pendencia = None
         elif efeito == Efeito.GRAVAR_MARCO and self.ciclo_id is not None:
-            banco.gravar_marco(
-                self.con, self.ciclo_id, "pausa_mestre" if m.evento == Evento.JOGADOR_PAUSOU else "retomada"
-            )
+            tipos = {Evento.JOGADOR_PAUSOU: "pausa_mestre", Evento.FALHA_PROLONGADA: "pausa_por_falhas"}
+            banco.gravar_marco(self.con, self.ciclo_id, tipos.get(m.evento, "retomada"))
         elif efeito == Efeito.OVERLAY_MESTRE_PAUSADO:
             self.painel.atualizar(pausado=True, enviando=False)
-            self.painel.mostrar_nada("Mestre pausado. Ctrl+Alt+P retoma.")
+            if m.evento == Evento.FALHA_PROLONGADA:
+                self.painel.mostrar_nada(
+                    f"Mestre pausado: {self.falhas_seguidas_do_servico} falhas seguidas do serviço. Ctrl+Alt+P retoma."
+                )
+            else:
+                self.painel.mostrar_nada("Mestre pausado. Ctrl+Alt+P retoma.")
         elif efeito == Efeito.REINICIAR_INTERVALO or efeito == Efeito.INTERVALO_COMO_VENCIDO:
             self.intervalo.tratar_como_vencido()
             self.painel.atualizar(pausado=False, falha=None)
+            if m.evento == Evento.JOGADOR_RETOMOU:  # o jogador retomou: a contagem de falhas recomeça do zero
+                self.falhas_seguidas_do_servico = 0
+                self.formato_seguidos = 0
+                self.origem_do_silencio = None
+        elif efeito == Efeito.MARCAR_QUEDA_DO_EMULADOR and self.ciclo_id is not None:
+            with contextlib.suppress(Exception):
+                banco.gravar_marco(self.con, self.ciclo_id, "queda_emulador", str(d.get("classe")))
+        elif efeito == Efeito.AVISAR_SEM_REGISTRO:
+            self.painel.atualizar(falha="registro sem escrita: nada executa sem registro")
         elif efeito == Efeito.EXECUTAR_REVERSAO and self.ciclo_id is not None:
             r = self.executor.reverter(self.ciclo_id)
             if r is None:
@@ -578,7 +715,9 @@ class Sessao:
                 )
                 self.intervalo.zerar()
         elif efeito == Efeito.GRAVAR_VOLTA:
-            self.falhas_seguidas_do_servico = 0
+            # a contagem de falhas do serviço NÃO zera aqui: só uma descrição válida zera, senão o intervalo
+            # crescente recomeçava em 4 s a cada volta (defeito achado no S5-01)
+            self.origem_do_silencio = None
             log.evento("recuperou")
         elif efeito == Efeito.ESTADO_FINAL_EM_SLOT:
             self.executor.salvar_periodico(self.situacao_atual)
