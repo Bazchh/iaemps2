@@ -35,6 +35,9 @@ class Assinatura:
     """Um lote de desenho do último quadro, como a camada de cena o vê (prova S7-00)."""
 
     hash_textura: int
+    hash_forma: (
+        int  # coordenadas de textura quantizadas: não muda com câmera nem pose; nomeia o pedaço de malha
+    )
     vertices: int
     x0: int
     y0: int
@@ -237,14 +240,17 @@ class Cliente:
         quadro, n = struct.unpack_from("<II", corpo, 0)
         itens = []
         for i in range(n):
-            h, nv, x0, y0, x1, y1, zmin, zmax, fb, q = struct.unpack_from("<QIhhhhIIBB", corpo, 8 + i * 32)
-            itens.append(Assinatura(h, nv, x0, y0, x1, y1, zmin, zmax, bool(fb), bool(q)))
+            h, hf, nv, x0, y0, x1, y1, zmin, zmax, fb, q, _ = struct.unpack_from(
+                "<QQIhhhhIIBBH", corpo, 8 + i * 40
+            )
+            itens.append(Assinatura(h, hf, nv, x0, y0, x1, y1, zmin, zmax, bool(fb), bool(q)))
         return int(quadro), itens
 
     def cena_regra(
         self,
         tipo: int,
         hash_textura: int = 0,
+        hash_forma: int = 0,
         retangulo: tuple[int, int, int, int] = (0, 0, 0, 0),
         z: int = 0,
         rgba: int = 0xFFFF00FF,
@@ -256,7 +262,20 @@ class Cliente:
         corpo = self.pedir(
             p.comando(
                 p.Codigo.EXT_SCENE_RULE,
-                struct.pack("<BQhhhhIIII", tipo, hash_textura, x0, y0, x1, y1, z, rgba, duracao_ms, apos_n),
+                struct.pack(
+                    "<BQQhhhhIIII",
+                    tipo,
+                    hash_textura,
+                    hash_forma,
+                    x0,
+                    y0,
+                    x1,
+                    y1,
+                    z,
+                    rgba,
+                    duracao_ms,
+                    apos_n,
+                ),
             )
         )
         return int(struct.unpack_from("<I", corpo, 0)[0])

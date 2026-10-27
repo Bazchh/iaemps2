@@ -19,10 +19,20 @@ import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any
 
 from iaemps2.ponte import protocolo as p
 
 VERSAO_SIMULADA = "PCSX2 v2.8.2-sim"
+# Cena de mentira da camada de cena (fase 4): (hash textura, hash forma, vértices, x0, y0, x1, y1, z_min, z_max,
+# fallback, qualifica). Dois pedaços do mesmo material, um objeto sem hash e a interface.
+CENA_DE_MENTIRA: tuple[tuple[int, int, int, int, int, int, int, int, int, int, int], ...] = (
+    (0x1111, 0xAAAA, 64, 100, 100, 200, 180, 20_000, 30_000, 0, 1),
+    (0x1111, 0xBBBB, 64, 210, 100, 300, 180, 20_000, 30_000, 0, 1),
+    (0xF000_0000_0000_0001, 0xCCCC, 2, 0, 0, 512, 448, 0, 0, 1, 0),
+    (0x2222, 0xDDDD, 12, 400, 380, 500, 440, 700_000, 700_000, 0, 1),
+)
+
 MEMORIA_EE = 32 * 1024 * 1024
 
 CENARIOS = (
@@ -83,6 +93,9 @@ class Simulador:
                 raise ValueError(f"cenário desconhecido: {nome}")
         self.jogo = Jogo()
         self.velocidade = Velocidade()
+        self.cena_quadro = 0
+        self.cena_proximo_id = 0
+        self.cena_regras: dict[int, dict[str, Any]] = {}
         self.comandos_atendidos = 0
         self.consultas_status = 0
         self.inicio = relogio()
@@ -194,8 +207,57 @@ class Simulador:
             return i
         # ---- extensão ----
         if c == p.Codigo.EXT_CAPABILITIES:
-            ret += struct.pack("<HI", p.VERSAO_EXTENSAO, p.CAP_PAUSA | p.CAP_VELOCIDADE)
+            ret += struct.pack("<HI", p.VERSAO_EXTENSAO, p.CAP_PAUSA | p.CAP_VELOCIDADE | p.CAP_CENA)
             return i
+        if c == p.Codigo.EXT_SCENE_LIST:
+            self.cena_quadro += 1
+            self._cena_avancar_quadro()
+            ret += struct.pack("<II", self.cena_quadro, len(CENA_DE_MENTIRA))
+            for h, hf, nv, x0, y0, x1, y1, zmin, zmax, fb, q in CENA_DE_MENTIRA:
+                ret += struct.pack("<QQIhhhhIIBBH", h, hf, nv, x0, y0, x1, y1, zmin, zmax, fb, q, 0)
+            return i
+        if c == p.Codigo.EXT_SCENE_RULE:
+            tipo, h, hf, _x0, _y0, _x1, _y1, _z, _rgba, duracao_ms, _apos_n = struct.unpack_from(
+                "<BQQhhhhIIII", buf, i
+            )
+            if tipo not in (1, 2):
+                raise _FalhaError
+            self.cena_proximo_id += 1
+            prazo = self.relogio() + duracao_ms / 1000 if duracao_ms > 0 else None
+            self.cena_regras[self.cena_proximo_id] = {
+                "tipo": tipo,
+                "hash": h,
+                "forma": hf,
+                "prazo": prazo,
+                "total": 0,
+                "aplicada": 0,
+            }
+            ret += struct.pack("<I", self.cena_proximo_id)
+            return i + 41
+        if c == p.Codigo.EXT_SCENE_CLEAR:
+            (id_regra,) = struct.unpack_from("<I", buf, i)
+            if id_regra == 0:
+                self.cena_regras.clear()
+            else:
+                self.cena_regras.pop(id_regra, None)
+            return i + 4
+        if c == p.Codigo.EXT_SCENE_STATS:
+            (id_regra,) = struct.unpack_from("<I", buf, i)
+            r = self.cena_regras.get(id_regra)
+            ret += struct.pack(
+                "<IIIIIQQIII",
+                1 if r else 0,
+                r["total"] if r else 0,
+                r["aplicada"] if r else 0,
+                r["aplicada"] if r else 0,
+                self.cena_quadro,
+                self.cena_quadro * 25_000,
+                25_000,
+                len(CENA_DE_MENTIRA),
+                sum(1 for a in CENA_DE_MENTIRA if a[10]),
+                sum(1 for a in CENA_DE_MENTIRA if not a[9]),
+            )
+            return i + 4
         if c == p.Codigo.EXT_SET_PAUSED:
             self._exige_vm()
             novo = p.Status.PAUSADO if buf[i] else p.Status.RODANDO
@@ -272,6 +334,19 @@ class Simulador:
         caminho = self.arquivo_estado(slot)
         if caminho is not None and caminho.is_file():
             self.jogo.status = p.Status.RODANDO
+
+    def _cena_avancar_quadro(self) -> None:
+        """Um quadro passou: regras vencidas somem; as de esconder que casam com a cena contam como aplicadas."""
+        agora = self.relogio()
+        for id_regra in [
+            k for k, r in self.cena_regras.items() if r["prazo"] is not None and agora >= r["prazo"]
+        ]:
+            del self.cena_regras[id_regra]
+        for r in self.cena_regras.values():
+            r["total"] += 1
+            casa = any(a[0] == r["hash"] and (r["forma"] == 0 or a[1] == r["forma"]) for a in CENA_DE_MENTIRA)
+            if r["tipo"] == 2 or casa:
+                r["aplicada"] += 1
 
     def _definir_velocidade(self, modo: int, escalar: float, duracao_ms: int) -> None:
         v = self.velocidade

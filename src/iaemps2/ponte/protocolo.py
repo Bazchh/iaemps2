@@ -68,6 +68,7 @@ class ModoVelocidade(IntEnum):
 CAP_PAUSA = 1
 CAP_VELOCIDADE = 2
 CAP_RESULTADO_ESTADO = 4
+CAP_CENA = 8  # camada de cena (fase 4): códigos 0x84 a 0x88
 VERSAO_EXTENSAO = 1
 
 TAMANHO_LEITURA = {Codigo.READ8: 1, Codigo.READ16: 2, Codigo.READ32: 4, Codigo.READ64: 8}

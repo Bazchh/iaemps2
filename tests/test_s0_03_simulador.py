@@ -63,7 +63,7 @@ def test_capacidades_falham_no_original_e_respondem_no_proprio() -> None:
     r, corpo = resposta(Simulador("proprio").processar(pedido(p.comando(p.Codigo.EXT_CAPABILITIES))))
     assert r == p.Resultado.OK
     versao, mascara = struct.unpack("<HI", corpo)
-    assert versao == p.VERSAO_EXTENSAO and mascara == p.CAP_PAUSA | p.CAP_VELOCIDADE
+    assert versao == p.VERSAO_EXTENSAO and mascara == (p.CAP_PAUSA | p.CAP_VELOCIDADE | p.CAP_CENA)
 
 
 def test_leitura_e_escrita_de_memoria() -> None:

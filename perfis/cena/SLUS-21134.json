@@ -1,0 +1,676 @@
+{
+  "versao_do_perfil": 1,
+  "jogo": {
+    "serial": "SLUS-21134",
+    "crc": "013e349d",
+    "titulo": "Resident Evil 4"
+  },
+  "area": "floresta de abertura e casa do vilarejo (primeira área)",
+  "data": "2026-10-27",
+  "quadro": [
+    512,
+    448
+  ],
+  "classes": [
+    "cenario",
+    "inimigo",
+    "personagem",
+    "item",
+    "interface",
+    "perigo",
+    "saida",
+    "desconhecido"
+  ],
+  "regra_rn11": "inimigo, personagem, perigo e saida nunca recebem regra de cena; desconhecido só aceita ação reversível",
+  "profundidade": {
+    "sentido": "maior_mais_perto",
+    "longe_ate": 100000,
+    "perto_de": 400000,
+    "faixa_medida": [
+      6308,
+      791471
+    ]
+  },
+  "materiais": [
+    {
+      "material": "f000001c00310909",
+      "classe": "interface",
+      "origem": "regra",
+      "mundo": false,
+      "fallback": true,
+      "nota": "sem profundidade, presente em todos os quadros"
+    },
+    {
+      "material": "f000000e00000909",
+      "classe": "interface",
+      "origem": "regra",
+      "mundo": false,
+      "fallback": true,
+      "nota": "sem profundidade, presente em todos os quadros"
+    },
+    {
+      "material": "f000003100000808",
+      "classe": "interface",
+      "origem": "regra",
+      "mundo": false,
+      "fallback": true,
+      "nota": "sem profundidade, presente em todos os quadros"
+    },
+    {
+      "material": "f000000e001b0909",
+      "classe": "interface",
+      "origem": "regra",
+      "mundo": false,
+      "fallback": true,
+      "nota": "sem profundidade, presente em todos os quadros"
+    },
+    {
+      "material": "f000003480000707",
+      "classe": "interface",
+      "origem": "regra",
+      "mundo": false,
+      "fallback": true,
+      "nota": "sem profundidade, presente em todos os quadros"
+    },
+    {
+      "material": "f000003100000707",
+      "classe": "interface",
+      "origem": "regra",
+      "mundo": false,
+      "fallback": true,
+      "nota": "sem profundidade, presente em todos os quadros"
+    },
+    {
+      "material": "f00000310002090a",
+      "classe": "interface",
+      "origem": "regra",
+      "mundo": false,
+      "fallback": true,
+      "nota": "sem profundidade, presente em todos os quadros"
+    },
+    {
+      "material": "f0000031001b0909",
+      "classe": "interface",
+      "origem": "regra",
+      "mundo": false,
+      "fallback": true,
+      "nota": "sem profundidade, presente em todos os quadros"
+    },
+    {
+      "material": "f000002a00000808",
+      "classe": "interface",
+      "origem": "regra",
+      "mundo": false,
+      "fallback": true,
+      "nota": "sem profundidade, presente em todos os quadros"
+    },
+    {
+      "material": "f000003620140505",
+      "classe": "interface",
+      "origem": "regra",
+      "mundo": false,
+      "fallback": true,
+      "nota": "sem profundidade, presente em todos os quadros"
+    },
+    {
+      "material": "f000003480000808",
+      "classe": "interface",
+      "origem": "regra",
+      "mundo": false,
+      "fallback": true,
+      "nota": "sem profundidade, presente em todos os quadros"
+    },
+    {
+      "material": "1f76ae281e7a1a96",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "2c62cce03dff5d21",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "96278c571b9f3006",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "e441eb64c752f9bb",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "038ab9802c281109",
+      "classe": "inimigo",
+      "origem": "cliente",
+      "mundo": true,
+      "fallback": false,
+      "nota": "cabeça/machado do Ganado da direita; cobre parcialmente"
+    },
+    {
+      "material": "51de84b3b042beaa",
+      "classe": "interface",
+      "origem": "regra",
+      "mundo": false,
+      "fallback": false,
+      "nota": "sem profundidade, presente em todos os quadros"
+    },
+    {
+      "material": "94c086a57f7b9a93",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "505f21d0afe30493",
+      "classe": "inimigo",
+      "origem": "cliente",
+      "mundo": true,
+      "fallback": false,
+      "nota": "tronco dos dois Ganados; confirmado pelo cliente em 27/10"
+    },
+    {
+      "material": "9f2a0c345d2b0786",
+      "classe": "inimigo",
+      "origem": "cliente",
+      "mundo": true,
+      "fallback": false,
+      "nota": "mão do Ganado"
+    },
+    {
+      "material": "c49403b0466d33a1",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "89080deb2d60b04f",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "ec4370fcffc1cf24",
+      "classe": "interface",
+      "origem": "regra",
+      "mundo": false,
+      "fallback": false,
+      "nota": "sem profundidade, presente em todos os quadros"
+    },
+    {
+      "material": "0b72321481a56fc0",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "9ab4133dd2bf3504",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "0cda3dc255affc0a",
+      "classe": "inimigo",
+      "origem": "cliente",
+      "mundo": true,
+      "fallback": false,
+      "nota": "cabeça do Ganado, borda de baixo"
+    },
+    {
+      "material": "3a701ae4aabf9b3c",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "221c9dc991e31673",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "5682490b44457b1a",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "238eb024ad3a65d0",
+      "classe": "interface",
+      "origem": "regra",
+      "mundo": false,
+      "fallback": false,
+      "nota": "sem profundidade, presente em todos os quadros"
+    },
+    {
+      "material": "195690da92f8540c",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "5de8490d20ab9714",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "68a8549ca45ead80",
+      "classe": "desconhecido",
+      "origem": "cliente",
+      "mundo": false,
+      "fallback": false,
+      "nota": "caixa grande no alto à direita, não confirmada"
+    },
+    {
+      "material": "9ceeed72d97dd469",
+      "classe": "interface",
+      "origem": "regra",
+      "mundo": false,
+      "fallback": false,
+      "nota": "sem profundidade, presente em todos os quadros"
+    },
+    {
+      "material": "2fb90816f44fde09",
+      "classe": "interface",
+      "origem": "regra",
+      "mundo": false,
+      "fallback": false,
+      "nota": "sem profundidade, presente em todos os quadros"
+    },
+    {
+      "material": "af40e2878e8ef001",
+      "classe": "interface",
+      "origem": "regra",
+      "mundo": false,
+      "fallback": false,
+      "nota": "sem profundidade, presente em todos os quadros"
+    },
+    {
+      "material": "c2b95129abbe9512",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "c70be27993bce92e",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "3b54ea5c13118e83",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "4ebbac01a8a3316c",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "092c951410a6beda",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "80e51a56771ded53",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "70bc11a8eb0ebe56",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "da3929026cf2c378",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "65ab6174468d346a",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "b56c2ce2eb29f6ed",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "168bd6698bd51edf",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "ae53db98b0bf7571",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "f498c193ec7d60dd",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "8f6c3d1d32fe9e6c",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "2b3fb93e4aa49fc6",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "b1904b62ad320279",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "f03af59b314ea05f",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "711212b86ce0ab5c",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "e00212bed5aeebcd",
+      "classe": "personagem",
+      "origem": "cliente",
+      "mundo": true,
+      "fallback": false,
+      "nota": "material compartilhado: cabeça do Leon e os dois Ganados"
+    },
+    {
+      "material": "02db40d5bdd26d8b",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "53bbe2e96e2117f2",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "9e49c5249dbaae92",
+      "classe": "desconhecido",
+      "origem": "cliente",
+      "mundo": true,
+      "fallback": false,
+      "nota": "caixa fora do Ganado"
+    },
+    {
+      "material": "ba7cb007bfcaefab",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "9ed3a371372ccc3d",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "aa193bec4ddac4c0",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "f000002d80000606",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": true,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "a59ead3a93aeafbf",
+      "classe": "interface",
+      "origem": "regra",
+      "mundo": false,
+      "fallback": false,
+      "nota": "sem profundidade, presente em todos os quadros"
+    },
+    {
+      "material": "fabdbc08a8285e9d",
+      "classe": "interface",
+      "origem": "regra",
+      "mundo": false,
+      "fallback": false,
+      "nota": "sem profundidade, presente em todos os quadros"
+    },
+    {
+      "material": "6930d7ddcbf93691",
+      "classe": "interface",
+      "origem": "regra",
+      "mundo": false,
+      "fallback": false,
+      "nota": "sem profundidade, presente em todos os quadros"
+    },
+    {
+      "material": "f937316be3d798d7",
+      "classe": "interface",
+      "origem": "regra",
+      "mundo": false,
+      "fallback": false,
+      "nota": "sem profundidade, presente em todos os quadros"
+    },
+    {
+      "material": "53f9c91b1889a0ed",
+      "classe": "interface",
+      "origem": "regra",
+      "mundo": false,
+      "fallback": false,
+      "nota": "sem profundidade, presente em todos os quadros"
+    },
+    {
+      "material": "23fb52649197bfbe",
+      "classe": "interface",
+      "origem": "regra",
+      "mundo": false,
+      "fallback": false,
+      "nota": "sem profundidade, presente em todos os quadros"
+    },
+    {
+      "material": "76d16e3657e30bc7",
+      "classe": "interface",
+      "origem": "regra",
+      "mundo": false,
+      "fallback": false,
+      "nota": "sem profundidade, presente em todos os quadros"
+    },
+    {
+      "material": "19c5c0412f17a420",
+      "classe": "interface",
+      "origem": "regra",
+      "mundo": false,
+      "fallback": false,
+      "nota": "sem profundidade, presente em todos os quadros"
+    },
+    {
+      "material": "0b85491badc82b3d",
+      "classe": "interface",
+      "origem": "regra",
+      "mundo": false,
+      "fallback": false,
+      "nota": "sem profundidade, presente em todos os quadros"
+    },
+    {
+      "material": "d6e9f1b2f3c98f7c",
+      "classe": "interface",
+      "origem": "regra",
+      "mundo": false,
+      "fallback": false,
+      "nota": "sem profundidade, presente em todos os quadros"
+    },
+    {
+      "material": "522d4d7f59d56a3e",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "cd1a073cb7e55d0a",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "efc5c275fc94b01d",
+      "classe": "personagem",
+      "origem": "cliente",
+      "mundo": true,
+      "fallback": false,
+      "nota": "material compartilhado: cabeça do Leon e o Ganado da esquerda"
+    },
+    {
+      "material": "6f45fcf21996b69e",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "4a10034ec77429d2",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "7871f97f0399c696",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "da3620d0ad6a1c4f",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    },
+    {
+      "material": "06fecf041576c3bc",
+      "classe": "cenario",
+      "origem": "regra",
+      "mundo": true,
+      "fallback": false,
+      "nota": "parado com a câmera parada"
+    }
+  ]
+}
