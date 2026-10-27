@@ -10,7 +10,7 @@ import time
 from typing import Any
 
 from iaemps2.config import Config
-from iaemps2.servicos.base import PedidoDescrever, Resposta, ServicoError
+from iaemps2.servicos.base import PedidoDescrever, PedidoDeTexto, Resposta, ServicoError
 
 MODELO_PADRAO = "gemini-3.5-flash-lite"
 
@@ -28,17 +28,25 @@ class ProvedorG:
         self._cliente = genai.Client(api_key=chave, http_options={"timeout": int(tempo_limite_s * 1000)})
 
     def descrever(self, pedido: PedidoDescrever) -> Resposta:
+        from google.genai import types
+
+        return self._gerar(
+            [
+                types.Part.from_bytes(data=pedido.captura_jpeg, mime_type="image/jpeg"),
+                types.Part.from_text(text=pedido.instrucao()),
+            ]
+        )
+
+    def decidir(self, pedido: PedidoDeTexto) -> Resposta:
+        from google.genai import types
+
+        return self._gerar([types.Part.from_text(text=pedido.instrucao())])
+
+    def _gerar(self, partes: list[Any]) -> Resposta:
         from google.genai import errors, types
 
         inicio = time.monotonic()
-        # um Content só, com imagem e instrução: é o tipo que o SDK aceita sem ambiguidade
-        conteudo = types.Content(
-            role="user",
-            parts=[
-                types.Part.from_bytes(data=pedido.captura_jpeg, mime_type="image/jpeg"),
-                types.Part.from_text(text=pedido.instrucao()),
-            ],
-        )
+        conteudo = types.Content(role="user", parts=partes)
         try:
             resposta: Any = self._cliente.models.generate_content(
                 model=self.modelo,

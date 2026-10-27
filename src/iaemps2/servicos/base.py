@@ -70,7 +70,15 @@ class ServicoError(RuntimeError):
         self.detalhe = detalhe
 
 
+class PedidoDeTexto(Protocol):
+    """Qualquer pedido que vira uma instrução de texto (o pedido de decisão, contrato 2)."""
+
+    def instrucao(self) -> str: ...
+
+
 class Servico(Protocol):
     nome: str
 
     def descrever(self, pedido: PedidoDescrever) -> Resposta: ...
+
+    def decidir(self, pedido: PedidoDeTexto) -> Resposta: ...
