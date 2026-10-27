@@ -1,0 +1,37 @@
+{
+  "versao_do_perfil": 1,
+  "jogo": {"serial": "SLUS-21134", "crc": "013e349d", "titulo": "Resident Evil 4", "versao": "1.01"},
+  "data": "2026-10-27",
+  "unidades": "milímetros; eixo Y para cima",
+  "variaveis": [
+    {"nome": "vida_jogador", "endereco": "0x0042DA76", "tipo": "u16", "faixa": [0, 2400], "significado": "vida atual do jogador", "origem": "fonte pública (lista de códigos para SLUS-21134), conferida ao vivo em 27/10: 1200", "validacao": "lida ao vivo"},
+    {"nome": "vida_maxima_jogador", "endereco": "0x0042DA78", "tipo": "u16", "faixa": [0, 2400], "significado": "vida máxima do jogador", "origem": "ao lado da vida atual; conferida ao vivo: 1200", "validacao": "lida ao vivo"},
+    {"nome": "vida_parceira", "endereco": "0x0042DA7A", "tipo": "u16", "faixa": [0, 1200], "significado": "vida atual da parceira", "origem": "fonte pública, conferida ao vivo: 600", "validacao": "lida ao vivo"},
+    {"nome": "personagem", "endereco": "0x0042DA8A", "tipo": "u8", "faixa": [0, 5], "significado": "personagem controlado", "origem": "fonte pública", "validacao": "lida ao vivo"},
+    {"nome": "costume", "endereco": "0x0042DA88", "tipo": "u8", "faixa": [0, 5], "significado": "roupa do personagem", "origem": "fonte pública", "validacao": "lida ao vivo"}
+  ],
+  "camera": {
+    "olho": {"endereco": "0x003CA220", "tipo": "vec3", "significado": "posição do olho da câmera; anda com o jogador e orbita quando ele vira no lugar", "origem": "descoberta em 27/10 (andar sem virar, virar sem andar)"},
+    "alvo": {"endereco": "0x003CA230", "tipo": "vec3", "significado": "ponto que a câmera olha: projeta no centro exato da tela; fica no tronco do jogador", "origem": "descoberta em 27/10: projeta em (0,0)"},
+    "matriz": {"endereco": "0x004327C0", "tipo": "mat4", "convencao": "vetor-linha vezes matriz; clip = (x,y,z,1)·M; terceira e quarta colunas iguais; w é a distância ao olho em mm", "origem": "descoberta em 27/10"},
+    "tela": {"endereco": "0x00432840", "tipo": "mat4", "significado": "escala e deslocamento para a tela: x_px = 256 - (x/w)·1104.64, y_px = 224 + (y/w)·1706.67 no quadro de 512x448; o sinal de x vem da escala negativa do bloco", "origem": "calibrada em 27/10 contra a caixa desenhada do inimigo"},
+    "validacao": "projeção da raiz, dos pés e da cabeça do inimigo dentro da caixa desenhada em 3 de 3 fotos"
+  },
+  "entidades": {
+    "estado": "lista encontrada; posição provada por projeção; vida do inimigo ainda não localizada",
+    "vetor": {"endereco": "0x01789F40", "passo": "0xED0", "slots": 24, "significado": "vetor de personagens: slot 0 é o jogador; os demais são inimigos, aves e outros atores; slot vazio tem cabeçalho zero", "origem": "descoberta em 27/10 pela cadeia de ponteiros a partir da raiz do esqueleto do inimigo"},
+    "vetor_anexos": {"endereco": "0x017BCDF0", "passo": "0xED0", "slots": 5, "significado": "vetor de objetos presos a personagens (armas, cabeças); mesmo formato", "origem": "descoberta em 27/10"},
+    "campos": {
+      "cabecalho": {"deslocamento": "0x000", "tipo": "u32", "significado": "0x0B002077 no jogador, 0x02002077 no inimigo de aldeia, 0x02002067 em aves, 0x0200686F em atores parados; bit 16 ligado = morto ou inativo (visto em duas mortes; provisório)"},
+      "posicao": {"deslocamento": "0x040", "tipo": "vec3", "significado": "posição dos pés no mundo, em mm; cópias em 0x0C0, 0x130 e 0x290"},
+      "ossos": {"deslocamento": "0x110", "tipo": "ptr", "significado": "ponteiro para a raiz do esqueleto (pool de nós de 0x270 bytes)"},
+      "animacao": {"deslocamento": "0x2FC", "tipo": "u16", "significado": "identificador da animação corrente (118 andando, 184 reação ao tiro, 103 morto no inimigo de aldeia); provisório"},
+      "anexo": {"deslocamento": "0x710", "tipo": "ptr", "significado": "ponteiro para o objeto preso (arma); zera na morte e o objeto some do vetor de anexos"}
+    },
+    "lista_de_tarefas": {"endereco": "0x0048A000", "significado": "lista encadeada de tarefas do quadro: triplas (objeto, função 0x00257F98 ou 0x00258AC0, próxima); serve para enumerar quem está ativo", "origem": "descoberta em 27/10"},
+    "validacao": "posição do slot 11 (inimigo do estado 91) projetada com a câmera cai na caixa desenhada do inimigo em 4 de 5 quadros válidos (tronco e cabeça; os pés saem pela borda inferior num deles); no quinto, durante a reação ao tiro, os três pontos ficam 8 px à esquerda da caixa",
+    "pendente": "vida do inimigo: nenhum campo do slot nem da memória cai a cada tiro nas seis fotos; próximo passo é vigia de escrita no fork (nível 2)"
+  },
+  "intocavel": [],
+  "acoes_de_mundo": []
+}
