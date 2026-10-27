@@ -212,3 +212,38 @@ def test_modo_reduzido_nao_consulta_velocidade(tmp_path: Path) -> None:
         assert estado["velocidade"] == 1.0 and estado["status"] == "rodando"
         cliente.fechar()
         con.close()
+
+
+def test_confirmacao_espera_a_thread_da_cpu_do_emulador(tmp_path: Path) -> None:
+    """O emulador real responde ao canal antes de a thread da CPU aplicar pausa e velocidade (S4-03). A
+    confirmação relê até ver o efeito em vez de falhar na primeira leitura."""
+    with Simulador(
+        "proprio", pasta_estados=tmp_path / "sstates", atraso_salvamento_s=0.1, atraso_aplicacao_s=0.15
+    ) as sim:
+        cliente = Cliente(porta=sim.porta or 0)
+        con = banco.criar(tmp_path / "s.sqlite")
+        sessao = banco.abrir_sessao(
+            con,
+            jogo_titulo="J",
+            jogo_serial="SLUS-21134",
+            jogo_crc="013e349d",
+            jogo_versao="1.01",
+            emulador_versao="sim",
+            modo="completo",
+            tom="imprevisivel",
+            intensidade="media",
+            servico="falso",
+            aceite_versao="1",
+            config_json="{}",
+        )
+        ciclo = banco.gravar_ciclo(con, sessao, 1, 0, "rodando", "executando")
+        slots = FilaDeSlots(tmp_path / "sstates", "SLUS-21134", "013e349d", list(range(90, 100)))
+        executor = Executor(cliente, slots, con, sessao, Contador(), cat.montar(COMPLETO))
+        b = Bancada(sim, cliente, con, sessao, ciclo, executor, [0.0])
+        atendidos_antes = sim.comandos_atendidos
+        _, resultado, _ = b.executar("camera_lenta", escalar=0.5, duracao_s=3)
+        assert resultado == "confirmada"
+        assert cliente.velocidade_atual().modo == p.ModoVelocidade.LENTA
+        assert sim.comandos_atendidos - atendidos_antes >= 5  # houve releitura além da primeira
+        cliente.fechar()
+        con.close()

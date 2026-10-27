@@ -162,10 +162,25 @@ class Sessao:
     def rodar(self) -> None:
         """A thread de trabalho inteira. Termina quando a sessão encerra."""
         self.iniciar()
-        while not self.encerrada.is_set():
-            self.passo()
-            if not self.encerrada.is_set():
-                self.dormir(self.config.captura.intervalo_ms / 1000)
+        relogio_de_fim = threading.Thread(target=self.vigiar_fins, name="fim", daemon=True)
+        relogio_de_fim.start()
+        try:
+            while not self.encerrada.is_set():
+                self.passo()
+                if not self.encerrada.is_set():
+                    self.dormir(self.config.captura.intervalo_ms / 1000)
+        finally:
+            relogio_de_fim.join(timeout=2)
+
+    def vigiar_fins(self, passo_s: float = 0.1) -> None:
+        """Encerra as ações com duração no segundo certo, mesmo com o laço parado esperando o serviço.
+        Na prova de fogo, pausas de 3 s duraram 9 e 11 s porque o fim só era visto entre ciclos."""
+        while not self.encerrada.wait(passo_s):
+            try:
+                for id_ in self.executor.encerrar_vencidos():
+                    log.evento("intervencao.fim", intervencao=id_)
+            except Exception as erro:  # RN-10
+                self._falha("emulador", type(erro).__name__, str(erro))
 
     def passo(self) -> None:
         """Um ciclo: gestos pendentes, um passo pelo estado, fim das ações com duração, gestos de novo."""

@@ -16,10 +16,12 @@ import io
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import Any, cast
 
 from PIL import Image
 
-PROCESSO_EMULADOR = "pcsx2-qt.exe"
+# Prefixo do executável: pcsx2-qt.exe (instalado) e pcsx2-qtx64-avx2.exe (compilado) são o mesmo emulador.
+PROCESSO_EMULADOR = "pcsx2-qt"
 
 
 class JanelaAusenteError(RuntimeError):
@@ -138,6 +140,13 @@ def preparar(
 # ---------------- parte do Windows ----------------
 
 
+def e_o_emulador(nome_do_processo: str | None, processo: str = PROCESSO_EMULADOR) -> bool:
+    """O executável do emulador muda de nome conforme a compilação (pcsx2-qt.exe, pcsx2-qtx64-avx2.exe);
+    o prefixo é o que identifica."""
+    nome = (nome_do_processo or "").lower()
+    return nome.startswith(processo.lower()) and nome.endswith(".exe")
+
+
 def localizar_janela(processo: str = PROCESSO_EMULADOR) -> tuple[int, Retangulo]:
     """A maior janela visível do processo do emulador, e a área do cliente dela em coordenadas de tela.
     Pelo processo, não pelo título: o título muda com o jogo."""
@@ -145,7 +154,7 @@ def localizar_janela(processo: str = PROCESSO_EMULADOR) -> tuple[int, Retangulo]
     import win32gui
     import win32process
 
-    pids = {p.pid for p in psutil.process_iter(["name"]) if (p.info["name"] or "").lower() == processo}
+    pids = {p.pid for p in psutil.process_iter(["name"]) if e_o_emulador(p.info["name"], processo)}
     if not pids:
         raise JanelaAusenteError(f"processo {processo} não está rodando")
     candidatas: list[tuple[int, int]] = []
@@ -187,7 +196,8 @@ def capturar_janela(hwnd: int, area: Retangulo) -> Image.Image:
     try:
         bmp.CreateCompatibleBitmap(mfc, largura, altura)
         mem.SelectObject(bmp)
-        ok = ctypes.windll.user32.PrintWindow(hwnd, mem.GetSafeHdc(), 3)  # 3 = PW_RENDERFULLCONTENT
+        user32 = cast(Any, ctypes).windll.user32  # cast: o typeshed fora do Windows não declara windll
+        ok = user32.PrintWindow(hwnd, mem.GetSafeHdc(), 3)  # 3 = PW_RENDERFULLCONTENT
         if not ok:
             raise JanelaAusenteError("a janela do emulador não aceitou a captura")
         info = bmp.GetInfo()

@@ -56,6 +56,7 @@ class ModoVelocidade(IntEnum):
     NORMAL = 0
     LENTA = 1
     TURBO = 2
+    ILIMITADA = 3  # só lida: o jogador ligou pelo atalho do emulador; o mestre nunca pede
 
 
 # máscara de capacidades da extensão

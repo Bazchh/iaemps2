@@ -9,9 +9,14 @@ repetida no ciclo; três seguidas tiram a alavanca do catálogo.
 
 from __future__ import annotations
 
+import functools
 import json
 import sqlite3
+import threading
+import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
+from typing import Any
 
 from iaemps2.catalogo import catalogo as cat
 from iaemps2.mestre.decisao import Veredito, situacao_mudou
@@ -22,7 +27,24 @@ from iaemps2.ponte.estados import FilaDeSlots, RecargaNaoConfirmadaError, Salvam
 from iaemps2.registro import banco
 from iaemps2.sessao.relogio import Contador
 
+
+def _sincronizado[**P, R](metodo: Callable[P, R]) -> Callable[P, R]:
+    """O laço e o relógio de fim chamam o executor de threads diferentes; um de cada vez."""
+
+    @functools.wraps(metodo)
+    def envolto(*args: P.args, **kwargs: P.kwargs) -> R:
+        executor: Any = args[0]
+        with executor._trava:
+            return metodo(*args, **kwargs)
+
+    return envolto
+
+
 COM_DURACAO = {"pausa", "camera_lenta", "turbo"}
+# O emulador aplica pausa e velocidade na thread da CPU dele, depois de responder ao canal; a confirmação
+# relê até ver o efeito, dentro deste limite.
+CONFIRMACAO_TENTATIVAS = 20
+CONFIRMACAO_PASSO_S = 0.05
 MODO_POR_ALAVANCA = {"camera_lenta": p.ModoVelocidade.LENTA, "turbo": p.ModoVelocidade.TURBO}
 
 
@@ -56,8 +78,11 @@ class Executor:
     ultima_reversivel: Execucao | None = None
     aperto_dos_slots: dict[int, int] = field(default_factory=dict)
     situacao_id_atual: int | None = None  # a sessão informa a cada ciclo; vira contexto do slot salvo
+    dormir: Callable[[float], None] = time.sleep  # entre releituras de confirmação
+    _trava: threading.RLock = field(default_factory=threading.RLock, repr=False)
 
     # ---------- estado do emulador para o registro ----------
+    @_sincronizado
     def estado_atual(self, situacao: Situacao | None) -> dict[str, object]:
         status = self.cliente.status()
         velocidade = 1.0
@@ -74,6 +99,7 @@ class Executor:
         }
 
     # ---------- D02 ----------
+    @_sincronizado
     def executar(
         self,
         veredito: Veredito,
@@ -161,15 +187,15 @@ class Executor:
         agora = self.contador.agora_ms()
         if v.alavanca == "pausa":
             self.cliente.pausar(True)
-            if self.cliente.status() != p.Status.PAUSADO:
+            if not self._confirmar(lambda: self.cliente.status() == p.Status.PAUSADO):
                 raise ComandoFalhouError("status não virou pausado")
             return agora + int(v.parametros["duracao_s"] * 1000), None
         if v.alavanca in MODO_POR_ALAVANCA:
             modo = MODO_POR_ALAVANCA[v.alavanca]
             duracao_ms = int(v.parametros["duracao_s"] * 1000)
             self.cliente.velocidade(modo, v.parametros["escalar"], duracao_ms)
-            atual = self.cliente.velocidade_atual()
-            if atual.modo != modo:
+            if not self._confirmar(lambda: self.cliente.velocidade_atual().modo == modo):
+                atual = self.cliente.velocidade_atual()
                 raise ComandoFalhouError(
                     f"velocidade em vigor é {atual.modo.name.lower()}, não {modo.name.lower()}"
                 )
@@ -184,6 +210,15 @@ class Executor:
             self.slots.recarregar(self.cliente, slot)
             return None, {"slot": float(volta_slot)}
         raise ComandoFalhouError(f"alavanca sem executor: {v.alavanca}")
+
+    def _confirmar(self, efeito_visto: Callable[[], bool]) -> bool:
+        """Relê o emulador até ver o efeito ou esgotar as tentativas. A primeira leitura é imediata."""
+        for tentativa in range(CONFIRMACAO_TENTATIVAS):
+            if efeito_visto():
+                return True
+            if tentativa < CONFIRMACAO_TENTATIVAS - 1:
+                self.dormir(CONFIRMACAO_PASSO_S)
+        return False
 
     def _slot_de_volta(self, destino: int) -> int:
         candidatos = [s for s in self.slots.slots if s != destino]
@@ -214,6 +249,7 @@ class Executor:
         self.catalogo = cat.com_slots(self.catalogo, tuple(sorted(self.aperto_dos_slots)))
         return registro_id
 
+    @_sincronizado
     def salvar_periodico(self, situacao: Situacao | None) -> int | None:
         """O salvamento de rotina da intensidade (A05), fora do catálogo de decisões."""
         try:
@@ -222,6 +258,7 @@ class Executor:
             return None
 
     # ---------- fim das ações com duração ----------
+    @_sincronizado
     def encerrar_vencidos(self, agora_ms: int | None = None) -> list[int]:
         """Pausa termina pela plataforma; velocidade termina pelo vigia do emulador. Grava o fim de ambas."""
         agora = self.contador.agora_ms() if agora_ms is None else agora_ms
@@ -233,6 +270,7 @@ class Executor:
             encerradas.append(pendente.intervencao_id)
         return encerradas
 
+    @_sincronizado
     def encerrar_todas(self) -> list[int]:
         """D05 e E04: tudo que tem duração volta ao normal agora."""
         encerradas = [pendente.intervencao_id for pendente in self.pendentes]
@@ -254,6 +292,7 @@ class Executor:
         self.pendentes.remove(pendente)
 
     # ---------- D03 ----------
+    @_sincronizado
     def reverter(self, ciclo_id: int) -> Execucao | None:
         """Desfaz a última intervenção reversível pelo caminho próprio dela. None se não há o que reverter."""
         ultima = self.ultima_reversivel

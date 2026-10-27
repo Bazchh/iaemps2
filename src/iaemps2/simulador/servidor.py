@@ -65,6 +65,7 @@ class Simulador:
         pasta_estados: Path | None = None,
         atraso_salvamento_s: float = 0.9,
         relogio: Callable[[], float] = time.monotonic,
+        atraso_aplicacao_s: float = 0.0,
         cenarios: dict[str, int | float] | None = None,
     ) -> None:
         if modo not in ("original", "proprio"):
@@ -72,6 +73,8 @@ class Simulador:
         self.modo = modo
         self.pasta_estados = pasta_estados
         self.atraso_salvamento_s = atraso_salvamento_s
+        self.atraso_aplicacao_s = atraso_aplicacao_s  # pausa e velocidade entram em vigor depois da resposta
+        self._aplicacoes_pendentes: list[tuple[float, Callable[[], None]]] = []
         self.relogio = relogio
         self.cenarios = dict(cenarios or {})
         for nome in self.cenarios:
@@ -102,7 +105,13 @@ class Simulador:
         return self.jogo.status
 
     def vigiar(self) -> None:
-        """Volta a velocidade a normal quando o prazo vence. O servidor chama a cada volta do laço."""
+        """Aplica o que já venceu o atraso e volta a velocidade a normal quando o prazo vence.
+        O servidor chama a cada volta do laço e antes de cada pedido."""
+        agora = self.relogio()
+        prontas = [a for a in self._aplicacoes_pendentes if a[0] <= agora]
+        self._aplicacoes_pendentes = [a for a in self._aplicacoes_pendentes if a[0] > agora]
+        for _, aplicar in prontas:
+            aplicar()
         v = self.velocidade
         if v.prazo is not None and self.relogio() >= v.prazo:
             v.modo = p.ModoVelocidade.NORMAL
@@ -187,12 +196,19 @@ class Simulador:
             return i
         if c == p.Codigo.EXT_SET_PAUSED:
             self._exige_vm()
-            self.jogo.status = p.Status.PAUSADO if buf[i] else p.Status.RODANDO
+            novo = p.Status.PAUSADO if buf[i] else p.Status.RODANDO
+
+            def pausar(novo: p.Status = novo) -> None:
+                self.jogo.status = novo
+
+            self._aplicar(pausar)
             return i + 1
         if c == p.Codigo.EXT_SET_SPEED:
             self._exige_vm()
             modo, escalar, duracao_ms = struct.unpack_from("<BfI", buf, i)
-            self._definir_velocidade(modo, escalar, duracao_ms)
+            if modo > p.ModoVelocidade.TURBO or (modo != p.ModoVelocidade.NORMAL and not escalar > 0.0):
+                raise _FalhaError  # como o emulador próprio: escalar 0 significaria ilimitado
+            self._aplicar(lambda: self._definir_velocidade(modo, escalar, duracao_ms))
             return i + 9
         if c == p.Codigo.EXT_GET_SPEED:
             v = self.velocidade
@@ -200,6 +216,13 @@ class Simulador:
             ret += struct.pack("<BfI", int(v.modo), v.alvo(), restante)
             return i
         raise _FalhaError
+
+    def _aplicar(self, aplicar: Callable[[], None]) -> None:
+        """Agora, ou depois do atraso de aplicação (o emulador real responde antes de a thread da CPU agir)."""
+        if self.atraso_aplicacao_s <= 0:
+            aplicar()
+        else:
+            self._aplicacoes_pendentes.append((self.relogio() + self.atraso_aplicacao_s, aplicar))
 
     def _exige_vm(self) -> None:
         if not self._vm_valida():

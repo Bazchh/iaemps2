@@ -271,3 +271,31 @@ def test_memoria_curta_vem_do_registro(tmp_path: Path) -> None:
         "lacunas",
     }
     con.close()
+
+
+def test_morte_recente_entra_no_pedido_e_no_implacavel_e_ordem() -> None:
+    """Prova de fogo: em duas mortes o serviço recebeu 'recarregar' e a morte na memória e escolheu velocidade.
+    Agora a morte recente vira aviso explícito; no tom implacável, ordem."""
+    recente = memoria.MemoriaCurta(marcos=[{"tipo": "morte", "ha_ms": 90_000}])
+
+    def pedido(tom: cat.Tom, mem: memoria.MemoriaCurta, slots: tuple[int, ...] = (93, 94)) -> str:
+        catalogo = cat.com_slots(cat.montar(COMPLETO, tom=tom), slots)
+        return mestre.montar_pedido(
+            catalogo=catalogo,
+            situacao=COMBATE_3,
+            status="rodando",
+            velocidade=1.0,
+            memoria=mem,
+            proxima_janela_ms=0,
+            jogo_titulo="J",
+        ).instrucao()
+
+    assert "DEVE escolher 'recarregar'" in pedido(cat.Tom.IMPLACAVEL, recente)
+    assert "resposta esperada" in pedido(cat.Tom.PROTETOR, recente)
+    assert "morreu" not in pedido(cat.Tom.IMPLACAVEL, memoria.MemoriaCurta())
+    assert "morreu" not in pedido(
+        cat.Tom.IMPLACAVEL, memoria.MemoriaCurta(marcos=[{"tipo": "morte", "ha_ms": 400_000}])
+    )
+    assert "morreu" not in pedido(
+        cat.Tom.IMPLACAVEL, recente, slots=()
+    )  # sem estado guardado não há o que recarregar

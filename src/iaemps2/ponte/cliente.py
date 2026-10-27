@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import socket
 import struct
+import threading
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -55,6 +56,7 @@ class Cliente:
         relogio: Callable[[], float] = time.monotonic,
         dormir: Callable[[float], None] = time.sleep,
     ) -> None:
+        self._trava = threading.RLock()
         self.host = host
         self.porta = porta
         self.tempo_limite_s = tempo_limite_s
@@ -95,7 +97,12 @@ class Cliente:
 
     # ---------- protocolo ----------
     def pedir(self, *comandos: bytes) -> bytes:
-        """Envia os comandos num pedido só e devolve o retorno. Reconecta uma vez se o canal caiu."""
+        """Envia os comandos num pedido só e devolve o retorno. Reconecta uma vez se o canal caiu.
+        Um pedido por vez: o laço e o relógio de fim das ações usam o mesmo canal de threads diferentes."""
+        with self._trava:
+            return self._pedir(*comandos)
+
+    def _pedir(self, *comandos: bytes) -> bytes:
         if self._sock is None:
             self.conectar()
         pedido = p.empacotar_pedido(*comandos)

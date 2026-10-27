@@ -11,11 +11,12 @@ Tudo que não é Tk (formatar linhas, o estado mostrado, a área ocupada) é pur
 from __future__ import annotations
 
 import contextlib
-import sys
+import os
 import time
 import tkinter as tk
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from typing import Any, cast
 
 from iaemps2.olho.captura import Retangulo
 
@@ -88,10 +89,15 @@ def teclas_pressionadas(estado_tecla: Callable[[int], bool]) -> str | None:
     return None
 
 
-def _leitor_do_windows() -> Callable[[int], bool]:
+def _user32() -> Any:
+    """A user32 do Windows. cast porque o typeshed de outras plataformas não declara windll."""
     import ctypes
 
-    user32 = ctypes.windll.user32
+    return cast(Any, ctypes).windll.user32
+
+
+def _leitor_do_windows() -> Callable[[int], bool]:
+    user32 = _user32()
 
     def pressionada(vk: int) -> bool:
         return bool(user32.GetAsyncKeyState(vk) & 0x8000)
@@ -101,11 +107,11 @@ def _leitor_do_windows() -> Callable[[int], bool]:
 
 def _janela_em_foco() -> int:
     """O hwnd da janela em primeiro plano (0 fora do Windows ou se não houver)."""
-    if sys.platform != "win32":
+    if (
+        os.name != "nt"
+    ):  # os.name, e não sys.platform: o mypy fixa sys.platform e marca o outro ramo como inalcançável
         return 0
-    import ctypes
-
-    return int(ctypes.windll.user32.GetForegroundWindow())
+    return int(_user32().GetForegroundWindow())
 
 
 class Overlay:
@@ -145,12 +151,10 @@ class Overlay:
         Os gestos vêm por GetAsyncKeyState, que não depende de foco; o arrasto e os botões recebem o mouse
         normalmente. O Tk ativa a janela ao mapeá-la, então o foco é devolvido a quem o tinha antes.
         """
-        if sys.platform != "win32":
+        if os.name != "nt":
             return
-        import ctypes
-
         self.root.update()  # mapeia a janela; o hwnd só é definitivo depois do overrideredirect ser aplicado
-        user32 = ctypes.windll.user32
+        user32 = _user32()
         hwnd = user32.GetParent(self.root.winfo_id()) or self.root.winfo_id()
         gwl_exstyle, ws_ex_noactivate, ws_ex_toolwindow = -20, 0x08000000, 0x00000080
         estilo = user32.GetWindowLongW(hwnd, gwl_exstyle)
