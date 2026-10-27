@@ -67,6 +67,46 @@ class EstatisticasCena:
     com_hash_ultimo_quadro: int
 
 
+@dataclass(frozen=True)
+class AcessoVigiado:
+    """Uma instrução do jogo que tocou a faixa vigiada, com o que ela fez no primeiro e no último acesso."""
+
+    pc: int
+    op: int
+    primeiro_endereco: int
+    ultimo_endereco: int
+    contagem: int
+    bits: int
+    escrita: bool
+    ultimo_valor: int
+    registradores: tuple[int, ...]  # 32 registradores gerais (32 bits baixos) no primeiro acesso
+
+    @property
+    def base(self) -> int:
+        """Registrador-base da instrução (rs): o ponteiro de onde o endereço saiu."""
+        return (self.op >> 21) & 0x1F
+
+    @property
+    def deslocamento(self) -> int:
+        d = self.op & 0xFFFF
+        return d - 0x10000 if d & 0x8000 else d
+
+
+@dataclass(frozen=True)
+class EstadoVigia:
+    ativo: bool
+    inicio: int
+    fim: int
+    acessos_total: int
+    descartados: int
+    instrucoes: int
+    restante_ms: int
+
+
+VIGIA_LEITURA = 1
+VIGIA_ESCRITA = 2
+VIGIA_AMBOS = 3
+
 REGRA_ESCONDER = 1
 REGRA_QUADRADO = 2
 
@@ -287,6 +327,29 @@ class Cliente:
         corpo = self.pedir(p.comando(p.Codigo.EXT_SCENE_STATS, struct.pack("<I", id_regra)))
         campos = struct.unpack_from("<IIIIIQQIII", corpo, 0)
         return EstatisticasCena(bool(campos[0]), *campos[1:])
+
+    # ---------- vigia de memória (card S8-01; códigos 0x89 a 0x8B) ----------
+    def vigia_definir(
+        self, inicio: int, fim: int, condicao: int = VIGIA_ESCRITA, duracao_ms: int = 0
+    ) -> None:
+        """Vigia a faixa [inicio, fim) sem pausar o jogo; o emulador fica mais lento enquanto o vigia existe."""
+        self.pedir(p.comando(p.Codigo.EXT_WATCH_SET, struct.pack("<IIBI", inicio, fim, condicao, duracao_ms)))
+
+    def vigia_ler(self, zerar: bool = False) -> tuple[EstadoVigia, list[AcessoVigiado]]:
+        corpo = self.pedir(p.comando(p.Codigo.EXT_WATCH_READ, bytes([1 if zerar else 0])))
+        ativo, inicio, fim, total, descartados, instrucoes, restante, n = struct.unpack_from(
+            "<IIIIIIII", corpo, 0
+        )
+        itens = []
+        for i in range(n):
+            base = 32 + i * 160
+            pc, op, e0, e1, cont, bits, escrita, _pad, valor = struct.unpack_from("<IIIIIBBHQ", corpo, base)
+            regs = struct.unpack_from("<32I", corpo, base + 32)
+            itens.append(AcessoVigiado(pc, op, e0, e1, cont, bits, bool(escrita), valor, tuple(regs)))
+        return EstadoVigia(bool(ativo), inicio, fim, total, descartados, instrucoes, restante), itens
+
+    def vigia_limpar(self) -> None:
+        self.pedir(p.comando(p.Codigo.EXT_WATCH_CLEAR))
 
     def esperar_jogo(self, limite_s: float, intervalo_s: float = 1.0) -> p.Status:
         """Sonda o status até "rodando" ou até o limite. "Desligado" nos primeiros segundos é carregamento normal."""

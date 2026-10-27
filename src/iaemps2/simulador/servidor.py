@@ -96,6 +96,7 @@ class Simulador:
         self.cena_quadro = 0
         self.cena_proximo_id = 0
         self.cena_regras: dict[int, dict[str, Any]] = {}
+        self.vigia_memoria: dict[str, Any] | None = None  # faixa vigiada e tabela de acessos por pc
         self.comandos_atendidos = 0
         self.consultas_status = 0
         self.inicio = relogio()
@@ -207,7 +208,9 @@ class Simulador:
             return i
         # ---- extensão ----
         if c == p.Codigo.EXT_CAPABILITIES:
-            ret += struct.pack("<HI", p.VERSAO_EXTENSAO, p.CAP_PAUSA | p.CAP_VELOCIDADE | p.CAP_CENA)
+            ret += struct.pack(
+                "<HI", p.VERSAO_EXTENSAO, p.CAP_PAUSA | p.CAP_VELOCIDADE | p.CAP_CENA | p.CAP_VIGIA
+            )
             return i
         if c == p.Codigo.EXT_SCENE_LIST:
             self.cena_quadro += 1
@@ -258,6 +261,52 @@ class Simulador:
                 sum(1 for a in CENA_DE_MENTIRA if not a[9]),
             )
             return i + 4
+        if c == p.Codigo.EXT_WATCH_SET:
+            self._exige_vm()
+            inicio, fim, cond, duracao_ms = struct.unpack_from("<IIBI", buf, i)
+            if inicio >= fim or (cond & 3) == 0:
+                raise _FalhaError
+            prazo = self.relogio() + duracao_ms / 1000 if duracao_ms > 0 else None
+            self.vigia_memoria = {
+                "inicio": inicio,
+                "fim": fim,
+                "cond": cond,
+                "prazo": prazo,
+                "total": 0,
+                "tabela": {},
+            }
+            return i + 13
+        if c == p.Codigo.EXT_WATCH_READ:
+            zerar = buf[i] != 0
+            self._vigia_prazo()
+            vg = self.vigia_memoria
+            tabela = vg["tabela"] if vg else {}
+            restante = 0
+            if vg and vg["prazo"] is not None:
+                restante = max(0, int((vg["prazo"] - self.relogio()) * 1000))
+            ret += struct.pack(
+                "<IIIIIIII",
+                1 if vg else 0,
+                vg["inicio"] if vg else 0,
+                vg["fim"] if vg else 0,
+                vg["total"] if vg else 0,
+                0,
+                len(tabela),
+                restante,
+                len(tabela),
+            )
+            for pc, e in tabela.items():
+                ret += struct.pack(
+                    "<IIIIIBBHQ", pc, e["op"], e["e0"], e["e1"], e["n"], e["bits"], 1, 0, e["valor"]
+                )
+                ret += struct.pack("<32I", *e["regs"])
+            if zerar and vg:
+                vg["tabela"] = {}
+                vg["total"] = 0
+            return i + 1
+        if c == p.Codigo.EXT_WATCH_CLEAR:
+            self.vigia_memoria = None
+            return i
         if c == p.Codigo.EXT_SET_PAUSED:
             self._exige_vm()
             novo = p.Status.PAUSADO if buf[i] else p.Status.RODANDO
@@ -297,7 +346,42 @@ class Simulador:
             raise _FalhaError
         return bytes(self.jogo.memoria[endereco : endereco + n])
 
+    def _vigia_prazo(self) -> None:
+        v = self.vigia_memoria
+        if v and v["prazo"] is not None and self.relogio() >= v["prazo"]:
+            self.vigia_memoria = None
+
+    def _vigia_registrar(self, endereco: int, dados: bytes) -> None:
+        """Escrita pelo canal dentro da faixa vigiada conta como um acesso de uma instrução de mentira."""
+        self._vigia_prazo()
+        v = self.vigia_memoria
+        if not v or not (v["cond"] & 2) or endereco >= v["fim"] or endereco + len(dados) <= v["inicio"]:
+            return
+        v["total"] += 1
+        bits = len(dados) * 8
+        pc = 0x00100000 + (endereco - v["inicio"])  # uma instrução por endereço, estável entre leituras
+        op = (0x2B << 26) | (4 << 21) | (5 << 16) | (endereco & 0xFFFF)  # sw t1, desl(a0)
+        valor = int.from_bytes(dados, "little")
+        e = v["tabela"].get(pc)
+        if e is None:
+            regs = [0] * 32
+            regs[4] = endereco - (endereco & 0xFFFF)
+            v["tabela"][pc] = {
+                "op": op,
+                "e0": endereco,
+                "e1": endereco,
+                "n": 1,
+                "bits": bits,
+                "valor": valor,
+                "regs": regs,
+            }
+        else:
+            e["e1"] = endereco
+            e["n"] += 1
+            e["valor"] = valor
+
     def _escrever(self, endereco: int, dados: bytes) -> None:
+        self._vigia_registrar(endereco, dados)
         if endereco + len(dados) > MEMORIA_EE:
             raise _FalhaError
         self.jogo.memoria[endereco : endereco + len(dados)] = dados
