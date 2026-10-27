@@ -11,6 +11,7 @@ Tudo que não é Tk (formatar linhas, o estado mostrado, a área ocupada) é pur
 from __future__ import annotations
 
 import contextlib
+import sys
 import time
 import tkinter as tk
 from collections.abc import Callable
@@ -98,6 +99,15 @@ def _leitor_do_windows() -> Callable[[int], bool]:
     return pressionada
 
 
+def _janela_em_foco() -> int:
+    """O hwnd da janela em primeiro plano (0 fora do Windows ou se não houver)."""
+    if sys.platform != "win32":
+        return 0
+    import ctypes
+
+    return int(ctypes.windll.user32.GetForegroundWindow())
+
+
 class Overlay:
     """A janela. `ao_gesto` recebe 'reverter' | 'pausar' | 'encerrar' e só enfileira."""
 
@@ -116,6 +126,7 @@ class Overlay:
         self._gesto_anterior: str | None = None
         self._recolhido = False
         self.area_atual: Retangulo | None = None  # escrita pelo tick do Tk, lida pela thread do laço
+        self._foco_anterior = _janela_em_foco()
         self.root = root or tk.Tk()
         self.root.title("IAEmPS2 · mestre")
         self.root.attributes("-topmost", True)
@@ -125,7 +136,30 @@ class Overlay:
         self.root.geometry(f"340x250+{posicao[0]}+{posicao[1]}")
         self._montar()
         self._arrastavel(self._cabecalho)
+        self._nao_roubar_foco()
         self.root.after(150, self._tick)
+
+    def _nao_roubar_foco(self) -> None:
+        """Windows: a janela nunca é ativada, nem ao aparecer nem ao ser clicada; o teclado continua no jogo.
+
+        Os gestos vêm por GetAsyncKeyState, que não depende de foco; o arrasto e os botões recebem o mouse
+        normalmente. O Tk ativa a janela ao mapeá-la, então o foco é devolvido a quem o tinha antes.
+        """
+        if sys.platform != "win32":
+            return
+        import ctypes
+
+        self.root.update()  # mapeia a janela; o hwnd só é definitivo depois do overrideredirect ser aplicado
+        user32 = ctypes.windll.user32
+        hwnd = user32.GetParent(self.root.winfo_id()) or self.root.winfo_id()
+        gwl_exstyle, ws_ex_noactivate, ws_ex_toolwindow = -20, 0x08000000, 0x00000080
+        estilo = user32.GetWindowLongW(hwnd, gwl_exstyle)
+        user32.SetWindowLongW(hwnd, gwl_exstyle, estilo | ws_ex_noactivate | ws_ex_toolwindow)
+        hwnd_topmost = -1
+        swp_nosize_nomove_noactivate_framechanged = 0x0001 | 0x0002 | 0x0010 | 0x0020
+        user32.SetWindowPos(hwnd, hwnd_topmost, 0, 0, 0, 0, swp_nosize_nomove_noactivate_framechanged)
+        if self._foco_anterior:
+            user32.SetForegroundWindow(self._foco_anterior)
 
     # ---------- montagem ----------
     def _montar(self) -> None:
