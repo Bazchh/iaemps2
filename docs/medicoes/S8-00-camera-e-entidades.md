@@ -16,6 +16,27 @@ parado.
 | bloco da câmera | uma 4x4 que muda ao andar e ao virar, seguida de uma identidade e da transformação para a tela (escala e deslocamento de 2048, profundidade de 24 bits) | só esse bloco tem a forma de projeção; a convenção ainda não fechou |
 | esqueleto do inimigo | pool de matrizes de ossos separado do pool do jogador; a raiz anda enquanto o jogador está parado | três fotos limpas, a raiz se desloca em linha |
 
+## Câmera fechada, com projeção provada
+
+A leitura correta do bloco: o que parecia "posição do jogador" é o **olho da câmera** (anda com o jogador e
+orbita quando ele vira no lugar); o ponto seguinte é o **alvo da câmera**, que projeta exatamente no centro
+da tela e fica no tronco do jogador; a 4x4 é uma visão-projeção em convenção vetor-linha, com a distância ao
+olho em w. A escala para a tela vem do bloco seguinte: x = 256 - (x/w)·1104,64 e y = 224 + (y/w)·1706,67,
+no quadro de 512x448, com o sinal de x vindo da escala negativa do bloco.
+
+Prova: a raiz, os pés e a cabeça do esqueleto do inimigo, lidos da memória, projetados com essa câmera,
+caem dentro da caixa que a camada de cena desenha para o inimigo (materiais que se movem) nas três fotos:
+
+| foto | caixa desenhada do inimigo (px) | raiz projetada | pés | cabeça | distância ao olho |
+|---|---|---|---|---|---|
+| inimigo1 | 217–347 × 114–515 | (271, 276) | (271, 492) | (260, 196) | 2,9 m |
+| inimigo2 | 261–372 × 88–434 | (308, 230) | (305, 414) | (306, 158) | 3,4 m |
+| inimigo3 | 264–385 × 91–458 | (317, 231) | (314, 418) | (310, 162) | 3,4 m |
+
+Três de três quadros amostrados: acima do critério de 90%, com a ressalva de que a amostra é pequena e o
+inimigo andava devagar. A câmera, o alvo, a matriz e a escala entraram no primeiro perfil de memória do jogo
+(`perfis/memoria/SLUS-21134.json`), junto com a vida do jogador e da parceira.
+
 ## O que ainda não fechou
 
 - **Projeção.** A posição do jogador pela 4x4 da câmera cai com divisor perto de zero: a matriz não é um

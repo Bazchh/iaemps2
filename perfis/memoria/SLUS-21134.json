@@ -1,0 +1,28 @@
+{
+  "versao_do_perfil": 1,
+  "jogo": {"serial": "SLUS-21134", "crc": "013e349d", "titulo": "Resident Evil 4", "versao": "1.01"},
+  "data": "2026-10-27",
+  "unidades": "milímetros; eixo Y para cima",
+  "variaveis": [
+    {"nome": "vida_jogador", "endereco": "0x0042DA76", "tipo": "u16", "faixa": [0, 2400], "significado": "vida atual do jogador", "origem": "fonte pública (lista de códigos para SLUS-21134), conferida ao vivo em 27/10: 1200", "validacao": "lida ao vivo"},
+    {"nome": "vida_maxima_jogador", "endereco": "0x0042DA78", "tipo": "u16", "faixa": [0, 2400], "significado": "vida máxima do jogador", "origem": "ao lado da vida atual; conferida ao vivo: 1200", "validacao": "lida ao vivo"},
+    {"nome": "vida_parceira", "endereco": "0x0042DA7A", "tipo": "u16", "faixa": [0, 1200], "significado": "vida atual da parceira", "origem": "fonte pública, conferida ao vivo: 600", "validacao": "lida ao vivo"},
+    {"nome": "personagem", "endereco": "0x0042DA8A", "tipo": "u8", "faixa": [0, 5], "significado": "personagem controlado", "origem": "fonte pública", "validacao": "lida ao vivo"},
+    {"nome": "costume", "endereco": "0x0042DA88", "tipo": "u8", "faixa": [0, 5], "significado": "roupa do personagem", "origem": "fonte pública", "validacao": "lida ao vivo"}
+  ],
+  "camera": {
+    "olho": {"endereco": "0x003CA220", "tipo": "vec3", "significado": "posição do olho da câmera; anda com o jogador e orbita quando ele vira no lugar", "origem": "descoberta em 27/10 (andar sem virar, virar sem andar)"},
+    "alvo": {"endereco": "0x003CA230", "tipo": "vec3", "significado": "ponto que a câmera olha: projeta no centro exato da tela; fica no tronco do jogador", "origem": "descoberta em 27/10: projeta em (0,0)"},
+    "matriz": {"endereco": "0x004327C0", "tipo": "mat4", "convencao": "vetor-linha vezes matriz; clip = (x,y,z,1)·M; terceira e quarta colunas iguais; w é a distância ao olho em mm", "origem": "descoberta em 27/10"},
+    "tela": {"endereco": "0x00432840", "tipo": "mat4", "significado": "escala e deslocamento para a tela: x_px = 256 - (x/w)·1104.64, y_px = 224 + (y/w)·1706.67 no quadro de 512x448; o sinal de x vem da escala negativa do bloco", "origem": "calibrada em 27/10 contra a caixa desenhada do inimigo"},
+    "validacao": "projeção da raiz, dos pés e da cabeça do inimigo dentro da caixa desenhada em 3 de 3 fotos"
+  },
+  "entidades": {
+    "estado": "parcial",
+    "observacao": "a lista de entidades (passo constante, posição por entidade) ainda não foi encontrada; o que está provado é a raiz do esqueleto do inimigo num pool de matrizes de ossos, que anda sozinha",
+    "raiz_esqueleto_inimigo_1": {"endereco": "0x016F7190", "tipo": "vec3", "significado": "translação da raiz do esqueleto do inimigo presente na cena do estado 91; provisório, endereço de pool", "origem": "descoberta em 27/10"},
+    "raiz_esqueleto_jogador": {"endereco": "0x016BAC50", "tipo": "vec3", "significado": "translação de um osso do jogador (pool de ossos); provisório", "origem": "descoberta em 27/10"}
+  },
+  "intocavel": [],
+  "acoes_de_mundo": []
+}
