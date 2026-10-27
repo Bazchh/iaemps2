@@ -69,6 +69,9 @@ def main(argv: list[str] | None = None) -> int:
         time.sleep(6)
     c.cena_limpar(0)
     esperar_cena(c)
+    # a captura vem ANTES da amostra: o inimigo pode morrer ou sair da tela durante os segundos seguintes
+    hwnd, area_janela = cap.localizar_janela()
+    imagem = cap.capturar_janela(hwnd, area_janela)
     quadros = amostrar(c, args.segundos)
     n = len(quadros)
     quadro = tamanho_do_quadro(quadros)
@@ -92,14 +95,12 @@ def main(argv: list[str] | None = None) -> int:
             valores.append((statistics.pstdev(xs) + statistics.pstdev(ys)) / 2)
         return statistics.median(valores) if valores else 0.0
 
-    hwnd, area_janela = cap.localizar_janela()
-    imagem = cap.capturar_janela(hwnd, area_janela)
     viewport = viewport_da_captura(imagem)
     desenho = ImageDraw.Draw(imagem)
     cores = {"interface": "#1f9d55", "cenario": "#1f4fd1", "movel": "#c53030", "desconhecido": "#c77d0a"}
 
     materiais = []
-    ultimo = quadros[-1][1]
+    ultimo = quadros[0][1]  # o quadro mais próximo da captura
     for indice, (m, pedacos) in enumerate(sorted(por_material.items(), key=lambda kv: -len(kv[1]))):
         presenca = len(presentes[m]) / max(1, n)
         desloc = deslocamento_do_material(m)
@@ -107,7 +108,8 @@ def main(argv: list[str] | None = None) -> int:
         # uma caixa por pedaço estável, não a união do material: a união cobre a tela quando o material é a casca
         # de todas as árvores
         for a in (a for a in ultimo if a.hash_textura == m):
-            if len(centros[(a.hash_textura, a.hash_forma)]) < max(3, n // 2):
+            # material móvel: toda caixa do último quadro (o pedaço muda a cada quadro); os outros, só os estáveis
+            if classe != "movel" and len(centros[(a.hash_textura, a.hash_forma)]) < max(3, n // 2):
                 continue
             caixa = para_janela((a.x0, a.y0, a.x1, a.y1), viewport, quadro)
             desenho.rectangle(caixa, outline=cores[classe], width=1)

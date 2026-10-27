@@ -61,14 +61,44 @@ Rascunhos gerados para duas cenas do jogo de abertura:
 Os 18 "móveis" da primeira cena são os materiais de Leon respirando. O critério do card pedia classificar
 inimigo e interface da primeira área: interface está classificada por regra; **inimigo depende de uma cena
 com inimigo na tela e da confirmação do mapeador**, que é o cliente, porque a ferramenta só sugere.
-As caixas desenhadas ainda saem deslocadas em parte da tela (a conversão de pixels do jogo para a janela
-assume o quadro inteiro visível); vale corrigir com a medição da câmera.
+A captura é tirada no instante do disparo, antes da amostragem, porque o inimigo morre ou sai da tela nos segundos seguintes.
+
+## Resultado: câmera girando (medido com o cliente no controle)
+
+| medida | câmera parada | câmera girando |
+|---|---|---|
+| pedaços de mundo por quadro | 168 | 66 |
+| pedaços com assinatura estável em 95% dos quadros | 153 (91%) | 1 |
+| pedaços em comum entre quadros seguidos | 92% | 35% (mínimo 17%) |
+| materiais em comum entre quadros seguidos | 100% | 98,5% |
+| materiais com a mesma lista de tamanhos de lote entre quadros | 51% | 34% |
+
+A causa está nos lotes: com a câmera em movimento o jogo recorta e descarta triângulos a cada quadro
+conforme o que entra na tela, e a quantidade de vértices de cada lote muda o tempo todo (um mesmo material
+veio como 4, 103 e 143 vértices num quadro e 25, 103 e 130 no seguinte). Os "pedaços" que o renderizador vê
+não são pedaços fixos da malha. **A assinatura de forma não serve como identidade de objeto em movimento.**
+O que se mantém é o material, e esconder por material seguiu agindo em 100% dos quadros.
+
+## Resultado: classe inimigo, confirmada pelo cliente
+
+Com dois Ganados na tela e a câmera parada, a ferramenta marcou como "móvel" os materiais que se
+deslocaram; o cliente conferiu caixa por caixa na captura. Resultado gravado em `perfis/cena/SLUS-21134.json`
+(primeiro perfil de cena versionado, sem imagem):
+
+- **inimigo (4 materiais):** tronco dos Ganados, cabeça, mão e machado;
+- **personagem compartilhado (2 materiais):** a cabeça do Leon e as cabeças dos Ganados usam o mesmo material;
+- **interface (27) e cenário (45):** por regra; **desconhecido (2):** caixas fora do inimigo.
+
+Achado que muda o desenho: **materiais de personagem são compartilhados entre o jogador e os inimigos**
+(pele, cabelo). Por material não dá para separar "Leon" de "Ganado"; para a RN-11 isso é seguro (a classe
+"personagem" é intocável como "inimigo"), mas para agir sobre um inimigo específico a identidade tem de vir
+da posição na tela ou da memória do jogo.
 
 ## O que a parte 1 responde e o que falta no S7-01
 
 - Assinaturas pelo canal em menos de 5 ms: **sim** (a lista de 550 assinaturas responde em um pedido).
-- Perfil de cena com interface classificada: **sim, por regra**. Inimigo: **pendente do mapeador**.
-- Identidade por pedaço com a câmera parada: **91% estável**. Com a câmera girando: **pendente**.
+- Perfil de cena com interface e inimigo classificados: **sim**; interface por regra, inimigo confirmado pelo cliente.
+- Identidade por pedaço com a câmera parada: **91% estável**. Com a câmera girando: **não serve** (1 em 66); o material serve (98,5%).
 - Agrupar pedaços em objetos: **não feito**; a parte 2 testa dois caminhos, vizinhança de caixa e
   endereço de origem do desenho na memória do jogo.
 
