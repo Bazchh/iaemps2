@@ -76,6 +76,8 @@ class Captura(Secao):
 class Servico(Secao):
     ativo: str = "falso"
     teto_custo_sessao: float = Field(default=0.0, ge=0)
+    preco_entrada_por_milhao: float = Field(default=0.0, ge=0)  # 0 = custo não estimado
+    preco_saida_por_milhao: float = Field(default=0.0, ge=0)
 
 
 class Config(Secao):

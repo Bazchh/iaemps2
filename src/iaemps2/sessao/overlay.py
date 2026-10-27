@@ -115,6 +115,7 @@ class Overlay:
         self._leitor = leitor_de_tecla
         self._gesto_anterior: str | None = None
         self._recolhido = False
+        self.area_atual: Retangulo | None = None  # escrita pelo tick do Tk, lida pela thread do laço
         self.root = root or tk.Tk()
         self.root.title("IAEmPS2 · mestre")
         self.root.attributes("-topmost", True)
@@ -270,6 +271,11 @@ class Overlay:
                     self.ao_gesto(gesto)
             self._gesto_anterior = gesto
             self._desenhar()
+            x, y = self.root.winfo_x(), self.root.winfo_y()
+            self.area_atual = Retangulo(x, y, x + self.root.winfo_width(), y + self.root.winfo_height())
+            if self.painel.estado == "encerrada":
+                self.root.quit()
+                return
         except tk.TclError:
             return
         self.root.after(150, self._tick)

@@ -162,6 +162,8 @@ _LINHAS: list[tuple[tuple[Estado, ...], Evento, Estado | str, tuple[Efeito, ...]
         Estado.BLOQUEADA,
         (E.GRAVAR_SITUACAO, E.GRAVAR_MARCO_SE_MORTE),
     ),
+    # refinamento do S3-06: situação inválida em tela fora de jogo continua bloqueada
+    ((Estado.BLOQUEADA,), Evento.SITUACAO_INVALIDA, Estado.BLOQUEADA, (E.GRAVAR_CICLO_SEM_SITUACAO,)),
     (
         (Estado.OBSERVANDO, Estado.DECIDINDO, Estado.BLOQUEADA),
         Evento.JOGADOR_PAUSOU,
