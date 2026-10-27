@@ -10,7 +10,7 @@ O binário resultante abre o jogo de abertura e responde ao canal com a mesma id
 | medida | valor |
 |---|---|
 | tempo de máquina da compilação completa (Release AVX2, MSVC) | 7 min 16 s (21:21:13 a 21:28:29) |
-| tempo de máquina da recompilação após mudar só `PINE.cpp` | ver registro do card S4-02 |
+| tempo de máquina da recompilação após mudar só `PINE.cpp` | 3 min 01 s (21:38:00 a 21:41:01) |
 | pasta de objetos (`build/`) | 2,4 GB |
 | binário e bibliotecas (`bin/`) | 274 MB |
 | pacote de dependências pré-compiladas (baixado) | 172 MB comprimido |

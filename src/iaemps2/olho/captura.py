@@ -16,6 +16,7 @@ import io
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import Any, cast
 
 from PIL import Image
 
@@ -195,7 +196,8 @@ def capturar_janela(hwnd: int, area: Retangulo) -> Image.Image:
     try:
         bmp.CreateCompatibleBitmap(mfc, largura, altura)
         mem.SelectObject(bmp)
-        ok = ctypes.windll.user32.PrintWindow(hwnd, mem.GetSafeHdc(), 3)  # 3 = PW_RENDERFULLCONTENT
+        user32 = cast(Any, ctypes).windll.user32  # cast: o typeshed fora do Windows não declara windll
+        ok = user32.PrintWindow(hwnd, mem.GetSafeHdc(), 3)  # 3 = PW_RENDERFULLCONTENT
         if not ok:
             raise JanelaAusenteError("a janela do emulador não aceitou a captura")
         info = bmp.GetInfo()

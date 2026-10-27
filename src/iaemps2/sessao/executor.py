@@ -11,6 +11,8 @@ from __future__ import annotations
 
 import json
 import sqlite3
+import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 
 from iaemps2.catalogo import catalogo as cat
@@ -23,6 +25,10 @@ from iaemps2.registro import banco
 from iaemps2.sessao.relogio import Contador
 
 COM_DURACAO = {"pausa", "camera_lenta", "turbo"}
+# O emulador aplica pausa e velocidade na thread da CPU dele, depois de responder ao canal; a confirmação
+# relê até ver o efeito, dentro deste limite.
+CONFIRMACAO_TENTATIVAS = 20
+CONFIRMACAO_PASSO_S = 0.05
 MODO_POR_ALAVANCA = {"camera_lenta": p.ModoVelocidade.LENTA, "turbo": p.ModoVelocidade.TURBO}
 
 
@@ -56,6 +62,7 @@ class Executor:
     ultima_reversivel: Execucao | None = None
     aperto_dos_slots: dict[int, int] = field(default_factory=dict)
     situacao_id_atual: int | None = None  # a sessão informa a cada ciclo; vira contexto do slot salvo
+    dormir: Callable[[float], None] = time.sleep  # entre releituras de confirmação
 
     # ---------- estado do emulador para o registro ----------
     def estado_atual(self, situacao: Situacao | None) -> dict[str, object]:
@@ -161,15 +168,15 @@ class Executor:
         agora = self.contador.agora_ms()
         if v.alavanca == "pausa":
             self.cliente.pausar(True)
-            if self.cliente.status() != p.Status.PAUSADO:
+            if not self._confirmar(lambda: self.cliente.status() == p.Status.PAUSADO):
                 raise ComandoFalhouError("status não virou pausado")
             return agora + int(v.parametros["duracao_s"] * 1000), None
         if v.alavanca in MODO_POR_ALAVANCA:
             modo = MODO_POR_ALAVANCA[v.alavanca]
             duracao_ms = int(v.parametros["duracao_s"] * 1000)
             self.cliente.velocidade(modo, v.parametros["escalar"], duracao_ms)
-            atual = self.cliente.velocidade_atual()
-            if atual.modo != modo:
+            if not self._confirmar(lambda: self.cliente.velocidade_atual().modo == modo):
+                atual = self.cliente.velocidade_atual()
                 raise ComandoFalhouError(
                     f"velocidade em vigor é {atual.modo.name.lower()}, não {modo.name.lower()}"
                 )
@@ -184,6 +191,15 @@ class Executor:
             self.slots.recarregar(self.cliente, slot)
             return None, {"slot": float(volta_slot)}
         raise ComandoFalhouError(f"alavanca sem executor: {v.alavanca}")
+
+    def _confirmar(self, efeito_visto: Callable[[], bool]) -> bool:
+        """Relê o emulador até ver o efeito ou esgotar as tentativas. A primeira leitura é imediata."""
+        for tentativa in range(CONFIRMACAO_TENTATIVAS):
+            if efeito_visto():
+                return True
+            if tentativa < CONFIRMACAO_TENTATIVAS - 1:
+                self.dormir(CONFIRMACAO_PASSO_S)
+        return False
 
     def _slot_de_volta(self, destino: int) -> int:
         candidatos = [s for s in self.slots.slots if s != destino]

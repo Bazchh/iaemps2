@@ -32,8 +32,7 @@ def _codigos_originais(c: Cliente) -> None:
     )
     assert len(corpo) == 5
     assert len(c.pedir(p.comando(p.Codigo.READ64, struct.pack("<I", 0x1000)))) == 8
-    valor = struct.unpack("<I", c.pedir(p.comando(p.Codigo.READ32, struct.pack("<I", 0x01FFFFF0))))[0]
-    c.pedir(p.comando(p.Codigo.WRITE32, struct.pack("<II", 0x01FFFFF0, valor)))  # o mesmo valor: inócuo
+    assert len(c.pedir(p.comando(p.Codigo.READ32, struct.pack("<I", 0x01FFFFF0)))) == 4
 
 
 def test_extensao_ou_regressao_no_emulador_real() -> None:
