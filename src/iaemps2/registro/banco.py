@@ -119,7 +119,8 @@ def abrir(caminho: Path) -> sqlite3.Connection:
 
 
 def _conectar(caminho: Path) -> sqlite3.Connection:
-    con = sqlite3.connect(caminho, isolation_level=None)
+    # a conexão nasce na thread que abre a sessão e passa a viver na thread do laço; só uma usa por vez
+    con = sqlite3.connect(caminho, isolation_level=None, check_same_thread=False)
     con.row_factory = sqlite3.Row
     con.execute("pragma journal_mode = wal")
     con.execute("pragma foreign_keys = on")

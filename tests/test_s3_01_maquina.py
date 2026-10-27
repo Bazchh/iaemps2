@@ -30,7 +30,9 @@ from iaemps2.sessao.relogio import Contador, IntervaloMinimo
 def test_oito_estados_e_a_tabela_do_blueprint() -> None:
     assert len(Estado) == 8
     assert len(pares_validos()) + len(pares_invalidos()) == len(Estado) * len(Evento)
-    assert len(pares_validos()) == 44  # as 25 linhas do capítulo 4 expandidas pelos estados de origem
+    assert (
+        len(pares_validos()) == 45
+    )  # 25 linhas do capítulo 4 expandidas pelos estados de origem, mais uma do S3-06
 
 
 @pytest.mark.parametrize(("atual", "evento"), pares_validos(), ids=lambda x: str(x))

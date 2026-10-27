@@ -24,4 +24,6 @@ intervalo_ms = 2000     # ciclo de observação
 
 [servico]
 ativo = "falso"         # nome do adaptador; os reais entram no card S2-03
-teto_custo_sessao = 0.0 # 0 = sem teto; na moeda da tabela de preço do adaptador
+teto_custo_sessao = 0.0 # 0 = sem teto; na moeda dos preços abaixo
+preco_entrada_por_milhao = 0.0 # preço por milhão de tokens de entrada do modelo em uso; 0 = não estimar
+preco_saida_por_milhao = 0.0
