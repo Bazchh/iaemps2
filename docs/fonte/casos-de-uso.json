@@ -3,12 +3,12 @@
   "subtitulo": "mestre invisível por inteligência artificial para jogos de PlayStation 2 em emulador",
   "titulo": "Casos de Uso",
   "kicker": "Especificação funcional · outubro de 2026",
-  "entrega": "Entrega 5: módulos A a G detalhados, a fase 1 inteira. H, I e J seguem no índice com código fixo, para as fases 2 e 3.",
-  "intro": "Tudo o que o mestre invisível precisa fazer, descrito um a um: quem usa, o que acontece passo a passo, o que fazer quando algo dá errado e o que ganhamos com cada um. Documento complementar ao Mapa do Projeto (revisão 3, aprovado) e ao Blueprint Técnico.",
+  "entrega": "Entrega 6: módulo K (Cena, fase 4) detalhado, sobre a fase 1 jogada e os módulos A a G. H, I e J seguem no índice com código fixo.",
+  "intro": "Tudo o que o mestre invisível precisa fazer, descrito um a um: quem usa, o que acontece passo a passo, o que fazer quando algo dá errado e o que ganhamos com cada um. Documento complementar ao Mapa do Projeto (revisão 6, aprovado) e ao Blueprint Técnico.",
   "rodape": "Casos de uso · IAEmPS2",
   "legenda_motor": "comando ao emulador",
-  "mapa_legenda": "Quem usa o quê. Os módulos A a G são o mestre jogável da fase 1; H põe o mundo em jogo na fase 2; I e J dão as mãos ao mestre na fase 3.",
-  "fechamento_lead": "Fase 1, o ritmo: mestre jogável em qualquer jogo. Fase 2, o mundo: perfil de memória e outros jogadores. Fase 3, as mãos: entidades e controle.",
+  "mapa_legenda": "Quem usa o quê. Os módulos A a G são o mestre jogável da fase 1; H põe o mundo em jogo na fase 2; I e J dão as mãos ao mestre na fase 3; K dá a cena ao mestre na fase 4.",
+  "fechamento_lead": "Fase 1, o ritmo: mestre jogável em qualquer jogo. Fase 2, o mundo: perfil de memória e outros jogadores. Fase 3, as mãos: entidades e controle. Fase 4, a cena: o espaço 3D redesenhado em tempo real.",
   "fases": {
     "1": {
       "nome": "mestre jogável em qualquer jogo",
@@ -24,6 +24,11 @@
       "nome": "entidades e controle",
       "cor": "f3",
       "resumo": "Mover inimigos e personagens no mapa, para jogos com mapa de entidades, e acionar o controle por um gamepad virtual."
+    },
+    "4": {
+      "nome": "a cena muda: camada de cena no emulador",
+      "cor": "f4",
+      "resumo": "O espaço 3D visto pelo jogador passa a ser modificável em tempo real, dentro do próprio emulador: esconder, duplicar, deformar e recolorir objetos (nível 1), acrescentar geometria com a câmera do perfil de memória (nível 2), trocar a aparência de um objeto (nível 3). Colisão nunca muda."
     }
   },
   "atores": [
@@ -35,7 +40,7 @@
     {
       "id": "Mapeador",
       "tipo": "pessoa",
-      "desc": "Cria o perfil de memória de um jogo: variáveis, faixas, ações e proibições. Importa de fontes públicas, valida contra o jogo e publica versões. Entra na fase 2."
+      "desc": "Cria o perfil de memória de um jogo: variáveis, faixas, ações e proibições. Importa de fontes públicas, valida contra o jogo e publica versões. Entra na fase 2. Na fase 4, cria também o perfil de cena: que objeto é cenário, inimigo, item, interface, perigo ou saída."
     },
     {
       "id": "Plataforma",
@@ -119,6 +124,12 @@
       "titulo": "Falha é visível e silencia o mestre",
       "texto": "Serviço fora do ar ou resposta inválida aparece no overlay; sem decisão válida, nenhuma ação acontece; o jogo segue sem o mestre e a sessão retoma.",
       "obtemos": "nunca parece vivo estando morto."
+    },
+    {
+      "codigo": "RN-11",
+      "titulo": "O que o mestre desenha nunca mente sobre o que mata",
+      "texto": "Geometria acrescentada ou alterada pela camada de cena é só visual, sem colisão. Por isso nunca esconde inimigo, perigo ou saída, e nunca cria obstáculo falso em caminho obrigatório.",
+      "obtemos": "\"dificulte, nunca derrote\" continua valendo com a cena redesenhada."
     }
   ],
   "modulos": [
@@ -2802,6 +2813,385 @@
           "prioridade": "Desejável"
         }
       ]
+    },
+    {
+      "letra": "K",
+      "nome": "Cena",
+      "fase": 4,
+      "detalhado": true,
+      "resumo": "A camada que modifica o espaço 3D visto pelo jogador, dentro do renderizador da versão própria do emulador, em qualquer placa de vídeo: identificar objetos, escondê-los, deformá-los, recolori-los, duplicá-los; acrescentar geometria com a câmera do perfil de memória; trocar a aparência de um objeto. Tudo pelo mesmo catálogo, registro e reversão das outras alavancas, e nunca tocando a colisão.",
+      "casos": [
+        {
+          "codigo": "K01",
+          "nome": "Identificar os objetos da cena",
+          "ator": "Plataforma",
+          "fase": 4,
+          "prioridade": "Essencial",
+          "apoio": [
+            "Emulador"
+          ],
+          "objetivo": "Dar nome estável a cada objeto que o jogo desenha, quadro a quadro, para que toda ação de cena mire o objeto certo e nunca pisque.",
+          "fluxo": [
+            {
+              "t": "Jogo manda desenhar",
+              "tipo": "ator"
+            },
+            {
+              "t": "Camada calcula a assinatura de cada lote",
+              "tipo": "motor"
+            },
+            {
+              "t": "Lista do quadro fica disponível pelo canal",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Plataforma casa assinaturas com o perfil de cena",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Objetos nomeados no estado da sessão",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Versão própria do emulador com a camada de cena.",
+            "Sessão aberta em modo completo."
+          ],
+          "gatilho": "Cada quadro desenhado pelo jogo enquanto a sessão está aberta.",
+          "principal": [
+            "A camada, dentro do renderizador, calcula para cada lote de triângulos uma assinatura: a textura que o veste, a quantidade de vértices e a caixa que ele ocupa na tela.",
+            "A camada guarda a lista de assinaturas do último quadro e a entrega pelo canal quando a plataforma pede, sem parar o jogo.",
+            "A plataforma casa as assinaturas com o perfil de cena do jogo (caso de uso K03): as conhecidas ganham classe; as desconhecidas ficam marcadas como tal.",
+            "A plataforma guarda, por ciclo, quais objetos conhecidos estavam na tela, e isso entra no pedido de decisão como parte do estado."
+          ],
+          "alternativos": [
+            {
+              "t": "Objeto que se move ou câmera que gira",
+              "d": "A caixa muda a cada quadro; a plataforma casa pela textura e pela quantidade de vértices e trata a caixa como posição, não como identidade."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "A mesma assinatura em vários objetos",
+              "d": "Várias caixas iguais no mesmo corredor: a plataforma trata o grupo como um objeto composto; ação sobre o grupo vale para todos ou para nenhum."
+            },
+            {
+              "t": "Jogo sem perfil de cena",
+              "d": "Toda assinatura é desconhecida: só ações reversíveis e visíveis são permitidas (caso de uso K02), e nenhuma sobre o que a situação descreve como inimigo."
+            }
+          ],
+          "resultado": "Lista de objetos do quadro, com classe quando conhecida, disponível para o mestre e para o registro.",
+          "regras": [
+            "RN-06",
+            "RN-11"
+          ]
+        },
+        {
+          "codigo": "K02",
+          "nome": "Alterar um objeto da cena",
+          "ator": "Plataforma",
+          "fase": 4,
+          "prioridade": "Essencial",
+          "apoio": [
+            "Emulador",
+            "Serviço de linguagem"
+          ],
+          "objetivo": "Executar as ações de nível 1 do mestre sobre um objeto identificado: esconder, recolorir, deformar ou duplicar, por um prazo, sem câmera e sem tocar a colisão.",
+          "fluxo": [
+            {
+              "t": "Mestre decide uma ação de cena",
+              "tipo": "llm"
+            },
+            {
+              "t": "Plataforma confere perfil de cena e RN-11",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Regra gravada no emulador pelo canal, com prazo",
+              "tipo": "motor"
+            },
+            {
+              "t": "Confirmação pela leitura das regras ativas",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Volta sozinha no prazo; registrada",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Objeto identificado (caso de uso K01).",
+            "Ação de cena disponível no catálogo para o tom e a intensidade da sessão."
+          ],
+          "gatilho": "O mestre decide esconder, recolorir, deformar ou duplicar um objeto, com parâmetros e prazo dentro das faixas.",
+          "principal": [
+            "A plataforma confere a decisão como qualquer outra (caso de uso C02): alavanca no catálogo, parâmetros na faixa, intervalo vencido, situação ainda a mesma.",
+            "A plataforma confere a RN-11 contra o perfil de cena: objeto classificado como inimigo, perigo ou saída é recusado; objeto desconhecido só aceita ação reversível e visível.",
+            "A plataforma grava a regra no emulador pelo canal: assinatura, ação, parâmetros e prazo. O emulador aplica a regra a cada quadro, antes de o lote ir para a placa de vídeo.",
+            "A plataforma confirma lendo as regras ativas no emulador e registra a intervenção com estado antes, ação e motivo.",
+            "No prazo, o próprio emulador apaga a regra; a plataforma registra o fim. Reverter (caso de uso D03) apaga a regra antes do prazo."
+          ],
+          "alternativos": [
+            {
+              "t": "Duplicar",
+              "d": "O mesmo objeto é desenhado uma segunda vez deslocado na tela: um vulto, uma sombra. Só é permitido com classe cenário ou item, nunca para simular inimigo."
+            },
+            {
+              "t": "Recolorir ou deformar o cenário inteiro",
+              "d": "Regra sobre um grupo de assinaturas de cenário: o corredor escurece, as paredes se inclinam. Mesmo caminho, prazo obrigatório."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Objeto some da tela antes do prazo",
+              "d": "A regra fica gravada e volta a valer se o objeto reaparecer dentro do prazo; o registro guarda os quadros em que ela agiu."
+            },
+            {
+              "t": "Plataforma cai com regras ativas",
+              "d": "O emulador apaga cada regra no prazo dela sozinho, como faz com a velocidade; nada fica alterado sem prazo."
+            }
+          ],
+          "resultado": "Objeto alterado na tela por um prazo, confirmado, registrado e reversível; jogo intocado por dentro.",
+          "regras": [
+            "RN-01",
+            "RN-03",
+            "RN-04",
+            "RN-06",
+            "RN-11"
+          ]
+        },
+        {
+          "codigo": "K03",
+          "nome": "Mapear a cena de um jogo",
+          "ator": "Mapeador",
+          "fase": 4,
+          "prioridade": "Essencial",
+          "apoio": [
+            "Emulador"
+          ],
+          "objetivo": "Criar e manter o perfil de cena de um jogo: que assinatura é cenário, inimigo, item, interface, perigo ou saída, para que a RN-11 tenha com que ser conferida.",
+          "fluxo": [
+            {
+              "t": "Mapeador abre a ferramenta com o jogo rodando",
+              "tipo": "ator"
+            },
+            {
+              "t": "Captura e assinaturas lado a lado",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Mapeador classifica cada assinatura",
+              "tipo": "ator"
+            },
+            {
+              "t": "Perfil validado contra o jogo em execução",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Perfil versionado publicado",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Versão própria do emulador com a camada de cena.",
+            "Jogo do mapeador rodando."
+          ],
+          "gatilho": "Um jogo novo vai receber ações de cena, ou uma área nova do jogo de abertura é alcançada.",
+          "principal": [
+            "A ferramenta mostra a captura do quadro e, sobre ela, a caixa de cada assinatura; o mapeador clica e escolhe a classe.",
+            "A ferramenta agrupa assinaturas iguais e sugere classe pela situação descrita pelo serviço (caso de uso B02), que o mapeador confirma ou corrige.",
+            "A plataforma valida o perfil contra o jogo em execução: toda assinatura do perfil tem de aparecer em algum quadro da área; a que não aparece é marcada.",
+            "O perfil é versionado e publicado como o perfil de memória (caso de uso H04), com a mesma licença e sem nenhuma imagem do jogo dentro."
+          ],
+          "alternativos": [
+            {
+              "t": "Perfil importado",
+              "d": "Perfil de outro mapeador para o mesmo serial e soma de verificação: passa pela mesma validação antes de entrar numa sessão."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Assinatura que muda de classe pelo contexto",
+              "d": "A mesma textura em porta trancada e porta aberta: o mapeador registra as duas assinaturas, e a classe mais restritiva vale quando há dúvida."
+            }
+          ],
+          "resultado": "Perfil de cena do jogo, versionado e validado, pronto para a RN-11.",
+          "regras": [
+            "RN-06",
+            "RN-09",
+            "RN-11"
+          ]
+        },
+        {
+          "codigo": "K04",
+          "nome": "Acrescentar geometria no mundo",
+          "ator": "Plataforma",
+          "fase": 4,
+          "prioridade": "Importante",
+          "apoio": [
+            "Emulador",
+            "Serviço de linguagem"
+          ],
+          "objetivo": "Pôr na cena o que não existia, com profundidade certa, usando a câmera lida da memória do jogo: um bloco no corredor, uma placa na parede, uma luz.",
+          "fluxo": [
+            {
+              "t": "Mestre decide acrescentar",
+              "tipo": "llm"
+            },
+            {
+              "t": "Plataforma lê a câmera pelo perfil de memória",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Vértices projetados e enviados ao emulador",
+              "tipo": "motor"
+            },
+            {
+              "t": "Emulador desenha com teste de profundidade",
+              "tipo": "motor"
+            },
+            {
+              "t": "Some no prazo; registrado",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Perfil de memória do jogo com o campo câmera validado (fase 2).",
+            "Convenção de profundidade do jogo no perfil de cena."
+          ],
+          "gatilho": "O mestre decide acrescentar uma forma do catálogo em um ponto do mundo, com prazo.",
+          "principal": [
+            "A plataforma confere a decisão e a RN-11: a forma não pode ficar sobre caminho obrigatório nem cobrir inimigo, perigo ou saída conhecidos.",
+            "A plataforma lê a câmera do quadro pela memória do jogo e entrega ao emulador a forma já em coordenadas de mundo; o emulador projeta para a tela com a convenção do jogo.",
+            "O emulador desenha a forma como um lote a mais, com o teste de profundidade ligado: o que está na frente a tapa, e ela tapa o que está atrás.",
+            "A plataforma confirma pela regra ativa, registra, e o emulador apaga a forma no prazo."
+          ],
+          "alternativos": [
+            {
+              "t": "Luz",
+              "d": "Uma forma sem geometria própria: só modula a cor dos vértices dos lotes vizinhos, escurecendo ou avermelhando uma área."
+            }
+          ],
+          "excecoes": [
+            {
+              "t": "Câmera não validada ou perfil sem câmera",
+              "d": "A ação fica indisponível no catálogo; o nível 1 continua funcionando."
+            },
+            {
+              "t": "Forma colada na tela em vez de no mundo",
+              "d": "Sinal de convenção de profundidade errada: a plataforma apaga a regra, registra a falha e desativa a ação até o perfil ser corrigido."
+            }
+          ],
+          "resultado": "Geometria nova visível no mundo, ocluída corretamente, por um prazo, sem colisão e registrada.",
+          "regras": [
+            "RN-01",
+            "RN-06",
+            "RN-11"
+          ]
+        },
+        {
+          "codigo": "K05",
+          "nome": "Trocar a aparência de um objeto",
+          "ator": "Plataforma",
+          "fase": 4,
+          "prioridade": "Desejável",
+          "apoio": [
+            "Emulador"
+          ],
+          "objetivo": "Substituir o desenho de um objeto identificado por outro, mantendo o lugar dele: a caixa vira pedra, a estátua vira outra.",
+          "fluxo": [
+            {
+              "t": "Mestre decide trocar",
+              "tipo": "llm"
+            },
+            {
+              "t": "Plataforma localiza o objeto no mundo",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Objeto escondido e substituto desenhado no lugar",
+              "tipo": "motor"
+            },
+            {
+              "t": "Registrado; volta no prazo",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Caso de uso K02 e K04 funcionando.",
+            "Posição do objeto no mundo conhecida pelo perfil de memória, ou estimada pela caixa e pela câmera."
+          ],
+          "gatilho": "O mestre decide trocar a aparência de um objeto classificado como cenário ou item.",
+          "principal": [
+            "A plataforma esconde o objeto (caso de uso K02) e acrescenta o substituto no mesmo lugar do mundo (caso de uso K04), como uma regra composta com um prazo só.",
+            "A plataforma confirma as duas partes pela leitura das regras ativas; se uma falhar, desfaz a outra, para nunca restar um objeto sumido sem substituto."
+          ],
+          "alternativos": [],
+          "excecoes": [
+            {
+              "t": "Posição no mundo desconhecida",
+              "d": "A ação fica indisponível para esse objeto; só esconder e deformar seguem possíveis."
+            }
+          ],
+          "resultado": "Objeto com outra aparência no mesmo lugar, por um prazo, registrado como uma intervenção só.",
+          "regras": [
+            "RN-01",
+            "RN-06",
+            "RN-11"
+          ]
+        },
+        {
+          "codigo": "K06",
+          "nome": "Reverter e limpar a cena",
+          "ator": "Jogador",
+          "fase": 4,
+          "prioridade": "Essencial",
+          "apoio": [
+            "Emulador"
+          ],
+          "objetivo": "Garantir que toda alteração de cena tem volta imediata pelo jogador e que nada fica alterado quando a sessão encerra ou cai.",
+          "fluxo": [
+            {
+              "t": "Jogador reverte, ou sessão encerra",
+              "tipo": "ator"
+            },
+            {
+              "t": "Plataforma apaga as regras de cena",
+              "tipo": "sistema"
+            },
+            {
+              "t": "Emulador volta a desenhar o jogo como é",
+              "tipo": "motor"
+            },
+            {
+              "t": "Registrado",
+              "tipo": "fim"
+            }
+          ],
+          "pre": [
+            "Regras de cena ativas no emulador."
+          ],
+          "gatilho": "O gesto de reverter (caso de uso D03), o encerramento (caso de uso E04), ou a queda da plataforma.",
+          "principal": [
+            "Reverter apaga a última regra de cena, como desfaz qualquer outra intervenção; a plataforma registra a reversão.",
+            "Encerrar apaga todas as regras antes de fechar a sessão; o resumo lista as ações de cena como as demais.",
+            "Se a plataforma cair, o emulador apaga cada regra no prazo dela; nenhuma regra existe sem prazo."
+          ],
+          "alternativos": [],
+          "excecoes": [
+            {
+              "t": "Emulador fechado com regras ativas",
+              "d": "Regras moram só na memória do emulador: reabrir o emulador é reabrir sem nenhuma."
+            }
+          ],
+          "resultado": "Cena de volta ao que o jogo desenha, sempre, por gesto ou por prazo.",
+          "regras": [
+            "RN-03",
+            "RN-04",
+            "RN-06"
+          ]
+        }
+      ]
     }
   ],
   "pendencias": [
@@ -2859,6 +3249,31 @@
       "codigo": "LC-13",
       "estado": "candidata",
       "texto": "Captura com o jogo em tela cheia exclusiva: o painel não fica por cima e a captura pode falhar. O caso E03 pede tela cheia sem borda; confirmar no esqueleto se basta."
+    },
+    {
+      "codigo": "DC-20",
+      "estado": "detalhada",
+      "texto": "Camada de cena própria no renderizador do emulador. Detalhada nas fichas K01 a K06; os números vêm do card S7-00 do Blueprint."
+    },
+    {
+      "codigo": "DC-21",
+      "estado": "detalhada",
+      "texto": "Ordem da fase 4: prova medida já; K04 e K05 esperam a câmera da fase 2."
+    },
+    {
+      "codigo": "LC-14",
+      "estado": "aberta",
+      "texto": "De onde vem a câmera: campo do perfil de memória; K04 e K05 ficam indisponíveis até ele existir."
+    },
+    {
+      "codigo": "LC-15",
+      "estado": "aberta",
+      "texto": "Identidade estável de objeto entre quadros; K01 define o comportamento com grupos e desconhecidos; a prova S7-00 mede."
+    },
+    {
+      "codigo": "LC-16",
+      "estado": "aberta",
+      "texto": "Convenção de profundidade por jogo; K04 trata o sintoma (forma colada na tela) desativando a ação."
     }
   ]
 }

@@ -116,7 +116,7 @@
     </div>
   </div>
 
-  <p style="font-size:8.8pt;color:var(--muted);margin-top:12px;border-top:1px solid var(--line);padding-top:8px">Versão 1.0 · outubro de 2026 · emulador PCSX2 2.8.2 · Resident Evil 4 (SLUS-21134, versão 1.01) · acompanha o Mapa do Projeto (revisão 3) e os Casos de Uso (entrega 5, fase 1 completa)</p>
+  <p style="font-size:8.8pt;color:var(--muted);margin-top:12px;border-top:1px solid var(--line);padding-top:8px">Versão 1.1 · outubro de 2026 · emulador PCSX2, versão própria a partir da etiqueta corrente · Resident Evil 4 (SLUS-21134, versão 1.01) · acompanha o Mapa do Projeto (revisão 6) e os Casos de Uso (entrega 6). A 1.1 acrescenta a camada de cena (fase 4) ao capítulo 6 e a etapa S7 ao roadmap; o resto é a 1.0 aprovada</p>
 </section>
 
 <!-- ============ CAP 1 ESCOPO ============ -->
@@ -659,14 +659,30 @@
   <table style="font-size:8.8pt">
     <thead><tr><th>Assunto</th><th>A regra</th></tr></thead>
     <tbody>
-      <tr><td>Repositório</td><td>Derivado do PCSX2 na etiqueta v2.8.2, com um único commit de extensão por cima, tocando só <code>pcsx2/PINE.cpp</code> e <code>pcsx2/PINE.h</code>. Repositório público, sob a mesma licença GPL-3.0, com o código da extensão (DC-14).</td></tr>
+      <tr><td>Repositório</td><td>Derivado do PCSX2 na etiqueta corrente do projeto (a única com dependências pré-compiladas publicadas; a 2.8.2 pedia versões anteriores), com commits de extensão isolados por recurso: o do canal toca só <code>pcsx2/PINE.cpp</code>; os da camada de cena (fase 4) tocam o renderizador. Repositório público, sob a mesma licença GPL-3.0, com o código da extensão (DC-14). Medido: compilação completa em 7 min, incremental em 3 min (LC-10).</td></tr>
       <tr><td>Compilação</td><td>A receita do próprio projeto para Windows: MSBuild com a solução Qt, configuração Release, MSVC. As dependências vêm do pacote pré-compilado que o projeto publica (164 MB), extraído em <code>deps/</code>; não se compila Qt nem ffmpeg.</td></tr>
       <tr><td>Versão</td><td>O binário responde à versão do canal com o sufixo da extensão, e à consulta de capacidades com a versão da extensão. A plataforma registra os dois na sessão.</td></tr>
-      <tr><td>Acompanhar o original</td><td>A cada versão estável do projeto, rebase do commit de extensão e nova compilação. Como o diff é um arquivo, o conflito esperado é zero ou trivial.</td></tr>
+      <tr><td>Acompanhar o original</td><td>A cada versão estável do projeto, rebase dos commits de extensão e nova compilação. O commit do canal é um arquivo: conflito zero ou trivial. Os da camada de cena tocam a parte que mais muda no original; por isso ficam atrás de uma única função de entrada e de um arquivo próprio, para o rebase ser mecânico (DC-13 revisada).</td></tr>
       <tr><td>Proposta ao original</td><td>Depois que o esqueleto jogar com a versão própria, o commit vira uma proposta ao projeto original, nos termos de contribuição dele. Aceito, a versão própria deixa de existir.</td></tr>
       <tr><td>Ferramentas que faltam na máquina do cliente</td><td>Nenhuma obrigatória: MSBuild, MSVC, SDK, CMake e Ninja estão instalados. O extrator de 7z do projeto não está, e o pacote de dependências é extraído pelo Python. Disco não é mais risco: 87 GB livres após limpeza do cliente, e a árvore do projeto com dependências e objetos de compilação fica abaixo de 20 GB. O card S4-01 ainda mede o espaço ocupado, para registro.</td></tr>
     </tbody>
   </table>
+
+  <h4>A camada de cena (fase 4, DC-20): o que o renderizador vê e o que a camada faz com isso</h4>
+  <p>Todo desenho que o jogo pede chega ao renderizador da versão própria como um lote de triângulos já projetados na tela: para cada vértice, posição em coordenadas de tela com profundidade, coordenada de textura, cor; para o lote, a textura que o veste, o alvo de desenho e o teste de profundidade. O renderizador já identifica a textura por um hash estável entre quadros, que é o que a troca de texturas do próprio emulador usa; esse hash hoje não fica guardado no desenho, e a camada passa a guardá-lo. Não existe câmera nesse ponto: o jogo já multiplicou tudo pela matriz dele antes de enviar. É isso que separa os três níveis.</p>
+  <table style="font-size:8.8pt">
+    <thead><tr><th>Peça</th><th>Onde mora</th><th>O que faz</th></tr></thead>
+    <tbody>
+      <tr><td>Assinatura de desenho</td><td>Renderizador, na função única de entrada da camada, chamada imediatamente antes de cada lote ir para a placa de vídeo</td><td>Hash da textura, quantidade de vértices e caixa envolvente na tela. É a identidade de um objeto num quadro (LC-15). A camada mantém a lista das assinaturas do último quadro para o canal ler.</td></tr>
+      <tr><td>Tabela de regras</td><td>Renderizador, protegida por trava; escrita pelo servidor do canal, lida pelo renderizador uma vez por quadro</td><td>Cada regra: assinatura alvo, ação (esconder, recolorir, deformar, duplicar com deslocamento; no nível 2, acrescentar), parâmetros e prazo. Prazo vencido apaga a regra sozinho, como o vigia de velocidade. Sem regras, o custo é um teste por lote.</td></tr>
+      <tr><td>Ações de nível 1</td><td>Renderizador</td><td>Esconder: o lote não vai para a placa. Recolorir: a cor dos vértices é modulada antes do envio. Deformar: os vértices são escalados em torno do centro da caixa envolvente. Duplicar: o mesmo lote vai duas vezes, o segundo deslocado na tela. Nenhuma depende de câmera; todas respeitam o teste de profundidade que o jogo pediu.</td></tr>
+      <tr><td>Ações de nível 2</td><td>Renderizador + perfil de memória</td><td>Acrescentar geometria: a camada recebe pelo canal a matriz de câmera lida da memória do jogo (campo "câmera" do perfil, LC-14), projeta os vértices novos para o espaço de tela do emulador com a mesma convenção de profundidade do jogo (LC-16) e os envia como um lote a mais, com o teste de profundidade ligado, para o que está na frente tapá-los.</td></tr>
+      <tr><td>Comandos de cena no canal</td><td>Servidor do canal, códigos 0x84 em diante</td><td>0x84 lista as assinaturas do último quadro; 0x85 grava uma regra (assinatura, ação, parâmetros, prazo); 0x86 apaga regras (uma ou todas); 0x87 entrega a câmera para o nível 2. Falham no emulador original como os demais; a máscara de capacidades ganha o bit 8 (cena).</td></tr>
+      <tr><td>Perfil de cena</td><td>Plataforma, por jogo, versionado como o perfil de memória</td><td>Classifica assinaturas conhecidas: cenário, inimigo, item, interface, perigo, saída. É o que permite a RN-11: regra sobre inimigo, perigo ou saída é recusada pela plataforma antes de chegar ao canal. Assinatura sem classe só aceita ações reversíveis e visíveis.</td></tr>
+      <tr><td>Catálogo</td><td>Plataforma</td><td>As ações de cena entram como alavancas com faixas, duração e reversão, pelo mesmo caminho das outras: o mestre decide, a plataforma confere contra o perfil de cena e a RN-11, executa pelo canal, confirma lendo as regras ativas, registra antes e depois. Encerrar a sessão apaga todas as regras.</td></tr>
+    </tbody>
+  </table>
+  <div class="note"><b>Lacuna LC-15, identidade entre quadros.</b> A mesma textura veste vários objetos (todas as caixas de um corredor), e a caixa envolvente de um objeto muda quando a câmera gira. A prova medida (S7-00) mede quanto a assinatura "hash + vértices + caixa" é estável num objeto parado e num objeto que se move; se não bastar, entra a posição vinda do perfil de memória, que é a resposta definitiva. <b>Lacuna LC-16, profundidade.</b> A prova mede, no jogo de abertura, a faixa e o sentido da profundidade que chega ao renderizador, para o nível 2 projetar certo; cada jogo terá o seu valor no perfil de cena.</div>
 </section>
 
 <!-- ============ CAP 7 FLUXOS ============ -->
@@ -759,7 +775,7 @@
 <!-- ============ CAP 8 ROADMAP ============ -->
 <section style="margin-top:14px">
   <div class="kicker">Capítulo 8</div>
-  <h2>O roadmap em 26 cards</h2>
+  <h2>O roadmap em 30 cards</h2>
   <p class="lead">Daqui para frente o documento vira backlog. Cada card tem um identificador permanente, um motivo de existir, a lista do que entra no repositório e um critério de aceite escrito como teste. A ordem é de execução, não de importância. Não há estimativa de esforço: o que mede o avanço é card fechado com critério provado.</p>
 
   <table>
@@ -772,12 +788,13 @@
       <tr><td><b>S4 Versão própria do emulador</b></td><td>Compilar o original sem mudar nada (a medição da lacuna LC-10), depois os quatro comandos, depois pausa e velocidade no catálogo.</td><td class="code">4</td></tr>
       <tr><td><b>S5 Robustez</b></td><td>Falhas classificadas, retomada, custo com teto, exportação e reprodução.</td><td class="code">4</td></tr>
       <tr><td><b>S6 Bancada e sessão jogada</b></td><td>Bancada no CI com casos sintéticos, comparação de serviços, e a sessão de aceite da fase 1.</td><td class="code">2</td></tr>
+      <tr><td><b>S7 Camada de cena</b></td><td>A prova medida que decide a fase 4 (DC-21), depois assinaturas pelo canal, as ações de nível 1 no catálogo com perfil de cena e RN-11, e o nível 2 quando a fase 2 entregar a câmera.</td><td class="code">4</td></tr>
     </tbody>
   </table>
 
   <div class="seq" style="margin-top:12px">
     <div class="lbl">Quem depende de quem</div>
-    <svg viewBox="0 0 700 250" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Consolas, monospace" font-size="7.5">
+    <svg viewBox="0 0 800 250" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Consolas, monospace" font-size="7.5">
       <g font-weight="700" font-size="8">
         <rect x="6" y="6" width="90" height="16" rx="3" fill="#5b6577"/><text x="51" y="17" text-anchor="middle" fill="#fff">S0</text>
         <rect x="106" y="6" width="90" height="16" rx="3" fill="#1f4fd1"/><text x="151" y="17" text-anchor="middle" fill="#fff">S1</text>
@@ -786,6 +803,7 @@
         <rect x="406" y="6" width="90" height="16" rx="3" fill="#e08a1e"/><text x="451" y="17" text-anchor="middle" fill="#fff">S4</text>
         <rect x="506" y="6" width="90" height="16" rx="3" fill="#6b3fd1"/><text x="551" y="17" text-anchor="middle" fill="#fff">S5</text>
         <rect x="606" y="6" width="88" height="16" rx="3" fill="#1f9d55"/><text x="650" y="17" text-anchor="middle" fill="#fff">S6</text>
+        <rect x="706" y="6" width="88" height="16" rx="3" fill="#8a3fc9"/><text x="750" y="17" text-anchor="middle" fill="#fff">S7 cena</text>
       </g>
       <g fill="#fff" stroke="#9aa4b5" stroke-width="0.8">
         <rect x="6" y="32" width="90" height="18" rx="3"/><rect x="6" y="62" width="90" height="18" rx="3"/><rect x="6" y="92" width="90" height="18" rx="3"/><rect x="6" y="122" width="90" height="18" rx="3"/>
@@ -795,6 +813,7 @@
         <rect x="406" y="32" width="90" height="18" rx="3"/><rect x="406" y="62" width="90" height="18" rx="3"/><rect x="406" y="92" width="90" height="18" rx="3"/><rect x="406" y="122" width="90" height="18" rx="3"/>
         <rect x="506" y="32" width="90" height="18" rx="3"/><rect x="506" y="62" width="90" height="18" rx="3"/><rect x="506" y="92" width="90" height="18" rx="3"/><rect x="506" y="122" width="90" height="18" rx="3"/>
         <rect x="606" y="32" width="88" height="18" rx="3"/><rect x="606" y="62" width="88" height="18" rx="3" stroke="#1f9d55" stroke-width="1.6"/>
+        <rect x="706" y="32" width="88" height="18" rx="3" stroke="#8a3fc9" stroke-width="1.6"/><rect x="706" y="62" width="88" height="18" rx="3"/><rect x="706" y="92" width="88" height="18" rx="3"/><rect x="706" y="122" width="88" height="18" rx="3" stroke-dasharray="3 2"/>
       </g>
       <g fill="#0f1b33" text-anchor="middle">
         <text x="51" y="44">S0-01 repo</text><text x="51" y="74">S0-02 sessão viva</text><text x="51" y="104">S0-03 simulador</text><text x="51" y="134">S0-04 CI e log</text>
@@ -804,14 +823,16 @@
         <text x="451" y="44">S4-01 compilar</text><text x="451" y="74">S4-02 capacidades</text><text x="451" y="104">S4-03 pausa/veloc.</text><text x="451" y="134">S4-04 catálogo cheio</text>
         <text x="551" y="44">S5-01 falhas</text><text x="551" y="74">S5-02 retomar</text><text x="551" y="104">S5-03 custo</text><text x="551" y="134">S5-04 exportar</text>
         <text x="650" y="44">S6-01 bancada</text><text x="650" y="74" font-weight="700">S6-02 aceite</text>
+        <text x="750" y="44" font-weight="700">S7-00 prova</text><text x="750" y="74">S7-01 assinaturas</text><text x="750" y="104">S7-02 nível 1</text><text x="750" y="134">S7-03 nível 2</text>
       </g>
       <g stroke="#9aa4b5" stroke-width="1.1" fill="none" marker-end="url(#a)">
         <defs><marker id="a" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#9aa4b5"/></marker></defs>
         <path d="M96,14 H105"/><path d="M196,14 H205"/><path d="M296,14 H305"/><path d="M396,14 H405"/>
         <path d="M351,200 V214 H451 V146"/><path d="M451,214 H551 V146"/><path d="M551,214 H650 V86"/>
         <path d="M496,131 H506 V131" stroke-dasharray="3 2"/><path d="M596,131 H606 V76" stroke-dasharray="3 2"/>
+        <path d="M451,146 V228 H750 V146" stroke-dasharray="3 2"/>
       </g>
-      <text x="350" y="236" text-anchor="middle" fill="#5b6577" font-family="Segoe UI, Arial" font-size="8">S0 a S3 são sequenciais. S4, S5 e S6 partem do esqueleto (S3-06) e andam em paralelo; S6-02 fecha depois de S4-04 e S5-04. Cards da mesma coluna sem seta podem andar em paralelo.</text>
+      <text x="400" y="236" text-anchor="middle" fill="#5b6577" font-family="Segoe UI, Arial" font-size="8">S0 a S3 são sequenciais; S4, S5 e S6 partem do esqueleto e andam em paralelo; S6-02 fecha depois de S4-04 e S5-04. S7 parte da versão própria: S7-00 é o portão da fase 4, S7-03 espera a câmera da fase 2.</text>
     </svg>
   </div>
   <div class="note"><b>Como usar estes cards.</b> Cada card vira um item no quadro, com o identificador no título. O critério de aceite é copiado como está: é a definição de terminado e deve ser executado por outra pessoa, não pelo autor; no caso deste projeto, pelo cliente, que também é o jogador. Trabalho novo entra como card novo, com código próprio.</div>
@@ -1017,6 +1038,35 @@
       <ul><li>Sessão inteira no jogo de abertura, em modo completo, com a intensidade padrão.</li><li>Registro de defeitos revisado; lacunas republicadas; revisão pós-fase escrita.</li><li>Validação da lacuna LC-08 planejada antes de qualquer trabalho da fase 2.</li></ul>
     </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> uma sessão jogada até encerrar, <b>quando</b> o registro é reproduzido, <b>então</b> toda intervenção tem antes, depois e motivo, nenhuma decisão executada está fora do catálogo, e o cliente diz que o jogo deixou de ser o de sempre, ou diz por que não, e isso vira item.</div></div>
   </div>
+
+  <div class="etapa">
+    <div class="eh"><div><span class="k">ETAPA S7</span><b>Camada de cena (fase 4)</b></div><span>4 cards</span></div>
+    <div class="ed">Primeiro a prova medida, que é a decisão DC-21: se a camada não for viável no jogo de abertura, a etapa termina no S7-00 com os números. Depois, só sobre a versão própria, as assinaturas pelo canal, o nível 1 no catálogo e, quando a fase 2 entregar a câmera, o nível 2.</div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S7-00</span><b>Prova medida: esconder um objeto e desenhar outro com profundidade certa</b><span class="pill uc">UC-K01 UC-K02</span></div>
+      <p class="why">O menor experimento que responde às três lacunas da fase 4 com número, antes de qualquer desenho de produto.</p>
+      <ul><li>Função única de entrada da camada no renderizador, chamada antes de cada lote ir para a placa; assinatura (hash da textura, vértices, caixa) gravada num arquivo por quadro durante a prova.</li><li>Regra fixa de teste: esconder a assinatura de um objeto escolhido do jogo de abertura; medir em quantos quadros seguidos ele some sem piscar, parado e com a câmera girando (LC-15).</li><li>Lote injetado: um retângulo em espaço de tela numa profundidade escolhida; medir se é tapado pelo que está na frente e se tapa o que está atrás, e a faixa e o sentido da profundidade do jogo (LC-16).</li><li>Custo por quadro com a camada ligada e sem regras, com uma regra e com dez, medido no renderizador.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> o jogo de abertura na versão própria, <b>quando</b> a prova roda, <b>então</b> existe um registro com: o objeto escondido em pelo menos 95% dos quadros de 10 segundos parado e o número com a câmera girando; o retângulo injetado ocluído corretamente em três profundidades; e o custo por quadro em milissegundos nos três cenários. Com esses números o cliente decide se S7-01 a S7-03 entram.</div></div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S7-01</span><b>Assinaturas pelo canal e perfil de cena mínimo</b><span class="pill uc">UC-K01 UC-K03</span></div>
+      <p class="why">A plataforma passa a ver a cena como lista de objetos identificáveis, e a classificá-los por jogo.</p>
+      <ul><li>Códigos 0x84 (lista do último quadro) e 0x86 (apagar regras) no servidor do canal; bit 8 na máscara de capacidades.</li><li>Perfil de cena do jogo de abertura: arquivo versionado com assinaturas conhecidas e classes (cenário, inimigo, item, interface, perigo, saída), criado pelo mapeador com uma ferramenta que mostra a captura e as assinaturas lado a lado.</li><li>Simulador do canal em modo próprio respondendo aos códigos novos, com uma cena de mentira.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> o jogo de abertura rodando, <b>quando</b> a ponte pede a lista, <b>então</b> recebe as assinaturas do último quadro em menos de 5 ms, e o perfil de cena classifica pelo menos as assinaturas de inimigo e de interface da primeira área do jogo.</div></div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S7-02</span><b>Ações de nível 1 no catálogo, com RN-11 e reversão</b><span class="pill uc">UC-K02 UC-K06</span></div>
+      <p class="why">Esconder, recolorir, deformar e duplicar viram alavancas do mestre pelo mesmo caminho das outras.</p>
+      <ul><li>Código 0x85 (gravar regra com prazo) e a tabela de regras no renderizador, com trava e vigia de prazo.</li><li>Alavancas de cena no catálogo, com faixas por intensidade; a plataforma recusa regra sobre assinatura classificada como inimigo, perigo ou saída (RN-11) e sobre assinatura sem classe quando a ação não for reversível.</li><li>Reversão pelo jogador e limpeza ao encerrar; confirmação pela leitura das regras ativas; registro antes e depois.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> uma situação de exploração com uma caixa classificada como cenário, <b>quando</b> o mestre decide escondê-la por 10 s, <b>então</b> ela some, a intervenção é confirmada pela regra ativa e volta sozinha no prazo; e uma decisão de esconder o inimigo é descartada antes de chegar ao canal, registrada com o motivo RN-11.</div></div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S7-03</span><b>Nível 2: geometria no mundo com a câmera do perfil de memória</b><span class="pill uc">UC-K04</span></div>
+      <p class="why">A cena ganha o que não existia, com profundidade certa. Depende da fase 2 entregar o campo "câmera".</p>
+      <ul><li>Código 0x87 (câmera do quadro) e a projeção dos vértices novos para o espaço de tela do emulador com a convenção de profundidade medida no S7-00.</li><li>Ação "acrescentar" no catálogo, com formas simples (bloco, placa, luz falsa por vértice colorido) e prazo.</li><li>Prova no jogo de abertura: um bloco posto no corredor é tapado pela parede quando a câmera passa atrás dela.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> o perfil de memória com a câmera validada, <b>quando</b> o mestre acrescenta um bloco a 2 m do jogador, <b>então</b> o bloco fica parado no mundo enquanto a câmera gira, é ocluído corretamente, e some no prazo; tudo registrado.</div></div>
+  </div>
 </section>
 
 <!-- ============ CAP 9 AMBIENTES ============ -->
@@ -1073,7 +1123,7 @@
     <div class="card f3"><div class="code">Passo 4</div><h3>O esqueleto</h3><p>Cards S3-01 a S3-06. No fim, o cliente joga. Só depois disso alguém compila o emulador.</p></div>
   </div>
 
-  <div class="note" style="margin-top:12px"><b>O que este documento decide e fecha.</b> DC-15 (slots 90 a 99, fila de 10, provado), DC-16 (formato fechado da situação, contrato 1), DC-17 (tons e intensidades), DC-18 (teclas), DC-19 (texto do aviso), LC-11 (confirmação pelo arquivo, com número), LC-12 (vigia dentro do emulador). Todas sobem ao Mapa do Projeto como revisão 4 junto com a aprovação deste documento.</div>
+  <div class="note" style="margin-top:12px"><b>O que este documento decide e fecha.</b> DC-15 (slots 90 a 99, fila de 10, provado), DC-16 (formato fechado da situação, contrato 1), DC-17 (tons e intensidades), DC-18 (teclas), DC-19 (texto do aviso), LC-11 (confirmação pelo arquivo, com número), LC-12 (vigia dentro do emulador). Todas sobem ao Mapa do Projeto como revisão 4 junto com a aprovação deste documento. <b>Versão 1.1:</b> detalha a fase 4 decidida no Mapa (revisão 6, DC-20 e DC-21) sem fechar nada novo; LC-14 a LC-16 ficam com o card S7-00.</div>
 
   <div class="warn"><b>O que este documento assume e precisa ser confirmado.</b>
     <ul class="clean" style="font-size:9.2pt">
