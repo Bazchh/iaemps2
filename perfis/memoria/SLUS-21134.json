@@ -18,10 +18,19 @@
     "validacao": "projeção da raiz, dos pés e da cabeça do inimigo dentro da caixa desenhada em 3 de 3 fotos"
   },
   "entidades": {
-    "estado": "parcial",
-    "observacao": "a lista de entidades (passo constante, posição por entidade) ainda não foi encontrada; o que está provado é a raiz do esqueleto do inimigo num pool de matrizes de ossos, que anda sozinha",
-    "raiz_esqueleto_inimigo_1": {"endereco": "0x016F7190", "tipo": "vec3", "significado": "translação da raiz do esqueleto do inimigo presente na cena do estado 91; provisório, endereço de pool", "origem": "descoberta em 27/10"},
-    "raiz_esqueleto_jogador": {"endereco": "0x016BAC50", "tipo": "vec3", "significado": "translação de um osso do jogador (pool de ossos); provisório", "origem": "descoberta em 27/10"}
+    "estado": "lista encontrada; posição provada por projeção; vida do inimigo ainda não localizada",
+    "vetor": {"endereco": "0x01789F40", "passo": "0xED0", "slots": 24, "significado": "vetor de personagens: slot 0 é o jogador; os demais são inimigos, aves e outros atores; slot vazio tem cabeçalho zero", "origem": "descoberta em 27/10 pela cadeia de ponteiros a partir da raiz do esqueleto do inimigo"},
+    "vetor_anexos": {"endereco": "0x017BCDF0", "passo": "0xED0", "slots": 5, "significado": "vetor de objetos presos a personagens (armas, cabeças); mesmo formato", "origem": "descoberta em 27/10"},
+    "campos": {
+      "cabecalho": {"deslocamento": "0x000", "tipo": "u32", "significado": "0x0B002077 no jogador, 0x02002077 no inimigo de aldeia, 0x02002067 em aves, 0x0200686F em atores parados; bit 16 ligado = morto ou inativo (visto em duas mortes; provisório)"},
+      "posicao": {"deslocamento": "0x040", "tipo": "vec3", "significado": "posição dos pés no mundo, em mm; cópias em 0x0C0, 0x130 e 0x290"},
+      "ossos": {"deslocamento": "0x110", "tipo": "ptr", "significado": "ponteiro para a raiz do esqueleto (pool de nós de 0x270 bytes)"},
+      "animacao": {"deslocamento": "0x2FC", "tipo": "u16", "significado": "identificador da animação corrente (118 andando, 184 reação ao tiro, 103 morto no inimigo de aldeia); provisório"},
+      "anexo": {"deslocamento": "0x710", "tipo": "ptr", "significado": "ponteiro para o objeto preso (arma); zera na morte e o objeto some do vetor de anexos"}
+    },
+    "lista_de_tarefas": {"endereco": "0x0048A000", "significado": "lista encadeada de tarefas do quadro: triplas (objeto, função 0x00257F98 ou 0x00258AC0, próxima); serve para enumerar quem está ativo", "origem": "descoberta em 27/10"},
+    "validacao": "posição do slot 11 (inimigo do estado 91) projetada com a câmera cai na caixa desenhada do inimigo em 4 de 5 quadros válidos (tronco e cabeça; os pés saem pela borda inferior num deles); no quinto, durante a reação ao tiro, os três pontos ficam 8 px à esquerda da caixa",
+    "pendente": "vida do inimigo: nenhum campo do slot nem da memória cai a cada tiro nas seis fotos; próximo passo é vigia de escrita no fork (nível 2)"
   },
   "intocavel": [],
   "acoes_de_mundo": []
