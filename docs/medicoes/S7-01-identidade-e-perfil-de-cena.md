@@ -94,6 +94,26 @@ Achado que muda o desenho: **materiais de personagem são compartilhados entre o
 "personagem" é intocável como "inimigo"), mas para agir sobre um inimigo específico a identidade tem de vir
 da posição na tela ou da memória do jogo.
 
+## Parte 2: material e região, e o que derrubou a identidade pelo desenho
+
+A camada ganhou regra de esconder por material **dentro de uma região da tela** (a caixa da regra), e a
+plataforma um rastreio simples: a caixa dos materiais de uma classe, quadro a quadro. A prova carregou o
+estado salvo com inimigos (slot 91) para esconder "o inimigo onde ele está" e poupar o resto.
+
+O que apareceu antes de qualquer regra: **os quatro materiais classificados como inimigo estavam sendo
+desenhados sem nenhum inimigo na tela**, cinco vezes por quadro, na região das árvores e da casa ao fundo.
+Um deles já tinha aparecido como cenário na floresta parada. São texturas compartilhadas entre personagens e
+cenário (atlas), e o hash da textura não distingue quem a veste. Com isso a identidade pelo desenho cai
+pela terceira vez:
+
+1. a forma do lote muda com a câmera (recorte por quadro);
+2. pele e cabelo são o mesmo material para o jogador e para os inimigos;
+3. materiais "de inimigo" também vestem o cenário quando não há inimigo.
+
+A regra por região continua útil, mas só quando alguém de fora disser **onde** o objeto está. Isso é a
+memória do jogo: posição das entidades e câmera (módulo H, fase 2). A decisão do cliente em 27/10 foi
+exatamente essa: se a identidade pelo desenho não fechasse, partir para a engenharia reversa do jogo.
+
 ## O que a parte 1 responde e o que falta no S7-01
 
 - Assinaturas pelo canal em menos de 5 ms: **sim** (a lista de 550 assinaturas responde em um pedido).
