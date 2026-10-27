@@ -7,7 +7,7 @@
   :root {
     --ink: #0f1b33; --text: #222a38; --muted: #5b6577; --line: #d7dde8;
     --accent: #1f4fd1; --bg-soft: #f3f5f9; --bg-card: #ffffff;
-    --f1: #1f4fd1; --f2: #e08a1e; --f3: #1f9d55; --red: #c53030; --amber: #c77d0a;
+    --f1: #1f4fd1; --f2: #e08a1e; --f3: #1f9d55; --f4: #8a3fc9; --red: #c53030; --amber: #c77d0a;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; background: #fff; color: var(--text);
@@ -33,7 +33,7 @@
   .card h3 { margin-top: 2px; }
   .card .meta { font-family: Consolas, monospace; font-size: 8pt; color: var(--accent); margin: 2px 0 5px; }
   .card p { font-size: 9.2pt; color: var(--text); margin: 0; }
-  .f1 { border-top-color: var(--f1); } .f2 { border-top-color: var(--f2); } .f3 { border-top-color: var(--f3); }
+  .f1 { border-top-color: var(--f1); } .f2 { border-top-color: var(--f2); } .f3 { border-top-color: var(--f3); } .f4 { border-top-color: var(--f4); }
   .pill { display: inline-block; font-family: Consolas, monospace; font-size: 7.5pt; padding: 1px 7px; border-radius: 10px; border: 1px solid; margin-right: 3px; vertical-align: middle; white-space: nowrap; }
   .pill.ok { color: var(--f3); border-color: var(--f3); background: #e8f7ee; }
   .pill.rev { color: var(--f1); border-color: var(--f1); background: #eaf0ff; }
@@ -74,7 +74,7 @@
   .actor p { font-size: 9pt; margin: 2px 0 0; }
   ul.clean { margin: 4px 0 0 16px; padding: 0; } ul.clean li { margin: 2px 0; }
   .phase { border: 1px solid var(--line); border-left: 4px solid var(--line); border-radius: 8px; padding: 9px 12px; margin-bottom: 8px; break-inside: avoid; }
-  .phase.p1 { border-left-color: var(--f1); } .phase.p2 { border-left-color: var(--f2); } .phase.p3 { border-left-color: var(--f3); }
+  .phase.p1 { border-left-color: var(--f1); } .phase.p2 { border-left-color: var(--f2); } .phase.p3 { border-left-color: var(--f3); } .phase.p4 { border-left-color: var(--f4); }
   .phase h3 { display: flex; justify-content: space-between; }
   .phase h3 span { font-family: Consolas, monospace; font-size: 8pt; color: var(--accent); font-weight: normal; }
   .phase p { font-size: 9.2pt; margin: 2px 0 4px; }
@@ -88,16 +88,16 @@
 
 <!-- ============ CAPA ============ -->
 <section>
-  <div class="kicker">Mapa do projeto · outubro de 2026 · revisão 5 · aprovado</div>
+  <div class="kicker">Mapa do projeto · outubro de 2026 · revisão 6 · proposta, aguardando aprovação</div>
   <h1>IAEmPS2</h1>
   <p class="lead" style="margin-bottom:8px">Um mestre invisível por inteligência artificial para jogos de PlayStation 2 em emulador. Ele vê a tela, lê o estado da partida e intervém, primeiro no ritmo e depois no mundo do jogo, para a experiência deixar de ser a de sempre: alivia no perigo real, aperta quando o jogador domina, e muitas vezes não faz nada. Casos de Uso e Blueprint Técnico derivam deste documento.</p>
-  <div class="note" style="max-width:150mm;margin-bottom:4px;padding:7px 12px;font-size:8.9pt"><b>Nome provisório:</b> "IAEmPS2", o nome da pasta do protótipo. <b>Revisão 1, 26 de outubro de 2026:</b> fase 1 vira tela e alavancas do emulador; Final Fantasy XII sai; versão própria mínima do emulador; LC-02 e LC-03 fechadas. <b>Revisão 2, mesmo dia:</b> perfil de memória deixa de ser opcional e vira a fase 2, a que muda o mundo. <b>Revisão 3, mesmo dia:</b> seis decisões propostas aprovadas; LC-01 fechada. <b>Revisão 4, mesmo dia:</b> Blueprint Técnico aprovado; entram DC-15 a DC-19 e LC-11 a LC-13; disco deixa de ser risco. <b>Revisão 5, mesmo dia:</b> DC-11 revisada, repositório público, decisão do cliente para a integração contínua rodar sem custo.</div>
+  <div class="note" style="max-width:150mm;margin-bottom:4px;padding:7px 12px;font-size:8.9pt"><b>Nome provisório:</b> "IAEmPS2", o nome da pasta do protótipo. <b>Revisão 1, 26 de outubro de 2026:</b> fase 1 vira tela e alavancas do emulador; Final Fantasy XII sai; versão própria mínima do emulador; LC-02 e LC-03 fechadas. <b>Revisão 2, mesmo dia:</b> perfil de memória deixa de ser opcional e vira a fase 2, a que muda o mundo. <b>Revisão 3, mesmo dia:</b> seis decisões propostas aprovadas; LC-01 fechada. <b>Revisão 4, mesmo dia:</b> Blueprint Técnico aprovado; entram DC-15 a DC-19 e LC-11 a LC-13; disco deixa de ser risco. <b>Revisão 5, mesmo dia:</b> DC-11 revisada, repositório público, decisão do cliente para a integração contínua rodar sem custo. <b>Revisão 6, 27 de outubro de 2026:</b> o cliente quer que o mestre modifique o espaço 3D; entra a fase 4 (módulo K, camada de cena no emulador), com DC-20 e DC-21 propostas, DC-13 revisada, RN-11 e as lacunas LC-14 a LC-16; LC-10 fechada com número e LC-07 fechada para esta fatia.</div>
 
   <div class="stats">
-    <div class="stat"><div class="big">10</div><div class="lbl">módulos funcionais</div></div>
-    <div class="stat"><div class="big">3</div><div class="lbl">fases de entrega</div></div>
-    <div class="stat"><div class="big">10</div><div class="lbl">regras de negócio</div></div>
-    <div class="stat"><div class="big">19</div><div class="lbl">decisões, todas fechadas</div></div>
+    <div class="stat"><div class="big">11</div><div class="lbl">módulos funcionais</div></div>
+    <div class="stat"><div class="big">4</div><div class="lbl">fases de entrega</div></div>
+    <div class="stat"><div class="big">11</div><div class="lbl">regras de negócio</div></div>
+    <div class="stat"><div class="big">21</div><div class="lbl">decisões: 19 fechadas, 2 propostas</div></div>
   </div>
 
   <div class="grid3">
@@ -111,7 +111,9 @@
     <div class="card f2"><div class="code">Módulo H</div><h3>Perfil de memória</h3><div class="meta">fase 2</div><p>A camada que muda o mundo, por jogo: inimigo que aparece, recurso que some, item onde não existia. Endereços, faixas, ações de mundo, fontes públicas.</p></div>
     <div class="card f3"><div class="code">Módulo I</div><h3>Entidades e mundo</h3><div class="meta">fase 3</div><p>Posição de inimigos e personagens: aproximar, afastar, reunir. Exige mapa de entidades por jogo.</p></div>
     <div class="card f3"><div class="code">Módulo J</div><h3>Controle virtual</h3><div class="meta">fase 3</div><p>O mestre aciona o controle por um gamepad virtual. Outro tipo de intervenção, com regras próprias.</p></div>
+    <div class="card f4"><div class="code">Módulo K</div><h3>Cena</h3><div class="meta">fase 4 · proposta</div><p>A camada que modifica o espaço 3D visto pelo jogador: esconder, duplicar, deformar e recolorir objetos da cena, acrescentar geometria e luz, trocar a aparência de um objeto. Vive dentro do renderizador da versão própria do emulador, em qualquer placa de vídeo, e fala com o mestre pelo mesmo canal. Nunca muda colisão.</p></div>
   </div>
+  <div class="note" style="margin-top:8px;font-size:8.9pt"><b>Refinamentos vindos do código, registrados aqui:</b> a versão própria do emulador parte da etiqueta corrente do projeto original, não da 2.8.2, porque só ela tem dependências pré-compiladas; a velocidade pode ser lida como "ilimitada" quando o jogador liga pelo atalho do emulador; a confirmação de pausa e velocidade relê o emulador até ver o efeito; morte recente com estado guardado vira aviso explícito ao mestre, ordem no tom implacável; falhas prolongadas pausam o mestre; o fim das ações com duração roda num relógio próprio.</div>
 </section>
 
 <!-- ============ VISÃO ============ -->
@@ -177,7 +179,7 @@
 <!-- ============ REGRAS DE NEGÓCIO ============ -->
 <section class="cap">
   <div class="kicker">Regras de negócio</div>
-  <h2>Dez regras que valem em todos os casos de uso</h2>
+  <h2>Onze regras que valem em todos os casos de uso</h2>
   <p class="lead">As cinco primeiras são as regras de mesa: o que mantém a diversão quando o mestre intervém. As demais são regras do produto, e quatro delas nascem de falhas que o protótipo teve de verdade. Cada uma vira teste.</p>
 
   <div class="rules">
@@ -191,6 +193,7 @@
     <div class="rule"><span class="tag">RN-08</span><div><b>Decidir sobre a situação atual</b><p>A plataforma relê tela e estado antes de agir. Se a situação mudou fora do esperado desde a decisão, a ação é descartada e registrada como tal. O protótipo agia sobre um estado lido segundos antes. Obtemos: nenhuma ação sobre situação velha.</p><div class="where">módulos B, D, G</div></div></div>
     <div class="rule"><span class="tag">RN-09</span><div><b>O jogo é do jogador</b><p>Imagem do jogo e BIOS ficam na máquina dele; nunca entram no repositório, nos testes compartilhados nem em qualquer envio. Ao serviço de linguagem vão capturas de tela e o estado resumido, e só isso, com o jogador ciente disso ao abrir a sessão. Obtemos: respeito à propriedade e à licença.</p><div class="where">módulos A, B, G</div></div></div>
     <div class="rule"><span class="tag">RN-10</span><div><b>Falha é visível e silencia o mestre</b><p>Serviço fora do ar ou resposta inválida aparece no overlay; sem decisão válida, nenhuma ação acontece; o jogo segue sem o mestre e a sessão retoma. O protótipo ficou meses parecendo vivo com o serviço desligado. Obtemos: nunca parece vivo estando morto.</p><div class="where">módulos E, G</div></div></div>
+    <div class="rule"><span class="tag">RN-11</span><div><b>O que o mestre desenha nunca mente sobre o que mata</b><p>Geometria acrescentada pela camada de cena é só visual: não tem colisão e o jogo não sabe dela. Por isso ela nunca esconde inimigo, perigo ou saída, e nunca cria obstáculo falso em caminho obrigatório. Deformar, escurecer e povoar a cena, sim; enganar o jogador sobre o que pode feri-lo, não. Obtemos: "dificulte, nunca derrote" continua valendo com a cena redesenhada.</p><div class="where">módulos C, D, K</div></div></div>
   </div>
 </section>
 
@@ -282,7 +285,7 @@
 <section class="cap">
   <div class="kicker">Fases de entrega</div>
   <h2>O que entra em cada fase</h2>
-  <p class="lead">A fase 1 é o mestre jogável em qualquer jogo, com tela e alavancas do emulador: o ritmo. A fase 2 é o mundo: o perfil de memória do jogo de abertura, com as ações que fazem o jogo deixar de ser o comum, e depois o produto para outros jogadores. A fase 3 dá ao mestre as mãos: entidades e controle.</p>
+  <p class="lead">A fase 1 é o mestre jogável em qualquer jogo, com tela e alavancas do emulador: o ritmo. A fase 2 é o mundo: o perfil de memória do jogo de abertura, com as ações que fazem o jogo deixar de ser o comum, e depois o produto para outros jogadores. A fase 3 dá ao mestre as mãos: entidades e controle. A fase 4, proposta nesta revisão, dá ao mestre a cena: o espaço 3D visto pelo jogador passa a ser modificável em tempo real, dentro do próprio emulador.</p>
 
   <div class="phase p1"><h3>Fase 1 · mestre jogável em qualquer jogo <span>módulos A a G</span></h3>
     <p>Abrir um jogo no emulador, abrir a sessão, jogar com o mestre vendo a tela e agindo pelas alavancas do emulador dentro das regras de negócio, ver, pausar, reverter, encerrar. Termina quando o cliente joga uma sessão inteira com toda intervenção registrada e nenhuma fora do catálogo.</p>
@@ -299,14 +302,19 @@
     <span class="chip"><span class="mono">I</span> Posição de entidades</span><span class="chip"><span class="mono">I</span> Aproximar, afastar, reunir</span><span class="chip"><span class="mono">J</span> Controle virtual</span><span class="chip"><span class="mono">J</span> Regras próprias de intervenção por controle</span>
   </div>
 
+  <div class="phase p4"><h3>Fase 4 · a cena muda: camada de cena no emulador <span>módulo K · proposta</span></h3>
+    <p>O renderizador do emulador vê cada triângulo que o jogo manda desenhar, já projetado na tela, com a textura que o veste e a profundidade de cada ponto. A camada de cena se apoia nisso em três níveis, cada um medido antes do seguinte. <b>Nível 1, sem câmera:</b> identificar objetos pela textura e pela forma, escondê-los, duplicá-los, deformá-los, recolori-los; trocar textura o emulador já faz. <b>Nível 2, com a câmera lida da memória do jogo (fase 2):</b> acrescentar geometria e luz no mundo, com profundidade certa, ocultada pelo que está na frente. <b>Nível 3:</b> trocar a aparência inteira de um objeto, o que exige saber também onde ele está. Em nenhum nível a colisão muda: o jogo continua decidindo por onde se anda e o que fere (RN-11). O caminho sem ray tracing e sem placa específica foi escolha do cliente (DC-20), sabendo que é a parte mais ambiciosa do projeto e a mais cara de acompanhar no original.</p>
+    <span class="chip"><span class="mono">K</span> Prova medida: esconder um objeto e desenhar outro com profundidade certa</span><span class="chip"><span class="mono">K</span> Identidade de objeto entre quadros</span><span class="chip"><span class="mono">K</span> Câmera por jogo, vinda do perfil de memória</span><span class="chip"><span class="mono">K</span> Alavancas de cena no catálogo, com as mesmas regras</span><span class="chip"><span class="mono">K</span> Comandos de cena no canal</span>
+  </div>
+
   <div class="note" style="margin-top:8px"><b>Jogo de abertura.</b> Resident Evil 4, versão americana, já rodando no emulador do cliente: tensão constante e tela fácil de ler para o mestre. Com alavancas universais, qualquer outro jogo dele também serve na fase 1 sem nada a refazer; o perfil de memória da fase 2 começa por este. Para testes automáticos e integração contínua, um emulador simulado que responde ao mesmo canal, mais um banco de capturas de tela gravadas, para que plataforma e mestre rodem sem emulador, sem jogo e sem serviço de linguagem.</div>
 </section>
 
 <!-- ============ DECISÕES ============ -->
 <section class="cap">
   <div class="kicker">Decisões</div>
-  <h2>Dezenove decisões fechadas com o cliente</h2>
-  <p class="lead">Todas fechadas em 26 de outubro de 2026, uma delas revisada no mesmo dia. As oito abaixo foram respondidas ao longo da conversa; as seis seguintes foram propostas por este documento e aprovadas; as cinco últimas nasceram nos Casos de Uso e fecharam no Blueprint Técnico. Mudança posterior entra como revisão numerada, com data, e propaga para os casos de uso e para o blueprint.</p>
+  <h2>Vinte e uma decisões: dezenove fechadas, duas propostas</h2>
+  <p class="lead">Todas fechadas em 26 de outubro de 2026, uma delas revisada no mesmo dia. As oito abaixo foram respondidas ao longo da conversa; as seis seguintes foram propostas por este documento e aprovadas; as cinco últimas nasceram nos Casos de Uso e fecharam no Blueprint Técnico. DC-20 e DC-21 são propostas desta revisão e DC-13 foi revisada por causa delas. Mudança posterior entra como revisão numerada, com data, e propaga para os casos de uso e para o blueprint.</p>
 
   <table style="font-size:8.4pt" class="tight">
     <thead><tr><th>Código</th><th>Decisão</th><th>Escolha</th><th>Por quê</th><th>Estado</th></tr></thead>
@@ -317,7 +325,7 @@
       <tr><td class="code">DC-05</td><td>Alvo</td><td>Qualquer jogo de PlayStation 2 no PCSX2; o PlayStation 2 é o objetivo, não o meio</td><td>Escolha do cliente, ciente de que um jogo de computador com modding daria mais alavancas.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
       <tr><td class="code">DC-06</td><td>Ponte com o emulador</td><td>O canal oficial de comunicação do emulador; varredura de memória por valor nunca mais</td><td>Já oferece leitura e escrita, estado salvo, identificação do jogo e status; elimina os doze scripts do protótipo.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
       <tr><td class="code">DC-07</td><td>Emulador</td><td>Só PCSX2; outros emuladores e consoles fora</td><td>Um emulador, um canal, uma versão própria para manter.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
-      <tr><td class="code">DC-13</td><td>Versão própria do emulador</td><td>Mínima: só o servidor do canal oficial ganha os comandos que faltam, pausar e velocidade; todo o resto igual ao original, com proposta de contribuição ao projeto original</td><td>O emulador é código aberto; uma extensão pequena acompanha as versões novas com pouco esforço e pode deixar de ser própria se for aceita.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
+      <tr><td class="code">DC-13</td><td>Versão própria do emulador</td><td>Versão própria do emulador com o mínimo por recurso: na fase 1, só o servidor do canal; na fase 4, também o renderizador, onde a camada de cena mora</td><td>Revisada em 27/10 pela fase 4: o renderizador é a parte que mais muda no projeto original, então acompanhar as versões novas fica mais caro (segunda metade de LC-10). Cada mudança continua isolada, nomeada e proposta ao original quando couber.</td><td><span class="pill rev">revisada 27/10</span></td></tr>
       <tr><td class="code">DC-14</td><td>Fronteira de licença</td><td>O emulador modificado é distribuído com o código, na mesma licença do original; o mestre é programa separado, que fala com o emulador por rede local, com licença própria</td><td>Decisão de desenho tomada de propósito: o que estende o emulador herda a licença dele; o que fica fora não. A leitura detalhada da licença é tarefa do blueprint.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
     </tbody>
   </table>
@@ -326,8 +334,8 @@
 <!-- ============ DECISÕES PROPOSTAS ============ -->
 <section class="cap">
   <div class="kicker">Decisões · continuação</div>
-  <h2>Seis propostas por este documento e cinco vindas do Blueprint</h2>
-  <p class="lead">As seis primeiras aprovadas sem alteração na revisão 3; o nome continua provisório. As cinco seguintes foram candidatas nos Casos de Uso e fecharam com a aprovação do Blueprint Técnico, onde estão detalhadas.</p>
+  <h2>Seis propostas da revisão 3, cinco vindas do Blueprint e duas desta revisão</h2>
+  <p class="lead">As seis primeiras aprovadas sem alteração na revisão 3; o nome continua provisório. As cinco seguintes foram candidatas nos Casos de Uso e fecharam com a aprovação do Blueprint Técnico, onde estão detalhadas. DC-20 e DC-21, da revisão 6, estão na tabela anterior e aguardam a aprovação do cliente; com ela, a fase 4 desce para os Casos de Uso e para o Blueprint.</p>
 
   <table style="font-size:8.4pt" class="tight">
     <thead><tr><th>Código</th><th>Decisão</th><th>Escolha</th><th>Por quê</th><th>Estado</th></tr></thead>
@@ -343,6 +351,8 @@
       <tr><td class="code">DC-17</td><td>Tons e intensidades</td><td>Tons protetor, imprevisível (padrão) e implacável; intensidades leve, média (padrão) e forte, que fixam intervalo mínimo e faixas</td><td>O jogador configura o comportamento sem nunca escolher uma ação.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
       <tr><td class="code">DC-18</td><td>Gestos do jogador</td><td>Ctrl+Alt+Z reverter, Ctrl+Alt+P pausar e retomar o mestre, Ctrl+Alt+Q encerrar, mais botões no overlay</td><td>Combinações que o emulador não usa; colisão com o jogo é conferida no esqueleto.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
       <tr><td class="code">DC-19</td><td>Aviso do que sai da máquina</td><td>Texto versionado, aceite registrado com data, reapresentado ao trocar de serviço</td><td>Capturas de tela saem da máquina; o jogador tem de saber antes da primeira.</td><td><span class="pill ok">fechada 26/10</span></td></tr>
+      <tr><td class="code">DC-20</td><td>Como o mestre modifica o espaço 3D</td><td>Camada de cena própria dentro do renderizador da versão própria do emulador: identifica, esconde, deforma e acrescenta geometria na tela, em qualquer placa de vídeo, sem ray tracing e sem plataforma de terceiros</td><td>Escolha do cliente em 27/10 entre quatro caminhos: alugar máquina com placa NVIDIA para medir a integração de ray tracing que o fabricante mostrou sobre o emulador; esta camada própria; só memória do jogo (fase 2); trocar o alvo por um motor aberto. A camada própria roda na máquina que o cliente tem e mantém o PlayStation 2 como objetivo (DC-05). O que já existe foi levantado: a integração de ray tracing exige placa específica e é cru; a captura de cena do emulador para arquivo existe, mas sem câmera.</td><td><span class="pill prop">proposta 27/10</span></td></tr>
+      <tr><td class="code">DC-21</td><td>Ordem da fase 4</td><td>Uma prova medida já (nível 1, sem câmera) para saber se a camada é viável; a fase 4 inteira só depois da fase 2, de onde vem a câmera</td><td>Os triângulos chegam ao renderizador já projetados; para pôr geometria nova no mundo é preciso a câmera, que mora na memória do jogo e é a fase 2. Medir antes de investir é a regra do projeto (LC-10 foi assim).</td><td><span class="pill prop">proposta 27/10</span></td></tr>
     </tbody>
   </table>
 
@@ -353,7 +363,7 @@
 <section class="cap">
   <div class="kicker">Lacunas</div>
   <h2>O que ainda não está resolvido</h2>
-  <p class="lead" style="margin-bottom:6px">Lista republicada no fim de cada fase. Cinco fechadas: três na máquina do cliente, duas no Blueprint.</p>
+  <p class="lead" style="margin-bottom:6px">Lista republicada no fim de cada fase. Sete fechadas: três na máquina do cliente, duas no Blueprint, duas por medição e levantamento no código. Três novas abertas pela fase 4.</p>
 <div class="callout" style="margin:0 0 10px"><b>Como usar este documento no dia a dia.</b> Ele é a origem de tudo: os casos de uso detalham os módulos daqui, o blueprint implementa os casos de uso, e cada card de código aponta para o caso de uso que cumpre. Quando uma necessidade nova surgir, ela entra primeiro aqui, como módulo, regra, decisão ou lacuna com código próprio, e só depois desce. Assim o escopo continua visível e negociável, e nenhuma decisão fica só na conversa.</div>
 
   <table class="tight" style="font-size:8.3pt">
@@ -365,13 +375,16 @@
       <tr><td class="code">LC-04</td><td>Cobertura real e termos de uso das fontes públicas de mapas, jogo a jogo.</td><td>Casos de uso do módulo H; levantamento na fase 2</td><td>A camada de memória vale para poucos jogos.</td></tr>
       <tr><td class="code">LC-05</td><td>Como medir a qualidade do mestre sem gabarito: bancada de situações sintéticas em que toda decisão cumpre as regras, mais sessões jogadas; a diversão continua julgamento do jogador.</td><td>Card S6-01 do Blueprint</td><td>Sem medida, regressão passa despercebida.</td></tr>
       <tr><td class="code">LC-06</td><td>Custo e latência por sessão com captura de tela a cada ciclo, e limite aceitável para o cliente. Imagem custa mais que texto.</td><td>Medição no esqueleto ambulante</td><td>Produto inviável de operar.</td></tr>
-      <tr><td class="code">LC-07</td><td>Levantamento do que já existe: produtos que alteram jogos em tempo real por evento externo, em emulador ou não. Nenhuma pesquisa feita ainda.</td><td>Antes da fase 2</td><td>Construir o que já existe.</td></tr>
+      <tr><td class="code">LC-07<span class="pill ok">fechada 27/10 para a cena</span></td><td>Levantamento do que já existe. Para modificar o espaço 3D: integração de ray tracing do fabricante de placas sobre um fork do emulador, mostrada em feira em 2026, que reconstrói a cena e troca malhas e materiais, mas exige placa específica e está crua; captura de cena do emulador para arquivo, sem câmera; nos outros emuladores, só troca de texturas. Para alterar jogos por evento externo (fase 2), o levantamento continua pendente.</td><td>Feito nesta revisão; fase 2 antes de começar</td><td>Construir o que já existe.</td></tr>
       <tr><td class="code">LC-08</td><td>Validação com outros jogadores antes da fase 2: medir interesse e qual jogo pedem primeiro.</td><td>Fim da fase 1</td><td>Produto certo para uma pessoa, errado para o resto.</td></tr>
       <tr><td class="code">LC-09</td><td>Nome definitivo do produto.</td><td>Decisão do cliente, a qualquer momento</td><td>Nenhum.</td></tr>
-      <tr><td class="code">LC-10</td><td>Ambiente de compilação do emulador e custo de acompanhar o original. Ferramentas instaladas, dependências pré-compiladas, disco sem risco; falta medir a compilação.</td><td>Card S4-01 do Blueprint</td><td>Versão própria cara demais de manter; fica o modo reduzido.</td></tr>
+      <tr><td class="code">LC-10<span class="pill ok">fechada 26/10</span></td><td>Ambiente de compilação do emulador. Medido na máquina do cliente: compilação completa em 7 minutos, recompilação após mudar o servidor do canal em 3 minutos, 2,4 GB de objetos, nada a instalar, zero erros. O custo de acompanhar o original cresce com a fase 4 (DC-13 revisada).</td><td>Card S4-01 do Blueprint, medição gravada no repositório</td><td>Nenhum para a fase 1; reavaliar na fase 4.</td></tr>
       <tr><td class="code">LC-11<span class="pill ok">fechada 26/10</span></td><td>Confirmação de salvar e recarregar estado: o emulador executa de forma assíncrona e reporta erro só na tela. Fechada por medição: confirmação pelo arquivo com tamanho estável, 0,9 s no jogo de abertura.</td><td>Blueprint, capítulo 6</td><td>Nenhum.</td></tr>
       <tr><td class="code">LC-12<span class="pill ok">fechada 26/10</span></td><td>Volta da velocidade ao normal se a plataforma cair. Fechada por desenho: vigia dentro do servidor do canal do emulador, com duração no próprio comando.</td><td>Blueprint, capítulo 6</td><td>Nenhum.</td></tr>
       <tr><td class="code">LC-13</td><td>Captura com o jogo em tela cheia exclusiva. A captura pela janela foi provada em modo janela; falta provar em tela cheia sem borda.</td><td>Card S2-01 do Blueprint</td><td>Jogador em tela cheia fica sem mestre.</td></tr>
+      <tr><td class="code">LC-14</td><td>De onde vem a câmera. Os triângulos chegam ao renderizador já projetados na tela; a matriz da câmera mora na memória de cada jogo, em lugar diferente por jogo. Sem ela, só o nível 1 da cena existe.</td><td>Perfil de memória do jogo de abertura (fase 2), com o campo "câmera"</td><td>Fase 4 para no nível 1: esconder e deformar, nunca acrescentar.</td></tr>
+      <tr><td class="code">LC-15</td><td>Identidade estável de um objeto entre quadros. A assinatura por textura já existe no emulador, mas a mesma textura veste vários objetos e não fica guardada em cada desenho; precisa de forma e posição junto.</td><td>Prova medida da fase 4 (DC-21)</td><td>O mestre esconde o objeto errado ou o objeto pisca.</td></tr>
+      <tr><td class="code">LC-16</td><td>Convenção de profundidade por jogo. A profundidade que o emulador recebe tem escala e sentido que variam por jogo; geometria acrescentada com profundidade errada aparece na frente do que deveria tapá-la.</td><td>Prova medida da fase 4, depois o perfil de memória</td><td>Cena acrescentada parece colada na tela, não no mundo.</td></tr>
     </tbody>
   </table>
 
