@@ -39,6 +39,11 @@ class Codigo(IntEnum):
     EXT_SET_PAUSED = 0x81
     EXT_SET_SPEED = 0x82
     EXT_GET_SPEED = 0x83
+    # camada de cena (fase 4, prova S7-00; ainda fora da máscara de capacidades)
+    EXT_SCENE_LIST = 0x84
+    EXT_SCENE_RULE = 0x85
+    EXT_SCENE_CLEAR = 0x86
+    EXT_SCENE_STATS = 0x88
 
 
 class Resultado(IntEnum):
