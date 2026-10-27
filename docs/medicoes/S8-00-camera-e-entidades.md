@@ -81,11 +81,15 @@ dezenas de endereços com o mesmo trio de valores: altura de ossos (em pé 1,6 m
 dados de animação. A vida do inimigo não aparece por diferença de fotos; o caminho é o nível 2: um vigia de
 escrita no fork, parado no instante em que o jogo desconta o dano, lendo o endereço escrito.
 
-Munição: ver o resultado da busca com as duas rodadas na seção seguinte.
+Munição: também não aparece por valor. Três fotos com o número do HUD informado pelo cliente (7 balas no
+carregador, 10 após recarregar, 9 após um tiro): nenhum endereço de 8, 16 ou 32 bits nem ponto flutuante faz
+7, 10, 9, nem a sequência invertida (balas que faltam), nem em outra base (diferença +3 depois −1); a reserva
+tampouco cai 3 fora das regiões de animação. O único padrão que acompanhou foi um contador cíclico de 0 a 10 em
+seis blocos de interface, que não é munição. Vida do inimigo e munição ficam para o vigia de escrita.
 
 ## O que ainda não fechou
 
-- **Vida do inimigo.** Não aparece por diferença de fotos (acima). Próximo passo: vigia de escrita no fork.
+- **Vida do inimigo e munição.** Não aparecem por diferença de fotos (acima). Próximo passo: vigia de escrita no fork.
 - **Critério do card.** Posição da entidade provada em 4 de 5 quadros; falta uma amostra maior e com o inimigo
   em movimento mais variado, com o roteiro novo (foto base antes do primeiro tiro, as duas rodadas a partir do
   mesmo carregamento).
