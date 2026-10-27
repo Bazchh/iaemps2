@@ -21,7 +21,7 @@ from iaemps2.registro import banco
 from iaemps2.servicos import criar
 from iaemps2.servicos.base import Servico
 from iaemps2.sessao import aviso
-from iaemps2.sessao.ciclo import Capturar, PainelDaSessao, Sessao
+from iaemps2.sessao.ciclo import Capturar, PainelDaSessao, Sessao, emulador_vivo
 from iaemps2.sessao.relogio import Contador
 
 
@@ -42,6 +42,7 @@ def abrir(
     cliente: Cliente | None = None,
     pasta_sessoes: Path | None = None,
     encerrar_apos_s: float | None = None,
+    processo_vivo: Callable[[], bool] | None = None,
 ) -> Sessao:
     pasta_sessoes = pasta_sessoes or config.sessoes.caminho()
     cliente = cliente or Cliente(config.canal.host, config.canal.porta, config.canal.tempo_limite_s)
@@ -117,6 +118,7 @@ def abrir(
         tom=tom,
         intensidade=intensidade,
         encerrar_apos_s=encerrar_apos_s,
+        processo_vivo=processo_vivo if processo_vivo is not None else emulador_vivo,
     )
     # um estado salvo logo no começo: a recarga precisa de um slot com contexto antes do primeiro período
     sessao.executor.salvar_periodico(None)

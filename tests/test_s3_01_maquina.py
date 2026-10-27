@@ -31,7 +31,7 @@ def test_oito_estados_e_a_tabela_do_blueprint() -> None:
     assert len(Estado) == 8
     assert len(pares_validos()) + len(pares_invalidos()) == len(Estado) * len(Evento)
     assert (
-        len(pares_validos()) == 45
+        len(pares_validos()) == 46
     )  # 25 linhas do capítulo 4 expandidas pelos estados de origem, mais uma do S3-06
 
 

@@ -57,6 +57,9 @@ class SlotsReservados(Secao):
 
 class Emulador(Secao):
     pasta_estados: str = ""  # vazio = %LOCALAPPDATA%/Programs/PCSX2/sstates (instalação portátil do cliente)
+    limite_travado_s: float = Field(
+        default=20.0, ge=1
+    )  # processo vivo sem responder por mais que isso = fechado
 
     def caminho_estados(self) -> Path:
         if self.pasta_estados:
@@ -78,6 +81,9 @@ class Servico(Secao):
     teto_custo_sessao: float = Field(default=0.0, ge=0)
     preco_entrada_por_milhao: float = Field(default=0.0, ge=0)  # 0 = custo não estimado
     preco_saida_por_milhao: float = Field(default=0.0, ge=0)
+    limite_falhas_seguidas: int = Field(
+        default=8, ge=4
+    )  # acima disso o mestre se pausa; > 3 pelo critério G02
 
 
 class Config(Secao):

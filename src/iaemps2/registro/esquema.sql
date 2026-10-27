@@ -136,7 +136,7 @@ create table metricas (
 create table marcos (
   id       integer primary key,
   ciclo_id integer not null references ciclos (id),
-  tipo     text not null check (tipo in ('morte','mudanca_fase','reversao','pausa_mestre','retomada','lacuna')),
+  tipo     text not null check (tipo in ('morte','mudanca_fase','reversao','pausa_mestre','retomada','lacuna','pausa_por_falhas','queda_emulador')),
   detalhe  text
 );
 
