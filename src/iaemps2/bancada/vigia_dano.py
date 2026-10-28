@@ -10,8 +10,16 @@ Comandos:
   janela <rotulo>            vigia a faixa por --segundos e grava a tabela em <pasta>/<rotulo>.json.
   comparar <base> <tiro>     instruções presentes em <tiro> e ausentes em <base>, com endereço, valor e base.
   ver <rotulo>               lista a tabela gravada, por contagem.
+  armar <inicio> <fim> <leitura|escrita|ambos> [--segundos 600]
+                             arma o vigia e zera a tabela; o jogador age no seu tempo e avisa.
+  ler <rotulo> [--zerar]     lê a tabela do vigia armado, grava em <pasta>/<rotulo>.json e lista.
 
 Uso: python -m iaemps2.bancada.vigia_dano janela base --inicio 0x01794230 --fim 0x01795100 --segundos 3
+     python -m iaemps2.bancada.vigia_dano armar 0x010F6540 0x010F65B0 leitura
+     python -m iaemps2.bancada.vigia_dano ler maleta
+
+A forma que funcionou com o jogador no controle foi a de armar por dez minutos e ler quando ele avisa (``armar``
+e ``ler``); as janelas curtas (``janela``, ``prova``) servem para o que acontece sozinho, como a câmera.
 """
 
 from __future__ import annotations
@@ -25,9 +33,10 @@ from pathlib import Path
 from typing import Any
 
 from iaemps2.ponte import protocolo as p
-from iaemps2.ponte.cliente import VIGIA_ESCRITA, AcessoVigiado, Cliente
+from iaemps2.ponte.cliente import VIGIA_AMBOS, VIGIA_ESCRITA, VIGIA_LEITURA, AcessoVigiado, Cliente
 
 PASTA_PADRAO = Path.home() / "IAEmPS2" / "medicoes" / "s8-01"
+CONDICOES = {"leitura": VIGIA_LEITURA, "escrita": VIGIA_ESCRITA, "ambos": VIGIA_AMBOS}
 VIDA_JOGADOR = 0x0042DA76
 NOMES_REG = [
     *("zero", "at", "v0", "v1", "a0", "a1", "a2", "a3"),
@@ -155,8 +164,42 @@ def comparar(args: argparse.Namespace) -> int:
     return 0
 
 
+def armar(args: argparse.Namespace) -> int:
+    c = _cliente()
+    c.vigia_limpar()
+    c.vigia_definir(args.inicio, args.fim, CONDICOES[args.condicao], duracao_ms=int(args.segundos * 1000))
+    c.vigia_ler(zerar=True)
+    c.fechar()
+    print(
+        f"vigia armado em {args.inicio:08x}..{args.fim:08x} ({args.condicao}) por {args.segundos:.0f} s; tabela zerada"
+    )
+    return 0
+
+
+def ler(args: argparse.Namespace) -> int:
+    args.pasta.mkdir(parents=True, exist_ok=True)
+    c = _cliente()
+    estado, itens = c.vigia_ler(zerar=args.zerar)
+    c.fechar()
+    resumo = {
+        "acessos_total": estado.acessos_total,
+        "descartados": estado.descartados,
+        "instrucoes": estado.instrucoes,
+        "restante_ms": estado.restante_ms,
+    }
+    acessos = [_dicionario(a) for a in itens]
+    dados = {"inicio": estado.inicio, "fim": estado.fim, "resumo": resumo, "acessos": acessos}
+    (args.pasta / f"{args.rotulo}.json").write_text(json.dumps(dados, ensure_ascii=False), encoding="utf-8")
+    print(f"{args.rotulo}: {resumo}")
+    for a in sorted(acessos, key=lambda x: -int(x["contagem"])):
+        print("  ", _linha(a))
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument("--pasta", type=Path, default=PASTA_PADRAO)
     sub = parser.add_subparsers(dest="comando", required=True)
     s = sub.add_parser("prova")
@@ -175,6 +218,16 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("base")
     s.add_argument("tiro")
     s.set_defaults(func=comparar)
+    s = sub.add_parser("armar")
+    s.add_argument("inicio", type=lambda x: int(x, 0))
+    s.add_argument("fim", type=lambda x: int(x, 0))
+    s.add_argument("condicao", choices=sorted(CONDICOES))
+    s.add_argument("--segundos", type=float, default=600.0)
+    s.set_defaults(func=armar)
+    s = sub.add_parser("ler")
+    s.add_argument("rotulo")
+    s.add_argument("--zerar", action="store_true")
+    s.set_defaults(func=ler)
     args = parser.parse_args(argv)
     return int(args.func(args))
 

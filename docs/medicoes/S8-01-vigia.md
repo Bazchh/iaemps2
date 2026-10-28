@@ -31,7 +31,7 @@ slot 0, espelho da vida global.
 
 Duas janelas anteriores não deram nada e valem como lição: a primeira porque o Ganado que o cliente atingiu não era
 o slot vigiado; a segunda porque a janela de tempo fechou antes do tiro. A forma que funcionou foi armar o vigia por
-dez minutos, deixar o cliente agir e ler a tabela quando ele avisa.
+dez minutos, deixar o cliente agir e ler a tabela quando ele avisa (`vigia_dano.py armar` e `ler`).
 
 ## A função de dano, lida no código
 
@@ -81,9 +81,50 @@ no estado inicial e 8, 6 e 4 na rodada A, dois a menos por passo, o que pede con
 rótulos trocados). O que sustenta a leitura é o decompilado (`>> 3`) mais os três acertos exatos. Por isso a caça
 por valor de S8-00 não achou: o número está multiplicado por 8.
 
+## Dar um item: a maleta é um tabuleiro
+
+Pedido do cliente em 28/10: "me dá uma bazuca". O caminho pelo gerenciador de itens não bastou: o lança-foguetes
+(id 0x35) gravado num slot livre, com flags, dono e quantidade como `cItemMgr::construct` grava, não apareceu na
+maleta em duas aberturas. O vigia de leitura nos oito primeiros slots durante uma abertura só mostrou o HUD lendo a
+pistola; o vigia na memória de rascunho do processador (0x70000000, 16 KB) só mostrou matemática de matrizes.
+Nenhuma cópia do vetor na foto da memória.
+
+A resposta veio do código, não do vigia. A tela da maleta (0x0111F4E0, módulo do menu) cria um `pzlPlayer` com
+dois `pzlBoard` e até 121 `pzlPiece`: `pzlPlayer::init` (0x0025FD10) percorre o vetor de itens e, para cada item
+ocupado do dono certo, procura o id na tabela de dados de peça (0x00326DE8: largura, altura, centro, grade) e cria
+uma peça apontando para o item, com posição igual ao campo +0xA/+0xB do item vezes 0,5 e orientação +0xC. A peça é
+então colocada no tabuleiro da maleta (10x6 no início do jogo) ou no extra, conforme +0xD; a colocação (0x0025F438)
+recusa a peça se alguma célula cai fora do tabuleiro ou sobre outra. Ao fechar, `pzlPlayer::save` grava de volta
+no item o centro, a orientação e o tabuleiro. A posição do item é o **centro** da peça em meias-células, não o
+canto: a pistola 3x2 com centro (1,0, 0,5) no canto (0,0) tem +0xA/+0xB = 2, 1.
+
+Com isso o que acontecia ficou claro na foto da memória viva: a peça do lança-foguetes existia (ponteiro para o slot
+6), mas com o bit "no tabuleiro" desligado, porque o canto calculado a partir da posição que eu tinha gravado como
+canto caía fora. Gravado o centro certo para o canto (0,4), linhas 4 e 5 livres (+0xA/+0xB = 7, 9), e a carga de um
+foguete em +0x8 (capacidade do nível 1 da tabela de armas 0x003A99C0, vezes 8), o item apareceu na maleta na
+abertura seguinte, confirmado pelo cliente. Nessa abertura o vigia nos slots viu `pzlPlayer::init` lendo os oito
+slots (0x25FF00 a 0x25FFE8) e o menu desenhando a partir das peças.
+
+Dois pontos sem explicação, registrados como estão:
+
+- Na primeira janela vigiada nos oito slots, nem `pzlPlayer::init` nem a iteração do menu apareceram; na segunda,
+  as duas apareceram. Não determinado por quê.
+- Depois da abertura em que o item apareceu, a quantidade e as flags do slot estavam zeradas (item removido pelo
+  jogo). Na primeira gravação a carga +0x8 valia 0; se a remoção vem daí não foi verificado. O slot foi regravado
+  com carga 1. O disparo do lança-foguetes dado pelo canal não foi testado.
+
+A ferramenta `bancada/inventario.py` (`listar`, `dar <id>`) faz o que o jogo faz ao dar um item (0x00261898): lê o
+vetor, a tabela de peças e a de armas pelo canal, monta a grade de ocupação, encaixa linha por linha e coluna por
+coluna sem girar, grava o slot como `construct` e aponta o gerenciador para ele. Tamanho da maleta é suposição
+declarada (10x6), passável por parâmetro. A regra de encaixe tem teste com a grade vista ao vivo e um teste de
+ponta a ponta contra o simulador.
+
 ## O que ainda não fechou
 
 - **Tabela de tipos de inimigo** (0x3C8F40): nomear os 64 casos.
+- **Item removido após aparecer** e **disparo do lança-foguetes**: ver acima.
+- **Orientação 1 na ferramenta**: o jogo tenta girar a peça quando não cabe; a ferramenta não, porque o centro da
+  peça girada é recalculado por uma função ainda não lida.
 - **Mapa de funções**: a tabela de símbolos, o extrator e o roteiro do Ghidra estão no repositório
   (`perfis/memoria/SLUS-21134.simbolos.csv`, `bancada/reversa.py`, `reversa/`); ficam fora o projeto do Ghidra e o
   C decompilado, regeneráveis da foto pela receita do `reversa/README.md`.
