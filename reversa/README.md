@@ -26,7 +26,8 @@ emulador. O produto não depende delas: o que elas descobrem entra no perfil de 
 1. Foto da memória com o jogo na cena de interesse: `python -m iaemps2.bancada.prova_memoria foto <rotulo>`.
 2. Executável: `python -m iaemps2.bancada.reversa elf "<jogo>.iso" <pasta>`.
 3. Símbolos: `python -m iaemps2.bancada.reversa simbolos <foto.bin> --saida perfis/memoria/<serial>.simbolos.csv`.
-4. Faixas de código fora do executável: `python -m iaemps2.bancada.reversa codigo <foto.bin>`.
+4. Faixas que parecem código, inclusive as do executável (as de fora dele são as que vão para o Ghidra como
+   `codigo:`): `python -m iaemps2.bancada.reversa codigo <foto.bin>`.
 5. Projeto do Ghidra (primeira vez importa e analisa; depois `-process <exe> -noanalysis`):
 
 ```

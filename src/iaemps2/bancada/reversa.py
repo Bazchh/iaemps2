@@ -11,8 +11,8 @@ Comandos:
   desmontar <foto> <inicio> <fim> desmonta a faixa (precisa do capstone).
   elf <iso> <pasta>               extrai o executável e o SYSTEM.CNF da ISO (precisa do pycdlib).
 
-Os endereços são os do jogo (a foto começa em 0). Formato da tabela de símbolos (vale para o SLUS-21134 e, pelo
-que se sabe, para outros jogos da mesma geração de ferramentas): entradas de 12 bytes (info, ponteiro para o nome,
+Os endereços são os do jogo (a foto começa em 0). Formato da tabela de símbolos (visto no SLUS-21134; outros jogos
+ainda não conferidos): entradas de 12 bytes (info, ponteiro para o nome,
 endereço), com os nomes numa seção de texto do executável; a tabela é achada procurando entradas válidas em volta
 de um ponteiro para um nome decorado.
 """

@@ -84,5 +84,9 @@ por valor de S8-00 não achou: o número está multiplicado por 8.
 ## O que ainda não fechou
 
 - **Tabela de tipos de inimigo** (0x3C8F40): nomear os 64 casos.
-- **Mapa de funções versionado**: hoje os símbolos e o decompilado ficam fora do repositório; decidir o formato.
+- **Mapa de funções**: a tabela de símbolos, o extrator e o roteiro do Ghidra estão no repositório
+  (`perfis/memoria/SLUS-21134.simbolos.csv`, `bancada/reversa.py`, `reversa/`); ficam fora o projeto do Ghidra e o
+  C decompilado, regeneráveis da foto pela receita do `reversa/README.md`.
+- **Munição na rodada A**: as fotos sem número do HUD caem de dois em dois por passo; conferir se foram dois tiros
+  por passo ou rótulos trocados.
 - **Modo "pausar no acerto"** do vigia: adiado; não foi necessário.
