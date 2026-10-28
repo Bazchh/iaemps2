@@ -25,6 +25,10 @@ dev = [
   "ruff>=0.6",
   "mypy>=1.11",
 ]
+reversa = [
+  "capstone>=5.0,<6",
+  "pycdlib>=1.14,<2",
+]
 
 [project.scripts]
 mestre = "iaemps2.cli:principal"
@@ -56,7 +60,7 @@ packages = ["iaemps2"]
 mypy_path = "src"
 
 [[tool.mypy.overrides]]
-module = ["mss", "mss.*", "win32gui", "win32ui", "win32con", "win32process", "psutil", "google.*"]
+module = ["mss", "mss.*", "win32gui", "win32ui", "win32con", "win32process", "psutil", "google.*", "capstone", "pycdlib"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

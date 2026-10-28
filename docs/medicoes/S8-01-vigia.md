@@ -10,9 +10,12 @@ ambas), o emulador registra, **por instrução do jogo**, cada acesso à faixa, 
 último acesso, contagem, largura, último valor escrito e os 32 registradores no primeiro acesso. A tabela tem 4096
 entradas por instrução; o que não cabe vira "descartado" e aparece no resumo. O vigia se desarma sozinho no prazo.
 
-Custo: enquanto há um vigia armado, todo acesso à memória do jogo passa pela verificação do depurador. Medido: o
-jogo cai de 60 para cerca de 29 quadros por segundo (86 acessos por instrução em 3 s numa escrita por quadro). É o
-preço esperado e aceitável para uma medição; o vigia não fica armado durante uma sessão normal.
+Custo: enquanto há um vigia armado, todo acesso à memória do jogo passa pela verificação do depurador, então o
+jogo tende a ficar mais lento. **Não medido.** As contagens vistas (86 acessos por instrução em 3 s no slot do
+inimigo, 168 em 2 s na matriz da câmera) não servem de medida porque não se sabe quantas vezes por quadro cada
+escrita acontece, e o jogo roda nativamente a 30 quadros por segundo. Receita para medir: achar um contador de
+quadros do jogo, ler pelo canal o avanço dele em 10 s sem vigia e com o vigia armado, e comparar. O vigia não fica
+armado durante uma sessão normal.
 
 ## Provas
 
@@ -70,10 +73,13 @@ roteiro e as funções saem com nome no C decompilado.
 `cItemMgr::bulletNumCurrent` (0x120450) lê o item equipado do gerenciador global em 0x3CE148 e devolve, para armas
 comuns, o campo +0x8 do item deslocado 3 bits à direita. O gerenciador guarda em +0x0C o ponteiro para o item
 equipado, em +0x14 o vetor de 384 itens de 14 bytes (id em +0x0, quantidade em +0x2, flags em +0x4, balas no pente
-vezes 8 em +0x8) e em +0x1C a quantidade de slots. Conferido nas sete fotos de 27/10 com o número do HUD informado
-pelo cliente (7, 10, 8, 6, 4 e 9 balas: 56, 80, 64, 48, 32 e 72 no campo) e ao vivo em 28/10 (72 = 9). A reserva é
-a quantidade do item de balas (id 4): 20 antes da recarga, 17 depois de recarregar três. Por isso a caça por valor
-de S8-00 não achou: o número está multiplicado por 8.
+vezes 8 em +0x8) e em +0x1C a quantidade de slots. Validação: o campo deslocado bate com o número do HUD informado
+pelo cliente em duas fotos de 27/10 (7 e 9 balas: 56 e 72) e na leitura ao vivo de 28/10 (72 = 9); na foto rotulada
+"10 após recarregar" o campo vale 72 (9), provavelmente tirada depois do tiro seguinte, e a reserva do item de balas
+(id 4) caiu de 20 para 17, o que confirma a recarga de três. As demais fotos (sem número do HUD informado) dão 10
+no estado inicial e 8, 6 e 4 na rodada A, dois a menos por passo, o que pede conferência (dois tiros por passo ou
+rótulos trocados). O que sustenta a leitura é o decompilado (`>> 3`) mais os três acertos exatos. Por isso a caça
+por valor de S8-00 não achou: o número está multiplicado por 8.
 
 ## O que ainda não fechou
 
