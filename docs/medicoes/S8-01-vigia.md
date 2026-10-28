@@ -50,17 +50,33 @@ acerto); no módulo de inimigos, 0x1BADAF0 é o tratador do acerto de um tiro: p
 tiro em +0x2E do registro e zona atingida), chama `dano` e abate do dano restante do registro (+0x89A do slot).
 O registro de acerto é preenchido por 0x1BB580, chamado de onze lugares (balas, explosões, agarrões).
 
-## Munição: ainda não
+## Virada: destrinchar o código do jogo
 
-O tiro não escreve no bloco do jogador (0x425BA0, 32 KB) nem no vetor de entidades; a munição mora em outro lugar
-(inventário ou arma equipada). O cliente decidiu em 28/10 mudar de estratégia: em vez de uma janela do vigia por
-pergunta, destrinchar o código do jogo de forma sistemática, com desmontador e decompilador (Ghidra com a extensão
-do Emotion Engine), partindo das âncoras acima e subindo a cadeia do tiro até o disparo da arma. O executável
-(SLUS_211.34, 3 MB, código de 0x100000 a 0x3C9F28) é completado com a foto da memória do estado 91, porque o código
-dos inimigos (0x1B00000 em diante) é módulo carregado por fase.
+O tiro não escreve no bloco do jogador (0x425BA0, 32 KB) nem no vetor de entidades. O cliente decidiu em 28/10
+mudar de estratégia: em vez de uma janela do vigia por pergunta, destrinchar o código do jogo de forma sistemática,
+com desmontador e decompilador (Ghidra 12.1.4 com a extensão do Emotion Engine, sem interface, por roteiro),
+partindo das âncoras acima. O executável (SLUS_211.34, 3 MB, código de 0x100000 a 0x3C9F28) é completado com a
+foto da memória do estado 91, porque boa parte do código é módulo carregado em tempo de execução (0x4A0000,
+0x8A0000, 0x10F0000, 0x1180000, 0x1B00000 em diante, achados pela densidade de prólogos de função na foto).
+
+A decompilação confirmou linha a linha a leitura manual da função de dano, e trouxe o que a desmontagem a mão não
+daria: **o executável carrega os próprios símbolos**. A seção `.sndata` tem 3448 nomes C++ decorados e uma tabela
+de 1275 entradas liga nome a endereço. Com eles o mapa ganhou classes: `cItemMgr` (inventário), `cObjWep` (arma),
+`cObjBull` (bala), `cPlayer`, `cEmHit`, `Merchant`, `CameraControl`. Os nomes entram no projeto do Ghidra por
+roteiro e as funções saem com nome no C decompilado.
+
+## Munição: fechada pelo inventário
+
+`cItemMgr::bulletNumCurrent` (0x120450) lê o item equipado do gerenciador global em 0x3CE148 e devolve, para armas
+comuns, o campo +0x8 do item deslocado 3 bits à direita. O gerenciador guarda em +0x0C o ponteiro para o item
+equipado, em +0x14 o vetor de 384 itens de 14 bytes (id em +0x0, quantidade em +0x2, flags em +0x4, balas no pente
+vezes 8 em +0x8) e em +0x1C a quantidade de slots. Conferido nas sete fotos de 27/10 com o número do HUD informado
+pelo cliente (7, 10, 8, 6, 4 e 9 balas: 56, 80, 64, 48, 32 e 72 no campo) e ao vivo em 28/10 (72 = 9). A reserva é
+a quantidade do item de balas (id 4): 20 antes da recarga, 17 depois de recarregar três. Por isso a caça por valor
+de S8-00 não achou: o número está multiplicado por 8.
 
 ## O que ainda não fechou
 
-- **Munição e inventário**: pela cadeia do tiro no decompilado.
 - **Tabela de tipos de inimigo** (0x3C8F40): nomear os 64 casos.
+- **Mapa de funções versionado**: hoje os símbolos e o decompilado ficam fora do repositório; decidir o formato.
 - **Modo "pausar no acerto"** do vigia: adiado; não foi necessário.

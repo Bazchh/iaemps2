@@ -180,7 +180,7 @@
       "origem": "descoberta em 27/10"
     },
     "validacao": "posição do slot 11 (inimigo do estado 91) projetada com a câmera cai na caixa desenhada do inimigo em 4 de 5 quadros válidos (tronco e cabeça; os pés saem pela borda inferior num deles); no quinto, durante a reação ao tiro, os três pontos ficam 8 px à esquerda da caixa",
-    "pendente": "munição: não é escrita no bloco do jogador nem no vetor de entidades durante o tiro; caminho em andamento é a decompilação sistemática (Ghidra) a partir da cadeia do tiro",
+    "pendente": "tabela de tipos de inimigo (0x3C8F40) sem nomes; vida do inimigo e munição fechadas",
     "funcoes": {
       "dano": {
         "endereco": "0x001C2618",
@@ -212,5 +212,42 @@
     }
   },
   "intocavel": [],
-  "acoes_de_mundo": []
+  "acoes_de_mundo": [],
+  "inventario": {
+    "gerenciador": {
+      "endereco": "0x003CE148",
+      "significado": "objeto global cItemMgr: +0x0C ponteiro para o item equipado, +0x10 id do item equipado (u16), +0x14 ponteiro para o vetor de itens, +0x1C quantidade de slots (384)",
+      "origem": "símbolos do jogo (cItemMgr::bulletNum, bulletNumCurrent, reload, use, trigger) decompilados em 28/10"
+    },
+    "item": {
+      "tamanho": 14,
+      "campos": {
+        "id": "+0x0 u16 (35 = pistola, 4 = balas de pistola, 124 = faca, 172 e 173 = tesouros ou chaves)",
+        "quantidade": "+0x2 u16 (reserva de munição no item de balas)",
+        "flags": "+0x4 u8, bit 0 = slot ocupado",
+        "dono": "+0x5 u8, comparado com +0x13 do gerenciador",
+        "balas_no_pente_x8": "+0x8 u16: balas no pente nos bits 3 em diante (valor >> 3); armas de carga (ids 0x34, 0x37, 0x53) usam +0x6",
+        "melhorias": "+0xA e +0xC u16, provavelmente níveis de melhoria (0x102 e 0x100 na pistola)"
+      }
+    },
+    "municao_no_pente": {
+      "como_ler": "ler o ponteiro em 0x003CE154, somar 8, ler u16 e deslocar 3 bits à direita",
+      "validacao": "sete fotos de 27/10 com o número do HUD (7, 10, 8, 6, 4, 9) e leitura ao vivo em 28/10 (9); recarga de 3 balas tirou 3 da reserva (20 → 17)"
+    },
+    "funcoes": {
+      "cItemMgr::bulletNumCurrent": "0x00120450",
+      "cItemMgr::bulletNum(id)": "0x001204F8",
+      "balas_do_item": "0x001205D8 (sem nome na tabela; devolve +0x8 >> 3)",
+      "cItemMgr::reload": "0x0011FC60 e 0x0011FC88",
+      "cItemMgr::use": "0x0011E960",
+      "cItemMgr::trigger": "0x0011FEC8",
+      "cObjWep::trigger": "0x00150690",
+      "cPlayer::keyReload": "0x00248A08",
+      "itemInfo(id, saida)": "0x0011DB40 (tipo do item no byte +2 da saída: 1 arma, 3 munição, 6 especial)"
+    }
+  },
+  "simbolos": {
+    "fonte": "seção .sndata do executável (0x0035E900, 0x493E0 bytes) com 3448 nomes C++ decorados e tabela em 0x00382EE4..0x00386AA8 de 1275 entradas (info, ponteiro para o nome, endereço)",
+    "arquivo": "~/IAEmPS2/reversa/simbolos.csv (fora do repositório; regenerável da foto da memória)"
+  }
 }
