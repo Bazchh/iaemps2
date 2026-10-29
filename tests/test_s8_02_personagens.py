@@ -54,7 +54,7 @@ def test_criar_contra_o_simulador(tmp_path: Path) -> None:
         c.conectar()
         r, q = pz.criar_personagem(c, 0x12, vida=1000, distancia_mm=2000.0)
         assert r.ok and q is not None and (q.slot, q.tipo, q.origem, q.vida) == (slot, 0x12, 0xFF, 1000)
-        assert sim.chamadas == [(pz.EM_SET_EVENT, (AREA_DO_MESTRE,), 20000, pz.ANCORA_CAMERA)]
+        assert sim.chamadas == [(pz.EM_SET_EVENT, (AREA_DO_MESTRE,), 5000, 0)]
         gravada = bytes(mem[AREA_DO_MESTRE : AREA_DO_MESTRE + 32])
         assert gravada == pz.montar_struct(0x12, 0, 1000, (100.0, 0.0, 2200.0), 0x0100)
 

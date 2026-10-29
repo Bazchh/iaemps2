@@ -122,7 +122,8 @@ def criar_personagem(
     c.pedir(
         *(p.comando(p.Codigo.WRITE8, struct.pack("<IB", AREA_DO_MESTRE + i, b)) for i, b in enumerate(dados))
     )
-    r = c.chamar(EM_SET_EVENT, (AREA_DO_MESTRE,), tempo_limite_ms=20000, ancora_endereco=ANCORA_CAMERA)
+    # com o módulo do tipo residente (ver bancada/modulos.py) a criação não dorme: chamada imediata
+    r = c.chamar(EM_SET_EVENT, (AREA_DO_MESTRE,), tempo_limite_ms=5000)
     if not r.ok or r.v0 == 0 or not (VETOR <= r.v0 < VETOR + SLOTS * PASSO):  # errEm vale 0
         return r, None
     return r, ler_personagem(c, (r.v0 - VETOR) // PASSO)
