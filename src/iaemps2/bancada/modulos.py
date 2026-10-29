@@ -9,7 +9,12 @@ arredondados a 0x800, +0x94 função de inicialização) e carrega do disco só 
 escalonador, o que não dá para forçar no meio do jogo. Aqui o mestre faz o trabalho do carregador: lê os dois
 arquivos da ISO, escreve-os numa área livre da memória (0x01E00000 em diante, sempre vazia nas fotos), preenche a
 entrada da tabela e pede ao jogo, pela chamada remota, que realoque e inicialize o módulo (``FUN_00262bb0``, que
-não dorme). A partir daí ``EmSetEvent`` cria o personagem na hora.
+não dorme). A partir daí ``EmSetEvent`` cria o personagem na hora. A memória dos dois arquivos vem do alocador do
+próprio jogo (``mem_alloc``), e a entrada fica marcada como o carregador marca as dele, para ``InitModule``
+liberar; escrever num endereço fixo sobrescreveria um módulo vivo (aconteceu em 29/10 e travou o jogo).
+
+Cuidados: nunca ``liberar`` um tipo com que o jogador está interagindo (destruir a lancha com o jogador em cima
+travou o jogo); salvar o estado antes.
 
 Comandos:
   listar [--iso ISO]          as quatro entradas da tabela de módulos e os arquivos de cada tipo pedido.
@@ -26,7 +31,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from iaemps2.ponte import protocolo as p
-from iaemps2.ponte.cliente import Cliente
+from iaemps2.ponte.cliente import AREA_DO_MESTRE, Cliente
 
 ISO_PADRAO = Path(r"C:\Users\mikael\Jogos\PS2\Resident Evil 4 (USA).iso")
 AFS_SETOR = 446273  # BIO4DAT.AFS na ISO (setor de 2048 bytes)
@@ -34,8 +39,18 @@ TABELA_ARQUIVOS = {0: 0x00328458, 1: 0x00328458, 2: 0x003286D8, 3: 0x00328958, 4
 TABELA_MODULOS = 0x00455E50
 ENTRADAS = 4
 TAMANHO_ENTRADA = 0x98
-AREA_MODULOS = 0x01E00000  # até 0x01FF0000 (o trampolim da chamada remota fica em 0x01FF0000)
-AREA_MODULOS_FIM = 0x01FF0000
+MEM_ALLOC = 0x00229338  # mem_alloc(tamanho, nome, 0, 1, 0xd, alinhamento): 6 argumentos, por isso o trampolim
+TRAMPOLIM_ALOCAR = AREA_DO_MESTRE + 0x1000  # página do mestre: a0 = tamanho; os outros 5 argumentos fixos
+CODIGO_ALOCAR = [
+    0x2408000D,  # addiu t0, zero, 0xd      (5º argumento)
+    0x24090080,  # addiu t1, zero, 0x80     (6º: alinhamento)
+    0x00002821,  # addu a1, zero, zero      (nome)
+    0x00003021,  # addu a2, zero, zero
+    0x24070001,  # addiu a3, zero, 1
+    0x0808A4CE,  # j mem_alloc              (volta direto ao trampolim da chamada, ra intacto)
+    0x00000000,  # nop
+]
+FLAGS_ALOCADO = 0x4 | 0x1  # como o carregador do jogo marca .dat e .rel alocados: InitModule libera os dois
 REGISTRAR_MODULO = 0x00262BB0  # realoca o .rel, chama a inicialização do módulo e grava +0x94
 SEARCH_EM_MODULE = 0x00262D68
 INIT_MODULE = 0x00262570
@@ -159,6 +174,20 @@ def liberar(c: Cliente, tipo: int) -> EntradaModulo | None:
     return entrada
 
 
+def alocar(c: Cliente, tamanho: int) -> int:
+    """Pede memória ao alocador do jogo pela chamada remota (trampolim com os argumentos fixos)."""
+    c.pedir(
+        *(
+            p.comando(p.Codigo.WRITE32, struct.pack("<II", TRAMPOLIM_ALOCAR + 4 * i, w))
+            for i, w in enumerate(CODIGO_ALOCAR)
+        )
+    )
+    r = c.chamar(TRAMPOLIM_ALOCAR, (tamanho,), tempo_limite_ms=3000)
+    if not r.ok or r.v0 == 0:
+        raise RuntimeError(f"mem_alloc({tamanho:#x}) falhou: {r.estado}, v0 {r.v0:#x}")
+    return r.v0
+
+
 def carregar(c: Cliente, tipo: int, afs: Afs) -> EntradaModulo:
     livre = next((e for e in entradas(c) if e.livre), None)
     if livre is None:
@@ -169,18 +198,15 @@ def carregar(c: Cliente, tipo: int, afs: Afs) -> EntradaModulo:
     dat, rel = afs.ler(dat_i), afs.ler(rel_i)
     if rel[:4] != b"SNR2":
         raise ValueError(f"{afs.nomes[rel_i]} não tem cabeçalho SNR2")
-    base_dat = AREA_MODULOS
-    base_rel = arredondar(base_dat + len(dat), 0x800)
-    if base_rel + arredondar(len(rel)) > AREA_MODULOS_FIM:
-        raise ValueError("módulo maior que a área livre")
+    tam_dat, tam_rel = arredondar(len(dat)), arredondar(len(rel))
+    base_dat = alocar(c, tam_dat)
+    base_rel = alocar(c, tam_rel)
     escrever_bloco(c, base_dat, dat)
     escrever_bloco(c, base_rel, rel)
     e = TABELA_MODULOS + livre.indice * TAMANHO_ENTRADA
     escrever_bloco(c, e, bytes(0x80))
     escrever_bloco(
-        c,
-        e + 0x80,
-        struct.pack("<HHIIIII", tipo, 0, base_dat, base_rel, arredondar(len(dat)), arredondar(len(rel)), 0),
+        c, e + 0x80, struct.pack("<HHIIIII", tipo, FLAGS_ALOCADO, base_dat, base_rel, tam_dat, tam_rel, 0)
     )
     r = c.chamar(REGISTRAR_MODULO, (e,), tempo_limite_ms=5000)
     if not r.ok:

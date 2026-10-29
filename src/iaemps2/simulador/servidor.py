@@ -99,6 +99,7 @@ class Simulador:
         self.vigia_memoria: dict[str, Any] | None = None  # faixa vigiada e tabela de acessos por pc
         # chamadas remotas recebidas: (função, args, prazo ms, âncora)
         self.chamadas: list[tuple[int, tuple[int, ...], int, int]] = []
+        self.respostas_chamada: list[tuple[int, int, int]] = []  # consumidas em ordem antes da resposta fixa
         self.resposta_chamada: tuple[int, int, int] = (
             0,
             0,
@@ -322,7 +323,9 @@ class Simulador:
             funcao, n, a0, a1, a2, a3, prazo_ms, ancora, ancora_end = struct.unpack_from("<IB4IIII", buf, i)
             if n > 4:
                 raise _FalhaError
-            estado, v0, v1 = self.resposta_chamada
+            estado, v0, v1 = (
+                self.respostas_chamada.pop(0) if self.respostas_chamada else self.resposta_chamada
+            )
             if not self._vm_valida() or self._status_atual() != p.Status.RODANDO:
                 estado, v0, v1 = 2, 0, 0
             else:

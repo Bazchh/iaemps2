@@ -65,22 +65,26 @@ def test_carregar_contra_o_simulador(tmp_path: Path) -> None:
             "<HHIIIII", mem, e0 + 0x80, 0x12, 7, 0x1882280, 0x1BAD300, 0x32B000, 0x6D000, 0x1BF8528
         )
         e1 = md.TABELA_MODULOS + md.TAMANHO_ENTRADA
-        sim.resposta_chamada = (
-            0,
-            e1,
-            0,
-        )  # SearchEmModule devolve a entrada que vai ser usada (a primeira livre)
+        # duas alocações pelo jogo, a inicialização e a busca do módulo (que devolve a entrada usada)
+        sim.respostas_chamada = [(0, 0x1500000, 0), (0, 0x1600000, 0), (0, 0, 0), (0, e1, 0)]
 
         c = Cliente(porta=sim.porta or 0)
         c.conectar()
         entrada = md.carregar(c, 3, md.Afs(iso))
         assert entrada.indice == 1  # a primeira livre
-        tipo, flags, b_dat, b_rel, t_dat, t_rel, init = struct.unpack_from("<HHIIIII", mem, e1 + 0x80)
-        assert (tipo, flags, b_dat, t_dat, t_rel, init) == (3, 0, md.AREA_MODULOS, 0x1000, 0x800, 0)
-        assert b_rel == md.AREA_MODULOS + 0x1000
-        assert bytes(mem[b_dat : b_dat + 3000]) == dat and bytes(mem[b_rel : b_rel + 504]) == rel
-        assert [ch[0] for ch in sim.chamadas] == [md.REGISTRAR_MODULO, md.SEARCH_EM_MODULE]
-        assert sim.chamadas[0][1] == (e1,) and sim.chamadas[1][1] == (3,)
+        campos = struct.unpack_from("<HHIIIII", mem, e1 + 0x80)
+        assert campos == (3, md.FLAGS_ALOCADO, 0x1500000, 0x1600000, 0x1000, 0x800, 0)
+        assert (
+            bytes(mem[0x1500000 : 0x1500000 + 3000]) == dat and bytes(mem[0x1600000 : 0x1600000 + 504]) == rel
+        )
+        assert [ch[0] for ch in sim.chamadas] == [
+            md.TRAMPOLIM_ALOCAR,
+            md.TRAMPOLIM_ALOCAR,
+            md.REGISTRAR_MODULO,
+            md.SEARCH_EM_MODULE,
+        ]
+        assert [ch[1] for ch in sim.chamadas] == [(0x1000,), (0x800,), (e1,), (3,)]
+        assert struct.unpack_from("<7I", mem, md.TRAMPOLIM_ALOCAR) == tuple(md.CODIGO_ALOCAR)
         c.fechar()
 
 
