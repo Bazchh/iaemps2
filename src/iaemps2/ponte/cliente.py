@@ -115,7 +115,9 @@ AREA_DO_MESTRE_FIM = 0x01FFC000
 
 @dataclass(frozen=True)
 class ResultadoChamada:
-    estado: str  # "ok", "prazo" (abortada no prazo, registradores restaurados) ou "recusada" (ocupado ou jogo parado)
+    # "ok"; "prazo" (abortada no prazo com os registradores restaurados); "recusada" (ocupado ou jogo parado);
+    # "perdida" (prazo com a thread sequestrada ainda dentro da função: recarregar um estado salvo)
+    estado: str
     v0: int
     v1: int
     duracao_ms: int
@@ -125,7 +127,7 @@ class ResultadoChamada:
         return self.estado == "ok"
 
 
-ESTADOS_CHAMADA = {0: "ok", 1: "prazo", 2: "recusada"}
+ESTADOS_CHAMADA = {0: "ok", 1: "prazo", 2: "recusada", 3: "perdida"}
 
 REGRA_ESCONDER = 1
 REGRA_QUADRADO = 2
@@ -373,16 +375,27 @@ class Cliente:
 
     # ---------- chamada remota (card S8-02; código 0x8C) ----------
     def chamar(
-        self, funcao: int, argumentos: tuple[int, ...] = (), tempo_limite_ms: int = 2000
+        self,
+        funcao: int,
+        argumentos: tuple[int, ...] = (),
+        tempo_limite_ms: int = 2000,
+        ancora: int = 0,
+        ancora_endereco: int = 0,
     ) -> ResultadoChamada:
         """Executa uma função do jogo no processador emulado, com até 4 argumentos inteiros, e devolve v0 e v1.
-        O jogo fica parado só durante a chamada; o emulador restaura os registradores ao fim ou no prazo."""
+        Sem âncora, desvia no próximo vsync, na thread que estiver rodando (no jogo de abertura, o kernel): só
+        para funções que não dormem. Com ``ancora_endereco`` (um endereço que a thread de jogo lê ou escreve a cada
+        quadro, como a matriz da câmera), desvia nessa thread no primeiro acesso, e a função pode dormir pelo
+        escalonador do jogo (carregar do disco). ``ancora`` (um pc) usa o breakpoint do depurador."""
         if len(argumentos) > 4:
             raise ValueError("a chamada remota aceita até 4 argumentos")
         args = tuple(a & 0xFFFFFFFF for a in argumentos) + (0,) * (4 - len(argumentos))
         corpo = self.pedir(
             p.comando(
-                p.Codigo.EXT_CALL, struct.pack("<IB4II", funcao, len(argumentos), *args, tempo_limite_ms)
+                p.Codigo.EXT_CALL,
+                struct.pack(
+                    "<IB4IIII", funcao, len(argumentos), *args, tempo_limite_ms, ancora, ancora_endereco
+                ),
             )
         )
         estado, v0, v1, duracao = struct.unpack_from("<BIII", corpo, 0)

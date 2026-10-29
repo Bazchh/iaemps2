@@ -34,6 +34,10 @@ VETOR = 0x01789F40
 PASSO = 0xED0
 SLOTS = 60
 EM_SET_EVENT = 0x001BD800
+# a matriz da câmera é escrita a cada quadro pela thread de jogo (4 `sq` em 0x252830): ancorar a chamada nesse
+# acesso faz a função rodar nessa thread, onde ela pode dormir pelo escalonador (carregar do disco o módulo de um
+# tipo ainda não residente)
+ANCORA_CAMERA = 0x004327C0
 BLOCO_G = 0x00425BA0  # pG
 CAMERA_OLHO = 0x003CA220
 CAMERA_ALVO = 0x003CA230
@@ -118,7 +122,7 @@ def criar_personagem(
     c.pedir(
         *(p.comando(p.Codigo.WRITE8, struct.pack("<IB", AREA_DO_MESTRE + i, b)) for i, b in enumerate(dados))
     )
-    r = c.chamar(EM_SET_EVENT, (AREA_DO_MESTRE,), tempo_limite_ms=3000)
+    r = c.chamar(EM_SET_EVENT, (AREA_DO_MESTRE,), tempo_limite_ms=20000, ancora_endereco=ANCORA_CAMERA)
     if not r.ok or r.v0 == 0 or not (VETOR <= r.v0 < VETOR + SLOTS * PASSO):  # errEm vale 0
         return r, None
     return r, ler_personagem(c, (r.v0 - VETOR) // PASSO)

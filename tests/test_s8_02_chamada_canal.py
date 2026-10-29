@@ -25,11 +25,15 @@ def test_chamada_chega_inteira_e_volta_v0_v1(tmp_path: Path) -> None:
         sim.resposta_chamada = (0, 0x01794230, 7)
         r = c.chamar(0x001BD800, (AREA_DO_MESTRE, 2), tempo_limite_ms=500)
         assert r.ok and (r.v0, r.v1) == (0x01794230, 7)
-        assert sim.chamadas == [(0x001BD800, (AREA_DO_MESTRE, 2), 500)]
+        assert sim.chamadas == [(0x001BD800, (AREA_DO_MESTRE, 2), 500, 0)]
 
         sim.resposta_chamada = (1, 0, 0)
         r = c.chamar(0x00100000)
         assert r.estado == "prazo" and not r.ok
+
+        sim.resposta_chamada = (3, 0, 0)
+        r = c.chamar(0x00100000, (), 500, ancora_endereco=0x004327C0)
+        assert r.estado == "perdida" and sim.chamadas[-1] == (0x00100000, (), 500, 0x004327C0)
 
         with pytest.raises(ValueError):
             c.chamar(0x00100000, (1, 2, 3, 4, 5))

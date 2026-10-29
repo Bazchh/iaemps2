@@ -97,9 +97,8 @@ class Simulador:
         self.cena_proximo_id = 0
         self.cena_regras: dict[int, dict[str, Any]] = {}
         self.vigia_memoria: dict[str, Any] | None = None  # faixa vigiada e tabela de acessos por pc
-        self.chamadas: list[
-            tuple[int, tuple[int, ...], int]
-        ] = []  # chamadas remotas recebidas (função, args, prazo)
+        # chamadas remotas recebidas: (função, args, prazo ms, âncora)
+        self.chamadas: list[tuple[int, tuple[int, ...], int, int]] = []
         self.resposta_chamada: tuple[int, int, int] = (
             0,
             0,
@@ -320,16 +319,16 @@ class Simulador:
         if c == p.Codigo.EXT_CALL:
             # o simulador não executa código do jogo: registra a chamada e devolve a resposta configurada;
             # com o jogo parado recusa (estado 2), como o emulador
-            funcao, n, a0, a1, a2, a3, prazo_ms = struct.unpack_from("<IB4II", buf, i)
+            funcao, n, a0, a1, a2, a3, prazo_ms, ancora, ancora_end = struct.unpack_from("<IB4IIII", buf, i)
             if n > 4:
                 raise _FalhaError
             estado, v0, v1 = self.resposta_chamada
             if not self._vm_valida() or self._status_atual() != p.Status.RODANDO:
                 estado, v0, v1 = 2, 0, 0
             else:
-                self.chamadas.append((funcao, (a0, a1, a2, a3)[:n], prazo_ms))
+                self.chamadas.append((funcao, (a0, a1, a2, a3)[:n], prazo_ms, ancora or ancora_end))
             ret += struct.pack("<BIII", estado, v0, v1, 1 if estado == 0 else 0)
-            return i + 25
+            return i + 33
         if c == p.Codigo.EXT_SET_PAUSED:
             self._exige_vm()
             novo = p.Status.PAUSADO if buf[i] else p.Status.RODANDO
