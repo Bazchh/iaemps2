@@ -77,6 +77,11 @@ public class MontarMemoriaEDecompilar extends GhidraScript {
         try {
             List<Function> fila = new ArrayList<>();
             for (String e : decompilar) {
+                if (e.equals("todas")) {  // todas as funções do programa (mapa completo)
+                    FunctionIterator todas = currentProgram.getFunctionManager().getFunctions(true);
+                    while (todas.hasNext()) fila.add(todas.next());
+                    continue;
+                }
                 boolean comChamadores = e.startsWith("+");  // +endereco: a função e quem a chama ('^' é escape do cmd)
                 Address addr = endereco(comChamadores ? e.substring(1) : e);
                 Function f = getFunctionContaining(addr);
@@ -85,10 +90,13 @@ public class MontarMemoriaEDecompilar extends GhidraScript {
                 fila.add(f);
                 if (comChamadores) fila.addAll(f.getCallingFunctions(monitor));
             }
+            int feitas = 0;
             for (Function f : fila) {
-                DecompileResults r = dec.decompileFunction(f, 120, monitor);
                 String nomeSeguro = f.getName().replaceAll("[^A-Za-z0-9_]+", "_");  // "::" não vale em nome de arquivo
                 File arq = new File(saida, String.format("%08x_%s.c", f.getEntryPoint().getOffset(), nomeSeguro));
+                if (fila.size() > 100 && arq.exists() && arq.length() > 0) continue;  // mapa completo: não refaz o que já existe
+                DecompileResults r = dec.decompileFunction(f, 120, monitor);
+                if (++feitas % 500 == 0) println("decompiladas " + feitas + " de " + fila.size());
                 try (PrintWriter w = new PrintWriter(new FileWriter(arq))) {
                     if (r.decompileCompleted()) {
                         w.print(r.getDecompiledFunction().getC());
