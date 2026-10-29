@@ -188,11 +188,13 @@ def alocar(c: Cliente, tamanho: int) -> int:
     return r.v0
 
 
-def carregar(c: Cliente, tipo: int, afs: Afs) -> EntradaModulo:
+def carregar(c: Cliente, tipo: int, afs: Afs, arquivos: tuple[int, int] | None = None) -> EntradaModulo:
+    """Carrega o módulo do tipo; ``arquivos`` (índices do .dat e do .rel no AFS) sobrepõe a tabela do jogo, o que
+    permite registrar sob um número de tipo um módulo que a tabela deste modo não lista (ex.: pl12, a Ada de cena)."""
     livre = next((e for e in entradas(c) if e.livre), None)
     if livre is None:
         raise ValueError("as quatro entradas de módulo estão em uso; libere uma com `liberar <tipo>`")
-    dat_i, rel_i = arquivos_do_tipo(c, tipo)
+    dat_i, rel_i = arquivos if arquivos else arquivos_do_tipo(c, tipo)
     if dat_i == 0 or rel_i == 0:
         raise ValueError(f"o tipo {tipo:#x} não tem arquivos de módulo neste modo de personagem")
     dat, rel = afs.ler(dat_i), afs.ler(rel_i)
@@ -260,7 +262,8 @@ def cmd_carregar(args: argparse.Namespace) -> int:
     c = _cliente()
     try:
         c.pedir(p.comando(p.Codigo.SAVE_STATE, bytes([95])))
-        e = carregar(c, args.tipo, Afs(args.iso))
+        arquivos = (args.dat, args.rel) if args.dat and args.rel else None
+        e = carregar(c, args.tipo, Afs(args.iso), arquivos)
         print("carregado:", _linha(e))
     finally:
         c.fechar()
@@ -282,6 +285,8 @@ def main(argv: list[str] | None = None) -> int:
     s = sub.add_parser("carregar")
     s.add_argument("tipo", type=lambda x: int(x, 0))
     s.add_argument("--iso", type=Path, default=ISO_PADRAO)
+    s.add_argument("--dat", type=int, default=0, help="índice do .dat no AFS (sobrepõe a tabela do jogo)")
+    s.add_argument("--rel", type=int, default=0, help="índice do .rel no AFS (sobrepõe a tabela do jogo)")
     s.set_defaults(func=cmd_carregar)
     args = parser.parse_args(argv)
     return int(args.func(args))
