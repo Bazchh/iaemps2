@@ -52,6 +52,8 @@ public class MontarMemoriaEDecompilar extends GhidraScript {
             if (a.equals("--")) { depoisDoSeparador = true; continue; }
             if (!depoisDoSeparador && a.startsWith("simbolos:")) {  // simbolos:<csv> endereco,nome,... aplica nomes
                 aplicarSimbolos(new File(a.substring(9)));
+            } else if (!depoisDoSeparador && a.startsWith("lote:")) {  // lote:<arquivo> com linhas "bloco nome bin endereco", "simbolos csv", "codigo ini fim"
+                lote(new File(a.substring(5)));
             } else if (!depoisDoSeparador && a.startsWith("refrescar:")) {  // refrescar:inicio-fim recarrega os bytes da faixa a partir da foto
                 String[] par = a.substring(10).split("-", 2);
                 refrescar(foto, endereco(par[0]), endereco(par[1]));
@@ -149,6 +151,33 @@ public class MontarMemoriaEDecompilar extends GhidraScript {
     }
 
     private boolean houveCodigoNovo = false;
+
+    // Lote do mapa completo: cada módulo realocado pelo realocador próprio vira um bloco executável com os seus
+    // símbolos. Linhas: "bloco <nome> <arquivo.bin> <endereco>", "simbolos <csv>", "codigo <ini> <fim>", "# comentário".
+    private void lote(File arquivo) throws Exception {
+        java.util.List<String> linhas = java.nio.file.Files.readAllLines(arquivo.toPath(), java.nio.charset.StandardCharsets.UTF_8);
+        Memory mem = currentProgram.getMemory();
+        for (String linha : linhas) {
+            String l = linha.trim();
+            if (l.isEmpty() || l.startsWith("#")) continue;
+            String[] p = l.split("\\s+");
+            if (p[0].equals("bloco")) {
+                Address inicio = endereco(p[3]);
+                if (mem.getBlock(p[1]) != null) { println("bloco " + p[1] + " já existe"); continue; }
+                File bin = new File(p[2]);
+                try (InputStream in = new FileInputStream(bin)) {
+                    MemoryBlock b = mem.createInitializedBlock(p[1], inicio, in, bin.length(), monitor, false);
+                    b.setRead(true); b.setWrite(true); b.setExecute(true);
+                }
+                houveCodigoNovo = true;
+                println(String.format("bloco %s em %s (%d bytes)", p[1], inicio, bin.length()));
+            } else if (p[0].equals("simbolos")) {
+                aplicarSimbolos(new File(p[1]));
+            } else if (p[0].equals("codigo")) {
+                marcarCodigo(endereco(p[1]), endereco(p[2]));
+            }
+        }
+    }
 
     // Sobrescreve os bytes de [inicio, fim) com os da foto: serve para módulos carregados depois da foto que criou
     // os blocos (o projeto guarda a foto antiga). Apaga as instruções da faixa para a análise refazê-las.
