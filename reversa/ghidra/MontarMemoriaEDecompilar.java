@@ -168,9 +168,11 @@ public class MontarMemoriaEDecompilar extends GhidraScript {
                 try (InputStream in = new FileInputStream(bin)) {
                     MemoryBlock b = mem.createInitializedBlock(p[1], inicio, in, bin.length(), monitor, false);
                     b.setRead(true); b.setWrite(true); b.setExecute(true);
+                    houveCodigoNovo = true;
+                    println(String.format("bloco %s em %s (%d bytes)", p[1], inicio, bin.length()));
+                } catch (ghidra.program.model.mem.MemoryConflictException ex) {
+                    printerr("bloco " + p[1] + " em " + inicio + " conflita com a memória existente: " + ex.getMessage());
                 }
-                houveCodigoNovo = true;
-                println(String.format("bloco %s em %s (%d bytes)", p[1], inicio, bin.length()));
             } else if (p[0].equals("simbolos")) {
                 aplicarSimbolos(new File(p[1]));
             } else if (p[0].equals("codigo")) {

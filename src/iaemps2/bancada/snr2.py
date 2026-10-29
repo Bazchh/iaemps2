@@ -222,6 +222,14 @@ def realocar(
 
 BASE_VIRTUAL = 0x08000000  # fora da RAM do PlayStation 2; cada módulo ganha uma fatia de 8 MB
 PASSO_VIRTUAL = 0x00800000
+# 0x10000000..0x20000000 são registradores do console e o Ghidra já os mapeia: os módulos saltam essa faixa
+FAIXA_RESERVADA = (0x10000000, 0x20000000)
+SALTO_RESERVADO = 0x40000000 - FAIXA_RESERVADA[0]
+
+
+def base_virtual(indice: int) -> int:
+    base = BASE_VIRTUAL + indice * PASSO_VIRTUAL
+    return base + SALTO_RESERVADO if base >= FAIXA_RESERVADA[0] else base
 
 
 def mapear_modulos(
@@ -247,7 +255,7 @@ def mapear_modulos(
         if rel[:4] != MAGIA:
             continue
         vistos.add(nome)
-        base = BASE_VIRTUAL + len(feitos) * PASSO_VIRTUAL
+        base = base_virtual(len(feitos))
         mod = realocar(rel, base, exportados)
         raiz = nome[:-4]
         (saida / f"{raiz}.bin").write_bytes(bytes(mod.dados))
