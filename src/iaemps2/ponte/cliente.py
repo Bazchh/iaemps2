@@ -107,6 +107,26 @@ VIGIA_LEITURA = 1
 VIGIA_ESCRITA = 2
 VIGIA_AMBOS = 3
 
+# memória reservada pela extensão para a chamada remota: 0x01FF0000 trampolim, pilha abaixo de 0x01FF8000,
+# e esta página livre para os dados que o mestre passa por ponteiro (structs, textos)
+AREA_DO_MESTRE = 0x01FF8000
+AREA_DO_MESTRE_FIM = 0x01FFC000
+
+
+@dataclass(frozen=True)
+class ResultadoChamada:
+    estado: str  # "ok", "prazo" (abortada no prazo, registradores restaurados) ou "recusada" (ocupado ou jogo parado)
+    v0: int
+    v1: int
+    duracao_ms: int
+
+    @property
+    def ok(self) -> bool:
+        return self.estado == "ok"
+
+
+ESTADOS_CHAMADA = {0: "ok", 1: "prazo", 2: "recusada"}
+
 REGRA_ESCONDER = 1
 REGRA_QUADRADO = 2
 
@@ -350,6 +370,23 @@ class Cliente:
 
     def vigia_limpar(self) -> None:
         self.pedir(p.comando(p.Codigo.EXT_WATCH_CLEAR))
+
+    # ---------- chamada remota (card S8-02; código 0x8C) ----------
+    def chamar(
+        self, funcao: int, argumentos: tuple[int, ...] = (), tempo_limite_ms: int = 2000
+    ) -> ResultadoChamada:
+        """Executa uma função do jogo no processador emulado, com até 4 argumentos inteiros, e devolve v0 e v1.
+        O jogo fica parado só durante a chamada; o emulador restaura os registradores ao fim ou no prazo."""
+        if len(argumentos) > 4:
+            raise ValueError("a chamada remota aceita até 4 argumentos")
+        args = tuple(a & 0xFFFFFFFF for a in argumentos) + (0,) * (4 - len(argumentos))
+        corpo = self.pedir(
+            p.comando(
+                p.Codigo.EXT_CALL, struct.pack("<IB4II", funcao, len(argumentos), *args, tempo_limite_ms)
+            )
+        )
+        estado, v0, v1, duracao = struct.unpack_from("<BIII", corpo, 0)
+        return ResultadoChamada(ESTADOS_CHAMADA.get(estado, "recusada"), v0, v1, duracao)
 
     def esperar_jogo(self, limite_s: float, intervalo_s: float = 1.0) -> p.Status:
         """Sonda o status até "rodando" ou até o limite. "Desligado" nos primeiros segundos é carregamento normal."""
