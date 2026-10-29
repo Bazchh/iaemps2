@@ -52,6 +52,9 @@ public class MontarMemoriaEDecompilar extends GhidraScript {
             if (a.equals("--")) { depoisDoSeparador = true; continue; }
             if (!depoisDoSeparador && a.startsWith("simbolos:")) {  // simbolos:<csv> endereco,nome,... aplica nomes
                 aplicarSimbolos(new File(a.substring(9)));
+            } else if (!depoisDoSeparador && a.startsWith("refrescar:")) {  // refrescar:inicio-fim recarrega os bytes da faixa a partir da foto
+                String[] par = a.substring(10).split("-", 2);
+                refrescar(foto, endereco(par[0]), endereco(par[1]));
             } else if (!depoisDoSeparador && a.startsWith("codigo:")) {  // codigo:inicio-fim marca a faixa como código
                 String[] par = a.substring(7).split("-", 2);
                 marcarCodigo(endereco(par[0]), endereco(par[1]));
@@ -138,6 +141,21 @@ public class MontarMemoriaEDecompilar extends GhidraScript {
     }
 
     private boolean houveCodigoNovo = false;
+
+    // Sobrescreve os bytes de [inicio, fim) com os da foto: serve para módulos carregados depois da foto que criou
+    // os blocos (o projeto guarda a foto antiga). Apaga as instruções da faixa para a análise refazê-las.
+    private void refrescar(File foto, Address inicio, Address fim) throws Exception {
+        long tamanho = fim.getOffset() - inicio.getOffset();
+        byte[] dados = new byte[(int) tamanho];
+        try (java.io.RandomAccessFile f = new java.io.RandomAccessFile(foto, "r")) {
+            f.seek(inicio.getOffset());
+            f.readFully(dados);
+        }
+        currentProgram.getListing().clearCodeUnits(inicio, fim.subtract(1), false);
+        currentProgram.getMemory().setBytes(inicio, dados);
+        houveCodigoNovo = true;
+        println("bytes refrescados: " + inicio + ".." + fim);
+    }
 
     // Recorta a faixa [inicio, fim) do bloco que a contém e a marca como executável, para a análise achar funções nela.
     private void marcarCodigo(Address inicio, Address fim) throws Exception {
