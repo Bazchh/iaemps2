@@ -125,6 +125,8 @@ ponta a ponta contra o simulador.
 - **Item removido após aparecer** e **disparo do lança-foguetes**: ver acima.
 - **Orientação 1 na ferramenta**: o jogo tenta girar a peça quando não cabe; a ferramenta não, porque o centro da
   peça girada é recalculado por uma função ainda não lida.
+- **Tipos de item na ferramenta**: `dar` monta o slot como `construct` só para armas (tipo 1) e descartáveis
+  (tipo 3); os tipos 9 e 10 recebem outros valores em +0x6/+0x8 e não são tratados.
 - **Mapa de funções**: a tabela de símbolos, o extrator e o roteiro do Ghidra estão no repositório
   (`perfis/memoria/SLUS-21134.simbolos.csv`, `bancada/reversa.py`, `reversa/`); ficam fora o projeto do Ghidra e o
   C decompilado, regeneráveis da foto pela receita do `reversa/README.md`.

@@ -152,7 +152,9 @@ def montar_item(
     arma: tuple[int, int] | None,
     canto: tuple[int, int],
 ) -> Item:
-    """O que cItemMgr::construct grava, mais a posição: armas têm quantidade 1 e carga do nível 1 em +0x8 (<< 3)."""
+    """O que cItemMgr::construct grava para armas (tipo 1) e descartáveis (tipo 3), mais a posição: armas têm
+    quantidade 1 e carga do nível 1 em +0x8 (<< 3). Os tipos 9 e 10 recebem outros valores em +0x6/+0x8 no jogo e
+    não são tratados aqui."""
     carga = arma[1] if arma else 0
     x2 = int((canto[0] + peca.centro_x) * 2)
     y2 = int((canto[1] + peca.centro_y) * 2)
