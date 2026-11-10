@@ -63,3 +63,12 @@ que criou os blocos).
 
 - O produto lê e aciona o jogo por fora, pelo emulador; não altera o disco nem o executável.
 - Sem contribuição ao Ghidra nem à extensão: uso como estão.
+
+## Colisão de cenário (`reversa/colisao/`)
+
+Scripts de medição do S9-02 (`docs/medicoes/S9-02-colisao-e-terreno.md`): `terreno.py` gera chão e paredes a partir
+do modelo visual da sala e registra as peças no `SatMgr`; `andarilho.py` verifica a colisão sozinho (teleporta,
+anda 10 cm por passo e classifica); `salto_check.py` testa o salto nativo nos muros marcados; `gravidade2.py` é a
+gravidade por fora; `morro.py` e `efeito.py` são as provas de laje e de efeitos. Rodam com o fork na porta 28011,
+um cliente por vez, e gravam as saídas (`.json`, `.sat`) ao lado de si, fora do repositório. `terreno.py` foi
+reconstruído em 10/11 a partir da transcrição e ainda não foi executado de novo.

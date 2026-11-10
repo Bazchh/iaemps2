@@ -25,3 +25,6 @@ sessoes/
 capturas/
 *.p2s
 *.sqlite
+# Saídas dos scripts de colisão (reversa/colisao): só análise local
+reversa/colisao/*.json
+reversa/colisao/*.sat
