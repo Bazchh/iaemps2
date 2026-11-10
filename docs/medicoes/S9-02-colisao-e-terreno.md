@@ -22,7 +22,7 @@ acabamento (paredes, salto) volta quando a LC-17 entrar como fase, com o mapa pr
   +0x2A flag (4 ativa, 2 arquivo alocado), +0x30 bloco raiz, +0x60 arquivo, +0x70 matriz, +0xB0 inversa. Arquivo:
   cabeçalho 0x14, vetor de 12 bytes, blocos irmãos por deslocamento relativo em +0x20, `polyBit` 0x400 → no máximo
   8192 polígonos por peça.
-- Funções: `cSatMgr::create(dados)` 0x1A32D0, `create(laje)` 0x1A33AB (o `Vec` do PS2 tem 16 bytes), `hitCheck2`
+- Funções: `cSatMgr::create(dados)` 0x1A32D0, `create(laje)` 0x1A33A8 (o `Vec` do PS2 tem 16 bytes), `hitCheck2`
   0x1A3988, `getFloor` 0x1A26D0, `polySphereCk` 0x1A3490, `check` 0x1A18E8, `Mem_free` 0x2296D8, `jumpCheck`
   0x246538 (recebe `cPlayer*`), atributo `SAT_ATTR_JUMPOVER` 0x80000.
 - Jogador: `cAtariInfo` em cEm+0x320 (+0x10 raio 400, +0x1E flags 0x1301); posição +0xC0, anterior +0x130, ângulo
@@ -36,20 +36,21 @@ acabamento (paredes, salto) volta quando a LC-17 entrar como fase, com o mapa pr
 - Memória: `mem_alloc(…, 0xd, …)` não confere limite (alocou sobre dados vivos; queda do R5900). Faixas zeradas
   medidas para arquivos do mestre: 0x1F00000..0x1FF0000 e 0xAB0000..0xDF0000.
 
-Peça de colisão da sala da floresta, lida ao vivo: 1971 polígonos (377 chão, 497 rampa, 1097 parede) na primeira
-leitura; nas rodadas finais, 1117 paredes (936 ativas para o jogador, 181 sem geometria visual a 1,5 m
-desligadas).
+Peça de colisão da sala da floresta, lida ao vivo nas rodadas finais: 1117 paredes (936 ativas para o jogador, 181
+sem geometria visual a 1,5 m desligadas).
 
-## O que foi feito e medido (uma execução cada; nada aqui é média)
+## O que foi feito e medido (uma execução cada; nada aqui é média; hora local)
 
 | o quê | resultado medido | hora |
 |---|---|---|
-| chão gerado do modelo visual (faces até 50°, só a superfície mais alta) e registrado como peça | 7148 triângulos, 1244 blocos, 673 KB em 0x1F00000; o cliente subiu o morro da floresta | 17:06 |
-| paredes do modelo visual (faces > 50°, aresta ≤ 6 m, nos dois sentidos) | 2 peças de 8000 polígonos em 0xAB0000 e 0xB56000; 23 329 faces íngremes no modelo, 8835 a 9969 ao alcance do jogador | 17:51 |
-| andarilho (teleporte + 10 cm por passo, 60 pontos, 8 direções, 30 passos) | livre 10 459 · barrado 34 · atravessou face 148 · flutuando 18 · afundado 0 · sem chão no modelo 268 · teleporte rejeitado 15 | 18:06 |
-| travessias por causa | 148: 57 com parede registrada perto, 91 só com face visual (fora das 16 000 registradas) | 18:09 |
-| salto nativo em muros marcados (jumpCheck do jogo, jogador parado) | de 2 em 24 (faces da malha) até 10 em 30 (338 muros retangulares de 1,6 m, 1352 triângulos) | 18:08 → 18:26 |
-| gravidade por fora (chão em Python, 5 Hz, 30 min) | 0 correções necessárias | 16:28 |
+| chão gerado do modelo visual (faces até 50°, só a superfície mais alta) e registrado como peça | 7148 triângulos, 1244 blocos, 673 KB em 0x1F00000; o cliente subiu o morro da floresta | 14:06 |
+| paredes do modelo visual (faces > 50°, aresta ≤ 6 m, nos dois sentidos) | 2 peças de 8000 polígonos em 0xAB0000 e 0xB56000; 23 329 faces íngremes no modelo, 8835 a 9969 ao alcance do jogador | 14:51 |
+| andarilho (teleporte + 10 cm por passo; 60 pontos e 30 passos confirmados na saída; 8 direções inferidas do total de 10 942 passos classificados, acima dos 7200 possíveis com 4) | livre 10 459 · barrado 34 · atravessou face 148 · flutuando 18 · afundado 0 · sem chão no modelo 268 · teleporte rejeitado 15 | 15:06 |
+| travessias por causa | 148: 57 com parede registrada perto, 91 só com face visual (fora das 16 000 registradas) | 15:09 |
+| salto nativo em muros marcados (jumpCheck do jogo, jogador parado) | de 2 em 24 (faces da malha) até 10 em 30 (338 muros retangulares de 1,6 m, 1352 triângulos) | 15:08 → 15:26 |
+
+A gravidade por fora (`gravidade2.py`, chão em Python a 5 Hz) rodou como vigia de fundo durante as rodadas, mas
+nenhuma execução dela chegou ao fim com relatório; não há número a registrar.
 
 O que ficou provado: chão andável a partir do modelo visual, registrado como colisão e aceito pelo jogo;
 teleporte confiável (posição, posição anterior e todas as partes); verificação automática sem o cliente.
@@ -63,14 +64,14 @@ teleporte confiável (posição, posição anterior e todas as partes); verifica
 | gravidade por chamada remota a 4 Hz durante a partida | TLB miss na física do casaco; asserção "FQC = 0 on VIF FIFO READ" | chamadas de função só com o jogador parado; em partida só leitura e escrita de memória |
 | teleporte só da posição | jogador arrastado até a primeira parede | a varredura de parede vai da posição anterior das partes até a nova |
 | salto em faces finas da malha | jumpCheck nega | exige parede contínua de ≥ 60 cm nos dois ombros (±300 a 400 de altura) e chão 3,8 m atrás dentro de ±1,5 m |
-| andarilho relançado às 18:28 com detecção refinada | processo morto por memória baixa do PC (2,6 GB livres) | não relançar sem ordem |
+| andarilho relançado às 15:28 com detecção refinada | processo morto por memória baixa do PC (2,6 GB livres) | não relançar sem ordem |
 
 ## O que não foi feito
 
 - A validação dos muros de salto pelo chão do próprio jogo está no `terreno.py` final, mas **nunca rodou**; o
   andarilho com detecção refinada **nunca terminou**. Os números acima são da versão anterior.
 - O scratchpad de 30/10 foi apagado pela limpeza de temporários. `andarilho.py`, `salto_check.py` e
-  `gravidade2.py` são o texto exato lido em 30/10; `terreno.py` foi reconstruído a partir da cópia das 15:07 e dos
+  `gravidade2.py` são o texto exato lido em 30/10; `terreno.py` foi reconstruído a partir da cópia das 12:07 e dos
   remendos registrados na transcrição (todos reaplicados, compila). O mesmo método, aplicado aos três scripts
   anteriores, reproduziu byte a byte o texto lido, o que valida a reconstrução; ainda assim `terreno.py` **não
   foi executado de novo**.

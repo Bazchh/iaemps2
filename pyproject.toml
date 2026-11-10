@@ -43,7 +43,7 @@ iaemps2 = ["py.typed", "**/*.sql", "**/*.json", "**/*.toml"]
 line-length = 110
 target-version = "py313"
 src = ["src", "tests"]
-extend-exclude = ["docs/fonte"]  # geradores dos documentos, fora do produto
+extend-exclude = ["docs/fonte", "reversa/colisao"]  # geradores dos documentos e scripts de medição, fora do produto
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "N", "SIM", "RUF"]
