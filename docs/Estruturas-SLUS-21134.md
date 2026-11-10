@@ -8,28 +8,34 @@ Fonte única do documento de estruturas (S9-02): docs/fonte/gerar_estruturas.py 
 ## Cobertura
 
 Uma linha por estrutura: campos descritos, campos com prova no PS2 (não só nome do GameCube), campos com quem
-escreve e quem lê determinados, e o estado. O critério de aceite do card (três campos por estrutura conferidos
-ao vivo pelo cliente) ainda não foi aplicado a nenhuma linha.
+escreve e quem lê determinados por prova (células marcadas '(gc)' ou '(inferido)' não contam), e o estado.
+As estruturas sem campo são as que ninguém leu ainda. O critério de aceite do card (três campos por estrutura
+conferidos ao vivo pelo cliente) ainda não foi aplicado a nenhuma linha.
 
 | estrutura | raiz | campos | com prova no PS2 | com escreve e lê | estado |
 |---|---|---|---|---|---|
-| [Bloco global do jogo (pG, GLOBAL_WK)](#pg) | 0x00425BA0 (apontado por 0x00325308); estático | 15 | 15 | 5 | parcial |
-| [Gerente de personagens (EmMgr, cManager<cEm>)](#emmgr) | 0x004203B0; estático. Ponteiro do jogador pPL em 0x004203D0 | 6 | 3 | 4 | lida |
-| [Personagem (cEm; cUnit → cCoord → cModel → cEm)](#cem) | EmMgr+0 + 0xED0 × vaga; dinâmico (heap). Vaga 0 = jogador (pPL) | 28 | 27 | 21 | parcial |
-| [Corpo de colisão do personagem (cAtariInfo, em cEm+0x320)](#catariinfo) | cEm+0x320 | 9 | 4 | 7 | parcial |
+| [Bloco global do jogo (pG, GLOBAL_WK)](#pg) | 0x00425BA0 (apontado por 0x00325308); estático | 15 | 15 | 4 | parcial |
+| [Gerente de personagens (EmMgr, cManager<cEm>)](#emmgr) | 0x004203B0; estático. Ponteiro do jogador pPL em 0x004203D0 | 6 | 3 | 1 | lida |
+| [Personagem (cEm; cUnit → cCoord → cModel → cEm)](#cem) | EmMgr+0 + 0xED0 × vaga; dinâmico (heap). Vaga 0 = jogador (pPL) | 28 | 27 | 4 | parcial |
+| [Corpo de colisão do personagem (cAtariInfo, em cEm+0x320)](#catariinfo) | cEm+0x320 | 11 | 7 | 1 | parcial |
 | [Entrada da lista de inimigos da sala (EM_LIST, 32 bytes)](#em_list) | pG+0x8344 + 0x20 × i (0x0042DEE4); arquivos emleon00..09.esl do AFS (emgirl* nas partes da Ashley) | 12 | 11 | 11 | lida |
-| [Inventário: gerenciador de itens (cItemMgr) e item](#citemmgr) | 0x003CE148; estático. Vetor de itens no heap (0x010F6540 no estado 91), lido por +0x14 | 14 | 14 | 12 | lida |
+| [Inventário: gerenciador de itens (cItemMgr) e item](#citemmgr) | 0x003CE148; estático. Vetor de itens no heap (0x010F6540 no estado 91), lido por +0x14 | 14 | 14 | 7 | lida |
 | [Tabelas de peças e de armas](#tabelas_itens) | peças 0x00326DE8 (ITEM_PIECE_INFO); armas 0x003A99C0 (43 entradas, contagem em 0x002F0200); alocações do inventário 0x00433F80; estáticas | 10 | 10 | 6 | lida |
-| [Módulos de personagem (tabela de módulos, arquivos por tipo, SNR2)](#modulos) | tabela de módulos 0x00455E50 (4 entradas de 0x98); arquivos por tipo 0x00328458 (+tipo × 8; 0x003286D8 / 0x00328958 / 0x00328BD8 por modo de personagem); estáticas. Código e dados dos módulos no heap (mem_alloc) | 11 | 11 | 9 | lida |
-| [Arquivos da ISO (BIO4DAT.AFS)](#afs) | ISO, setor 446273 (2048 bytes por setor) | 4 | 4 | 3 | parcial |
-| [Tarefas e threads (escalonador do jogo)](#tarefas) | tabela de tarefas 0x00451688 (20 entradas de 0x350); tarefa corrente em 0x00451680; semáforos do kernel 0x004558CC / 0x004558D0; estáticas | 8 | 8 | 6 | parcial |
-| [Sistema de cenas: áreas de roteiro (SceAt) e eventos (Event/EventMgr)](#cenas) | lista ordenada percorrida por sceAtSetOtStart 0x002661B0 / sceAtGetOtAddr 0x002661C0; registros SCE_AT_DATA de 0xA0 bytes (itens SCE_AT_ITEM de 0xB0) vindos dos blocos AEV/ITA da sala | 15 | 8 | 15 | parcial |
-| [Colisão de cenário (SatMgr, EatMgr, cSat, cSatFile)](#colisao) | SatMgr 0x0041AF10 (personagens), EatMgr 0x0041AF30 (balas, objetos, câmera); SEck 0x0041B578; estáticos. Peças (cSat de 0xF0) no vetor de 20 vagas de cada gerente; a da sala é a primeira | 18 | 18 | 8 | lida |
-| [Câmera](#camera) | olho 0x003CA220, alvo 0x003CA230, matriz visão-projeção 0x004327C0, transformação de tela 0x00432840; estáticos | 4 | 4 | 2 | lida |
-| [Modelo visual (.bin) e objetos de cenário](#modelo_visual) | tabela de objetos da sala 0x004568AC (ponteiros cObj); SMD em 0x004568A0; estáticos. Modelos no heap | 4 | 4 | 4 | lida |
-| [Efeitos (EstSet, tabela Est)](#efeitos) | gerente em *0x004203A4; tabela Est em gerente+0x7400 (0xC por id); Esp em gerente+0x6000 | 1 | 1 | 1 | parcial |
-| [Controle (joystick)](#controle) | 0x00431948; estático | 1 | 1 | 1 | parcial |
-| **total** | | **160** | **143** | **115** | 8 lidas, 8 parciais, 0 não lidas |
+| [Módulos de personagem (tabela de módulos, arquivos por tipo, SNR2)](#modulos) | tabela de módulos 0x00455E50 (4 entradas de 0x98); arquivos por tipo 0x00328458 (+tipo × 8; 0x003286D8 / 0x00328958 / 0x00328BD8 por modo de personagem); estáticas. Código e dados dos módulos no heap (mem_alloc) | 11 | 11 | 8 | lida |
+| [Arquivos da ISO (BIO4DAT.AFS)](#afs) | ISO, setor 446273 (2048 bytes por setor) | 4 | 4 | 2 | parcial |
+| [Tarefas e threads (escalonador do jogo)](#tarefas) | tabela de tarefas 0x00451688 (20 entradas de 0x350); tarefa corrente em 0x00451680; semáforos do kernel 0x004558CC / 0x004558D0; estáticas | 8 | 8 | 2 | parcial |
+| [Sistema de cenas: áreas de roteiro (SceAt) e eventos (Event/EventMgr)](#cenas) | lista ordenada percorrida por sceAtSetOtStart 0x002661B0 / sceAtGetOtAddr 0x002661C0; registros SCE_AT_DATA de 0xA0 bytes (itens SCE_AT_ITEM de 0xB0) vindos dos blocos AEV/ITA da sala | 15 | 8 | 7 | parcial |
+| [Colisão de cenário (SatMgr, EatMgr, cSat, cSatFile)](#colisao) | SatMgr 0x0041AF10 (personagens), EatMgr 0x0041AF30 (balas, objetos, câmera); SEck 0x0041B578; estáticos. Peças (cSat de 0xF0) no vetor de 20 vagas de cada gerente; a da sala é a primeira | 18 | 18 | 2 | lida |
+| [Câmera](#camera) | olho 0x003CA220, alvo 0x003CA230, matriz visão-projeção 0x004327C0, transformação de tela 0x00432840; estáticos | 4 | 4 | 0 | lida |
+| [Modelo visual (.bin) e objetos de cenário](#modelo_visual) | tabela de objetos da sala 0x004568AC (ponteiros cObj); SMD em 0x004568A0; estáticos. Modelos no heap | 4 | 4 | 3 | lida |
+| [Efeitos (EstSet, tabela Est)](#efeitos) | gerente em *0x004203A4; tabela Est em gerente+0x7400 (0xC por id); Esp em gerente+0x6000 | 1 | 1 | 0 | parcial |
+| [Controle (joystick)](#controle) | 0x00431948; estático | 1 | 1 | 0 | parcial |
+| [Eventos e cutscenes (Event, EventMgr, blocos EVS)](#eventos) | EventMgr (0x00205B90..0x00207470 nomeadas no índice); raiz dos dados não localizada | 0 | 0 | 0 | não lida |
+| [Arquivo de sala (blocos SMD/SMX, LIT, SAR, EFF, TEX, ITM/ETM/ETS, CAM, BLK, EVS/FSE/AEV/ITA)](#blocos_sala) | não localizada no PS2 (no GameCube, pG->pRoom e pCore) | 0 | 0 | 0 | não lida |
+| [Tabuleiro da maleta (pzlPlayer, pzlBoard, pzlPiece)](#pzl) | criado pela tela da maleta 0x0111F4E0 (módulo do menu); vive só com a tela aberta | 0 | 0 | 0 | não lida |
+| [Cabeçalho SNR2 do módulo realocável (.rel)](#snr2) | início de cada .rel (tabela de módulos +0x88) | 0 | 0 | 0 | parcial |
+| [Tabela de tipos de inimigo (0x003C8F40)](#tipos_inimigo) | 0x003C8F40; estática | 0 | 0 | 0 | não lida |
+| **total** | | **162** | **146** | **58** | 8 lidas, 9 parciais, 4 não lidas |
 
 Legenda das provas: **decompilado** = lido no C decompilado do PS2; **vigia** = vigia de escrita do fork; **foto** = diferença entre fotos da memória; **ao_vivo** = lido ou escrito pelo canal com efeito conferido; **publica** = fonte pública conferida ao vivo; **gc** = nome ou papel vindo da decompilação do GameCube, sem prova no PS2.
 
@@ -45,7 +51,7 @@ Estado global da partida: sala, vida, dificuldade, personagem, lista de inimigos
 | deslocamento | tipo | campo | significado | quem escreve | quem lê | prova |
 |---|---|---|---|---|---|---|
 | `0x5C` | u32 | sinalizadores de sistema | a função de dano testa o bit 0x40000000 (com pSys+8 == 0) e readEmList o bit 0x2000; nome não determinado | não lido | LifeDownSet2, readEmList | decompilado |
-| `0x70` | s32 | (Speed?) | readEmList recarrega a lista quando este valor é negativo e a lista mudou; papel não determinado | não lido | readEmList | decompilado |
+| `0x70` | s32 | não nomeado | readEmList recarrega a lista quando este valor é negativo e a lista mudou; papel não determinado | não lido | readEmList | decompilado |
 | `0x7EB8` | u16 | sala (room_id) | byte baixo = sala, byte alto = estágio; chave de cRoomData::checkPassed e das tabelas por sala | troca de sala (não lida) | EmSetFromList2, readEmList, MercSysInitRoom, cRoomData::checkPassed e dezenas de funções | decompilado, ao_vivo |
 | `0x7EC4` | u8 | dificuldade adaptativa (Game_level) | 0 a 10; fator do jogador 0,1·dif + 0,5; do inimigo 2,0 − 0,2·dif abaixo de 6, senão 1,0 − 0,03·(dif − 5) | não lido (GameAddPoint no GameCube) | LifeDownSet2 | decompilado, ao_vivo |
 | `0x7ED5` | s8 | lista de inimigos carregada (em_list_no) | número do arquivo .esl em memória; −1 = nenhuma | readEmList | EmSetFromList2, readEmList | decompilado |
@@ -83,16 +89,16 @@ Pool fixo de 60 personagens de 0xED0 bytes; o vetor é alocado no heap (0x01789F
 
 | deslocamento | tipo | campo | significado | quem escreve | quem lê | prova |
 |---|---|---|---|---|---|---|
-| `0x00` | ptr | pArray | vetor de personagens (heap) | arrayAlloc | EmSetEvent, EmSetFromList2, tudo que percorre personagens | decompilado, ao_vivo |
-| `0x04` | u32 | nArray | 60 | arrayAlloc | at() | decompilado, ao_vivo |
-| `0x08` | u32 | size | 0xED0 (passo do vetor) | construtor | at() | decompilado, ao_vivo |
+| `0x00` | ptr | pArray | vetor de personagens (heap) | arrayAlloc (gc) | EmSetEvent, EmSetFromList2, tudo que percorre personagens | decompilado, ao_vivo |
+| `0x04` | u32 | nArray | 60 | arrayAlloc (gc) | at() (gc) | decompilado, ao_vivo |
+| `0x08` | u32 | size | 0xED0 (passo do vetor) | construtor (gc) | at() (gc) | decompilado, ao_vivo |
 | `0x0C` | u8 | flag | — | construtor | — | gc |
 | `0x10` | ptr | pAlive | cabeça da lista de vivos (cEm+0x4 = próximo) | create/destroy | move, getEmPtr | gc |
 | `0x34` | u32 | Guid | próximo serial de modelo | construct | — | gc |
 
 Funções:
 
-- `0x00110378` cEmMgr::create (tipo comum): pega uma vaga e constrói o cEm do tipo (vagas do fim para os tipos 0x0F e 0x25: 0x00117B00)
+- `0x00110378` função sem nome (criar vaga): recebe o EmMgr, pega uma vaga e constrói o cEm do tipo; para os tipos 0x0F e 0x25 é a 0x00117B00 (vagas do fim). Nomes não vêm da tabela de símbolos
 - `0x001BD800` EmSetEvent(EM_LIST*): cria de uma struct avulsa; devolve o cEm ou errEm (0); marca a struct com 7 e chama o método virtual +0x2C do tipo
 - `0x001BD538` EmSetFromList2(i, checar_usada): cria a entrada i da lista da sala; recusa se sala/estágio não batem, já criada, id 0 ou bit usado
 - `0x001BD9E8 / 0x001BDAA8 / 0x001BDB38` GetEmPtrFromList / GetEmIdFromList / EmListIsAlive: consultas por índice da lista
@@ -113,27 +119,27 @@ Mesma estrutura para jogador, parceira, inimigos e objetos-inimigo (caixas, port
 
 | deslocamento | tipo | campo | significado | quem escreve | quem lê | prova |
 |---|---|---|---|---|---|---|
-| `0x000` | u32 | be_flag | bit 0 vivo; 0x200/0x400 pedido de morte (vivo = (be_flag & 0x201) == 1); bit 16 ligou nas duas mortes vistas; cabeçalho 0x0B002077 no jogador, 0x02002077 no aldeão | cManager (create/destroy) | isAlive em todo laço de personagens | foto, vigia |
-| `0x004` | ptr | pNext | próximo vivo (lista de EmMgr+0x10) | cManager | cManager | gc |
-| `0x008` | ptr | tabela virtual | EmSetEvent chama *(vt+0x2C)(this + *(s16*)(vt+0x28)) logo após preencher a struct | construtor do tipo | EmSetEvent | decompilado |
-| `0x010` | mat4 | matriz de mundo (cCoord) | 4×4 de floats; +0x40 é a linha de translação (o que S8-00 chamou de 'posição com cópias') | matUpdate a cada quadro | desenho, partes | foto |
-| `0x0C0` | vec3 | pos | posição dos pés em mm | EmSetEvent (lista ×10), movimento, colisão (encaixe no chão e empurrão de parede), canal (teleporte) | tudo | decompilado, ao_vivo |
+| `0x000` | u32 | be_flag | bit 0 vivo; 0x200/0x400 pedido de morte (vivo = (be_flag & 0x201) == 1); bit 16 ligou nas duas mortes vistas; cabeçalho 0x0B002077 no jogador, 0x02002077 no aldeão | cManager (gc) | isAlive em todo laço de personagens (gc) | foto, vigia |
+| `0x004` | ptr | pNext | próximo vivo (lista de EmMgr+0x10) | cManager (gc) | cManager (gc) | gc |
+| `0x008` | ptr | tabela virtual | EmSetEvent chama *(vt+0x2C)(this + *(s16*)(vt+0x28)) logo após preencher a struct | construtor do tipo (inferido) | EmSetEvent | decompilado |
+| `0x010` | mat4 | matriz de mundo (cCoord) | 4×4 de floats, conferida na foto inimigo1 (S8-00): três linhas unitárias da rotação em y (ang +0xD4 = 1,75 rad) e a linha +0x40 igual a pos; é o que S8-00 chamou de 'posição com cópias' | matUpdate a cada quadro (gc) | desenho, partes (inferido) | foto |
+| `0x0C0` | vec3 | pos | posição dos pés em mm | EmSetEvent (lista ×10), movimento, colisão (encaixe no chão e empurrão de parede), canal (teleporte) | jumpCheck, EmSetEvent (distância ao jogador), tudo o mais (inferido) | decompilado, ao_vivo |
 | `0x0D0` | vec3 | ang | rotação em radianos (lista × π/16384); +0xD4 = eixo y (frente) | EmSetEvent, movimento, canal | desenho, salto (jumpCheck) | decompilado, ao_vivo |
-| `0x110` | ptr | pList (partes) | primeira cParts; cada parte: +0x80 posição de mundo, +0x90 anterior, +0xA0 anterior-anterior, +0x110 próxima parte. No teleporte é preciso escrever as três posições de todas as partes | partsWorldCalc a cada quadro | colisão (varredura anterior→atual), desenho | foto, ao_vivo |
-| `0x11C` | u8 | id (tipo) | 0 jogador, 1 a 13 parceira e aliados, ≥ 16 inimigos (ramo da função de dano; tabela por tipo 0x003C8F40) | construtor do tipo | LifeDownSet2 | decompilado, ao_vivo |
-| `0x11D` | u8 | type (variante) | byte +2 da EM_LIST | EmSetEvent, EmSetFromList2 | rotinas do tipo | decompilado |
-| `0x130` | vec3 | pos_old | posição antes do movimento do quadro; EmSetEvent copia pos para cá | EmSetEvent, updateOldPos | colisão | decompilado, ao_vivo |
-| `0x140` | vec3 | Wall_norm | normal da parede que empurrou o modelo; zero sem parede | colisão de cenário | movimento | gc, ao_vivo |
-| `0x150` | ptr | pFloor_norm | normal do chão (câmera de ombro inclina com ela) | getFloor | câmera | gc, ao_vivo |
-| `0x190` | ptr | pModelInfo | cModelInfo: +0xC model_addr (.bin do modelo em memória) | modelInit | desenho, terreno.py | ao_vivo |
+| `0x110` | ptr | pList (partes) | primeira cParts; cada parte: +0x80 posição de mundo, +0x90 anterior, +0xA0 anterior-anterior, +0x110 próxima parte. No teleporte é preciso escrever as três posições de todas as partes | partsWorldCalc a cada quadro (gc) | colisão (varredura anterior→atual), desenho | foto, ao_vivo |
+| `0x11C` | u8 | id (tipo) | 0 jogador, 1 a 13 parceira e aliados, ≥ 16 inimigos (ramo da função de dano; tabela por tipo 0x003C8F40) | construtor do tipo (inferido) | LifeDownSet2 | decompilado, ao_vivo |
+| `0x11D` | u8 | type (variante) | byte +2 da EM_LIST | EmSetEvent, EmSetFromList2 | rotinas do tipo (inferido) | decompilado |
+| `0x130` | vec3 | pos_old | posição antes do movimento do quadro; EmSetEvent copia pos para cá | EmSetEvent, updateOldPos (gc) | colisão | decompilado, ao_vivo |
+| `0x140` | vec3 | Wall_norm | normal da parede que empurrou o modelo; zero sem parede | colisão de cenário (gc) | movimento (gc) | gc, ao_vivo |
+| `0x150` | ptr | pFloor_norm | normal do chão (câmera de ombro inclina com ela) | getFloor (gc) | câmera (gc) | gc, ao_vivo |
+| `0x190` | ptr | pModelInfo | cModelInfo: +0xC model_addr (.bin do modelo em memória) | modelInit (gc) | desenho (inferido), terreno.py | ao_vivo |
 | `0x290` | vec3 | cópia da posição | muda junto com +0xC0 nas fotos; papel não lido | não lido | não lido | foto |
-| `0x2FC` | u16 | animação corrente | 118 andando, 184 reação ao tiro, 103 morto (aldeão); provisório | motionSet | — | foto |
-| `0x320` | cAtariInfo | atari (corpo de colisão) | ver a estrutura cAtariInfo | cAtariInfo::init/move | SatMgr::check, EmAtCheck | decompilado, ao_vivo |
-| `0x480` | ptr | base do módulo do tipo | — | construtor | — | foto |
-| `0x498` | f32 | l_pl | distância² ao jogador no plano xz (EmSetEvent calcula na criação) | EmSetEvent, move | rotinas do tipo | decompilado |
-| `0x49C` | f32 | l_sub | distância² à parceira; 1e16 na criação | EmSetEvent, move | rotinas do tipo | decompilado |
-| `0x4A4` | f32 | Guard_r | raio de guarda = EM_LIST+0x1A × 1000 | EmSetEvent, EmSetFromList2 | rotinas do tipo | decompilado |
-| `0x4AC` | u32 | flag | = EM_LIST+4 | EmSetEvent, EmSetFromList2 | rotinas do tipo | decompilado |
+| `0x2FC` | u16 | animação corrente | 118 andando, 184 reação ao tiro, 103 morto (aldeão); provisório | motionSet (gc) | — | foto |
+| `0x320` | cAtariInfo | atari (corpo de colisão) | ver a estrutura cAtariInfo | cAtariInfo::init/move | SatMgr::check, EmAtCheck (gc) | decompilado, ao_vivo |
+| `0x480` | ptr | base do módulo do tipo | — | construtor (inferido) | — | foto |
+| `0x498` | f32 | l_pl | distância² ao jogador no plano xz (EmSetEvent calcula na criação) | EmSetEvent, move (gc) | rotinas do tipo (inferido) | decompilado |
+| `0x49C` | f32 | l_sub | distância² à parceira; 1e16 na criação | EmSetEvent, move (gc) | rotinas do tipo (inferido) | decompilado |
+| `0x4A4` | f32 | Guard_r | raio de guarda = EM_LIST+0x1A × 1000 | EmSetEvent, EmSetFromList2 | rotinas do tipo (inferido) | decompilado |
+| `0x4AC` | u32 | flag | = EM_LIST+4 | EmSetEvent, EmSetFromList2 | rotinas do tipo (inferido) | decompilado |
 | `0x4B0` | s16 | hp (vida) | = EM_LIST+8; aldeão 500, corvo 10, atores parados 1000, jogador 1200 (espelho da vida global) | EmSetEvent, LifeDownSet2 (instrução 0x1C2AA8) | LifeDownSet2, HUD do inimigo | vigia, decompilado, ao_vivo |
 | `0x4B2` | s16 | hp_max | = EM_LIST+8 | EmSetEvent | — | decompilado, ao_vivo |
 | `0x4BD` | u8 | set | = EM_LIST+3 | EmSetEvent | — | decompilado |
@@ -165,15 +171,17 @@ Layout do GameCube com o Vec de 12 bytes trocado pelo de 16: os deslocamentos ab
 
 | deslocamento | tipo | campo | significado | quem escreve | quem lê | prova |
 |---|---|---|---|---|---|---|
-| `0x00` | vec4 | m_offset | deslocamento em relação ao modelo | init | getPos | gc |
-| `0x10` | f32 | m_radius | 400 no jogador | init/set | polySphereCk | ao_vivo |
-| `0x14` | f32 | m_radius2 | — | init/set | — | gc |
-| `0x18` | f32 | m_height | meia altura | init | — | gc |
-| `0x1C` | s16 | m_parts_no | parte que o corpo segue (+1), 0 = o modelo | init | getPos | gc |
-| `0x1E` | u16 | m_flag | 0x1301 no jogador: 0x100 colide com cenário (Sca), 0x200 com personagens (Oba), bits 3-4 prioridade de empurrão, bit 0 linha | on/off/setPriority | SatMgr::check, EmAtCheck | ao_vivo |
-| `0x40` | vec4 | m_Pos | posição de mundo deste quadro (= cEm+0x360) | move | colisão | ao_vivo |
-| `0x50` | vec4 | m_oldPos | posição do quadro anterior (= cEm+0x370) | move | colisão (varredura) | ao_vivo |
-| `0x60` | ptr | m_pList | próximo corpo da cadeia | init | DrawOba | gc |
+| `0x00` | vec4 | m_offset | deslocamento em relação ao modelo | init (gc) | getPos (gc) | gc |
+| `0x10` | f32 | m_radius | 400 no jogador (foto inimigo1: +0x330 da vaga 0 = 400,0) | cAtariInfo::move (interpola para +0x20 em +0x28 quadros), init/set (gc) | polySphereCk | decompilado, ao_vivo |
+| `0x14` | f32 | m_radius2 | — | cAtariInfo::move (interpola para +0x24) | — | decompilado |
+| `0x18` | f32 | m_height | meia altura | init (gc) | — | gc |
+| `0x1C` | s16 | m_parts_no | parte que o corpo segue (+1), 0 = o modelo | init (gc) | getPos (gc) | gc |
+| `0x1E` | u16 | m_flag | 0x1301 no jogador: 0x100 colide com cenário (Sca), 0x200 com personagens (Oba), bits 3-4 prioridade de empurrão, bit 0 linha | on/off/setPriority (gc) | SatMgr::check, EmAtCheck (gc) | ao_vivo |
+| `0x20` | f32[2] | m_radius_n, m_radius2_n | raios-alvo da interpolação | set (gc) | cAtariInfo::move | decompilado |
+| `0x28` | u16 | m_hokan | quadros restantes da interpolação dos raios | cAtariInfo::move (decrementa) | cAtariInfo::move | decompilado |
+| `0x40` | vec4 | m_Pos | posição de mundo deste quadro (= cEm+0x360; foto inimigo1: pos com y + 876) | não lido no PS2 (EmAtCheck no GameCube); o move não escreve aqui | colisão | foto, ao_vivo |
+| `0x50` | vec4 | m_oldPos | posição do quadro anterior (= cEm+0x370) | não lido no PS2 | colisão (varredura) | foto, ao_vivo |
+| `0x60` | ptr | m_pList | próximo corpo da cadeia | init (gc) | DrawOba (gc) | gc |
 
 Funções:
 
@@ -181,7 +189,7 @@ Funções:
 
 Pendências:
 
-- +0x20..+0x3C (raios de interpolação, hokan, stat, pMod, radius3) só por nome
+- +0x2A stat, +0x2C pMod, +0x30 radius3 só por nome; quem escreve m_Pos/m_oldPos no PS2
 
 <a id="em_list"></a>
 ## Entrada da lista de inimigos da sala (EM_LIST, 32 bytes)
@@ -218,16 +226,16 @@ A maleta é um tabuleiro remontado a cada abertura a partir do vetor (pzlPlayer)
 
 | deslocamento | tipo | campo | significado | quem escreve | quem lê | prova |
 |---|---|---|---|---|---|---|
-| `0x0C` | ptr | item equipado | ponteiro para a vaga do item equipado | equipar | cItemMgr::bulletNumCurrent | decompilado, ao_vivo |
-| `0x10` | u16 | id do item equipado | — | equipar | — | decompilado |
-| `0x14` | ptr | vetor de itens | 384 vagas de 14 bytes (heap) | construtor | at, search, pzlPlayer::init | decompilado, ao_vivo |
+| `0x0C` | ptr | item equipado | ponteiro para a vaga do item equipado | equipar (inferido) | cItemMgr::bulletNumCurrent | decompilado, ao_vivo |
+| `0x10` | u16 | id do item equipado | — | equipar (inferido) | — | decompilado |
+| `0x14` | ptr | vetor de itens | 384 vagas de 14 bytes (heap) | construtor (inferido) | at, search, pzlPlayer::init | decompilado, ao_vivo |
 | `0x18` | ptr | última vaga tocada | bancada/inventario.py aponta para a vaga dada | get | — | decompilado |
-| `0x1C` | u32 | quantidade de vagas | 384 | construtor | at | decompilado |
-| `item+0x0` | u16 | id | 0x23 pistola, 0x04 balas de pistola, 0x05 erva verde, 0x7C faca, 0x35 lança-foguetes, 0xAC/0xAD tesouros ou chaves | construct | tudo | decompilado, ao_vivo |
-| `item+0x2` | u16 | quantidade | reserva de munição no item de balas; 1 nas armas | get, reload | HUD | decompilado, ao_vivo |
+| `0x1C` | u32 | quantidade de vagas | 384 | construtor (inferido) | at | decompilado |
+| `item+0x0` | u16 | id | 0x23 pistola, 0x04 balas de pistola, 0x05 erva verde, 0x7C faca, 0x35 lança-foguetes, 0xAC/0xAD tesouros ou chaves | construct | search, num, pzlPlayer::init | decompilado, ao_vivo |
+| `item+0x2` | u16 | quantidade | reserva de munição no item de balas; 1 nas armas | get, reload | reload, HUD (inferido) | decompilado, ao_vivo |
 | `item+0x4` | u8 | flags | bit 0 = vaga ocupada | construct | pzlPlayer::init | decompilado |
 | `item+0x5` | u8 | dono | comparado com +0x13 do gerenciador | construct | pzlPlayer::init | decompilado |
-| `item+0x6` | u16 | níveis | melhorias da arma em 4 bits cada | construct, loja | arm | decompilado |
+| `item+0x6` | u16 | níveis | melhorias da arma em 4 bits cada | construct, loja (inferido) | arm (gc) | decompilado |
 | `item+0x8` | u16 | balas no pente × 8 | valor >> 3; armas de carga (0x34, 0x37, 0x53) usam +0x6 | construct, reload, trigger | bulletNumCurrent (HUD) | decompilado, ao_vivo |
 | `item+0xA` | u8[2] | centro da peça (x, y) | meias-células; canto = centro − centro da peça da tabela | pzlPlayer::save, dar_item_se_couber | pzlPlayer::init | decompilado, ao_vivo |
 | `item+0xC` | u8 | orientação | 0 a 7 | pzlPlayer::save | pzlPlayer::init | decompilado |
@@ -282,7 +290,7 @@ Cada tipo de personagem é um .dat (modelos) mais um .rel (código realocável S
 |---|---|---|---|---|---|---|
 | `0x80` | u16 | tipo | 0 = vaga livre | carregador, bancada/modulos.py | SearchEmModule | decompilado, ao_vivo |
 | `0x82` | u16 | flags | 1 .rel alocado, 2 ligado, 4 .dat alocado; InitModule libera os alocados | carregador | InitModule | decompilado, ao_vivo |
-| `0x84` | ptr | .dat | — | carregador | construtor do tipo | decompilado, ao_vivo |
+| `0x84` | ptr | .dat | — | carregador | construtor do tipo (inferido) | decompilado, ao_vivo |
 | `0x88` | ptr | .rel | — | carregador | ligador | decompilado, ao_vivo |
 | `0x8C` | u32 | tamanho do .dat | arredondado a 0x800 | carregador | InitModule | decompilado |
 | `0x90` | u32 | tamanho do .rel | arredondado a 0x800 | carregador | InitModule | decompilado |
@@ -316,7 +324,7 @@ Cabeçalho 'AFS', contagem, pares (deslocamento, tamanho), nomes de 48 bytes no 
 
 | deslocamento | tipo | campo | significado | quem escreve | quem lê | prova |
 |---|---|---|---|---|---|---|
-| `0x00` | char[4] | assinatura | 'AFS\0' | disco | cDvd | ao_vivo |
+| `0x00` | char[4] | assinatura | 'AFS\0' | disco | cDvd (inferido) | ao_vivo |
 | `0x04` | u32 | quantidade | 2628 | disco | — | ao_vivo |
 | `0x08` | u32[2][n+1] | (deslocamento, tamanho) | última entrada aponta para os nomes | disco | bancada/modulos.py | ao_vivo |
 | `nomes` | char[48][n] | nomes | 32 bytes de nome mais atributos | disco | bancada/modulos.py | ao_vivo |
@@ -342,14 +350,14 @@ Cada tarefa do jogo é uma thread do kernel com semáforo; TaskSleep marca a tar
 
 | deslocamento | tipo | campo | significado | quem escreve | quem lê | prova |
 |---|---|---|---|---|---|---|
-| `0x04` | u8 | estado | TaskExec grava 1; TaskSleep grava (estado & 0x80) \| 2 | TaskExec, TaskSleep | escalonador, SceExec | decompilado |
+| `0x04` | u8 | estado | TaskExec grava 1; TaskSleep grava (estado & 0x80) \| 2 | TaskExec, TaskSleep | SceExec, escalonador (inferido) | decompilado |
 | `0x05` | u8 | tipo | 0x17 normal (TaskExec), 0x16 tarefa de roteiro (SceExec); escolhe o semáforo sinalizado em TaskSleep | TaskExec, SceExec | TaskSleep | decompilado |
 | `0x0C` | u32 | semáforo da tarefa | WaitSema em TaskSleep | criação | TaskSleep | decompilado |
 | `0x10` | u8 | sinalizador (kind) | SceExec copia o da tarefa corrente ou grava 1 | SceExec | — | decompilado |
-| `0x14` | u16 | contador de sono | quadros a dormir (TaskSleep) | TaskSleep | escalonador | decompilado |
-| `0x18` | u32 | argumento | 3º argumento de TaskExec | TaskExec | entrada da tarefa | decompilado |
+| `0x14` | u16 | contador de sono | quadros a dormir (TaskSleep) | TaskSleep | escalonador (inferido) | decompilado |
+| `0x18` | u32 | argumento | 3º argumento de TaskExec | TaskExec | entrada da tarefa (inferido) | decompilado |
 | `0x340` | ptr | função (cópia) | — | TaskExec | — | decompilado |
-| `0x344` | ptr | função | 2º argumento de TaskExec | TaskExec | escalonador | decompilado |
+| `0x344` | ptr | função | 2º argumento de TaskExec | TaskExec | escalonador (inferido) | decompilado |
 
 Funções:
 
@@ -377,22 +385,22 @@ Uma área de roteiro é um volume (AREA_HIT_DATA) com tipo, número, quem dispar
 | `0x00` | u32 | tag | elo da lista ordenada | SceAtInit | sceAtGetOtAddr | gc |
 | `0x04` | AREA_HIT_DATA | area | volume do gatilho (0x30 bytes) | SceAtInit | SceAtHitCheck | gc |
 | `0x34` | u8 | be_flg | bit 0 habilitada, bit 1 ativa, bit 2 alocada em tempo de execução (SceAtCreate*) | SceAtSetEnable | SceAtCheckEnable | gc |
-| `0x35` | u8 | id (tipo da área) | 0 normal, 1 porta, 2 exec, 3 item, 4 sinalizador, 5 mensagem, 7 salto, 8 save, 9 sombra, 10 dano, 11 colisão de roteiro, 12 câmera, 13 campo, 14 agachar, 15 chave (SKEY), 16 escada, 17 usar, 18 esconder, 19 teleporte, 20 item-pai, 21 arame da Ada (nomes do GameCube; o 15 confere no PS2) | arquivo AEV | SceAtExecute (tabela por tipo), SceAtDataSet_exec | decompilado |
-| `0x36` | u8 | no (número da área) | chave de SceAtPtr(no); itens do ITA + 0x80 | arquivo | SceAtPtr | decompilado |
-| `0x38` | u8 | trg_type | bits de estado que disparam (1/2/4), bit 3 botão de ação, bit 7 desativa após usar; SceAtDataSet_exec troca com cópia em +0x3B | SceAtDataSet_exec | SceAtExecute | decompilado |
+| `0x35` | u8 | id (tipo da área) | 0 normal, 1 porta, 2 exec, 3 item, 4 sinalizador, 5 mensagem, 7 salto, 8 save, 9 sombra, 10 dano, 11 colisão de roteiro, 12 câmera, 13 campo, 14 agachar, 15 chave (SKEY), 16 escada, 17 usar, 18 esconder, 19 teleporte, 20 item-pai, 21 arame da Ada (nomes do GameCube; o 15 confere no PS2) | arquivo AEV (inferido) | SceAtDataSet_exec, SceAtExecute (inferido) | decompilado |
+| `0x36` | u8 | no (número da área) | chave de SceAtPtr(no); itens do ITA + 0x80 | arquivo (inferido) | SceAtPtr | decompilado |
+| `0x38` | u8 | trg_type | bits de estado que disparam (1/2/4), bit 3 botão de ação, bit 7 desativa após usar; SceAtDataSet_exec troca com cópia em +0x3B | SceAtDataSet_exec | SceAtExecute (inferido) | decompilado |
 | `0x39` | u8 | target_type | 1 jogador, 2 inimigo, 8 parceira | arquivo | SceAtHitCheck | gc |
-| `0x3A` | u8 | task_level | prioridade do SceExec (máx 0x14; 0 = chamar direto) | SceAtDataSet_exec | SceAtExecute | decompilado |
-| `0x3B` | u8 | trg_type_bak | — | SceAtDataSet_exec | SceAtDataReset | decompilado |
-| `0x3C` | ptr | pParam | argumento da função | SceAtDataSet_exec | SceAtExecute | decompilado |
-| `0x40` | ptr | pFunc | função da área (tarefa de roteiro) | SceAtDataSet_exec | SceAtExecute | decompilado |
+| `0x3A` | u8 | task_level | prioridade do SceExec (máx 0x14; 0 = chamar direto) | SceAtDataSet_exec | SceAtExecute (inferido) | decompilado |
+| `0x3B` | u8 | trg_type_bak | — | SceAtDataSet_exec | SceAtDataReset (inferido) | decompilado |
+| `0x3C` | ptr | pParam | argumento da função | SceAtDataSet_exec | SceAtExecute (inferido) | decompilado |
+| `0x40` | ptr | pFunc | função da área (tarefa de roteiro) | SceAtDataSet_exec | SceAtExecute (inferido) | decompilado |
 | `0x44` | u8 | priority | índice na tabela de ordenação (0..15) | arquivo | SceExec | gc |
-| `0x45` | u8 | kind | sinalizador passado ao SceExec | SceAtDataSet_exec | SceExec | decompilado |
+| `0x45` | u8 | kind | sinalizador passado ao SceExec | SceAtDataSet_exec | SceExec (inferido) | decompilado |
 | `0x4C` | ptr | pParent | modelo pai (a área acompanha) | SceAtSetParent | SceAtGetCenterPos | gc |
-| `0x60` | u8[0x40] | dados por tipo | porta: posição, ângulo, estágio/sala destino, chave; item: posição, modelo, id, quantidade, sinalizador de salvamento; colisão de roteiro: pSat, pEat, atributos; tipo 15: +0x60/+0x64 função e argumento, +0x68 nível, +0x69 kind (lido no PS2) | arquivo, SceAtDataSet_* | função por tipo | gc |
+| `0x60` | u8[0x40] | dados por tipo | porta: posição, ângulo, estágio/sala destino, chave; item: posição, modelo, id, quantidade, sinalizador de salvamento; colisão de roteiro: pSat, pEat, atributos; tipo 15: +0x60 argumento, +0x64 função, +0x68 nível, +0x69 kind (lido no PS2) | arquivo, SceAtDataSet_* | função por tipo | gc |
 
 Funções:
 
-- `0x0026A750 / 0x0026A8A8` SceAtPtr(no) / SceAtDataSet_exec(no, nível, trg, arg, func, kind): achar e armar uma área (função e argumento)
+- `0x0026A750 / 0x0026A8A8` SceAtPtr(no) / SceAtDataSet_exec(no, nível, trg, func, arg, kind): achar e armar uma área: o 4º argumento vai para +0x40 (função) e o 5º para +0x3C (argumento); no tipo 15, +0x64 e +0x60
 - `0x0026A9C8 / 0x0026AA80 / 0x0026AAB0 / 0x0026AAE0` SceAtSetEnable / SceAtCheckEnable / SceAtHitCheck / SceAtExecute: habilitar, testar e executar áreas
 - `0x0026C458 / 0x0026C898 / 0x0026D790` SceAtCreateExecAt / SceAtCreateItemAt / SceAtSetItemModel: criar áreas e itens em tempo de execução (candidatas a ação do mestre)
 - `0x0026B0C8 / 0x0026A868` SceAtExecRoomJump / SceAtSetDoorFunc: troca de sala por porta
@@ -417,11 +425,11 @@ Medido em S9-02-colisao-e-terreno: chão gerado do modelo visual e registrado co
 
 | deslocamento | tipo | campo | significado | quem escreve | quem lê | prova |
 |---|---|---|---|---|---|---|
-| `mgr+0x00` | ptr | pArray | vetor de cSat | arrayAlloc | check, hitCheck2 | decompilado, ao_vivo |
+| `mgr+0x00` | ptr | pArray | vetor de cSat | arrayAlloc (gc) | check, hitCheck2 | decompilado, ao_vivo |
 | `mgr+0x04` | u32 | nArray | 20 vagas | — | — | ao_vivo |
 | `mgr+0x08` | u32 | size | 0xF0 | — | — | ao_vivo |
-| `mgr+0x10` | ptr | pAlive | lista de peças vivas | create/destroy | check | ao_vivo |
-| `mgr+0x1C` | u32 | type | 0 SatMgr, 1 EatMgr; copiado para SEck em hitCheck2; os filtros de atributo (PL_NOHIT 0x00400000 etc.) só valem com 0 | construtor | hitCheck2 | decompilado, ao_vivo |
+| `mgr+0x10` | ptr | pAlive | lista de peças vivas | create/destroy | check (inferido) | ao_vivo |
+| `mgr+0x1C` | u32 | type | 0 SatMgr, 1 EatMgr; copiado para SEck em hitCheck2; os filtros de atributo (PL_NOHIT 0x00400000 etc.) só valem com 0 | construtor (inferido) | hitCheck2 | decompilado, ao_vivo |
 | `sat+0x00` | u32 | be_flag | bit 0 vivo | create/destroy | — | ao_vivo |
 | `sat+0x0C` | ptr | vértices | Vec de 12 bytes no arquivo | create | polySphereCk | decompilado, ao_vivo |
 | `sat+0x10` | ptr | normais | — | create | — | ao_vivo |
@@ -429,12 +437,12 @@ Medido em S9-02-colisao-e-terreno: chão gerado do modelo visual e registrado co
 | `sat+0x18` | ptr | polígonos | 0x14 bytes: v0..v2, normal, e0..e2, reserva, status u32 (atributos: 0x40 chão, 0x80 parede, 0x80000 saltável, 0x400000 não colide com o jogador) | create | polySphereCk, hitCheck2 | decompilado, ao_vivo |
 | `sat+0x1C` | u16 | nº de vértices | — | create | — | ao_vivo |
 | `sat+0x1E` | u16 | nº de polígonos | máx 8192 (polyBit 0x400) | create | — | ao_vivo |
-| `sat+0x20` | u16[3] | chão / rampa / parede | contagens por classe (polígonos ordenados assim) | create | getFloor | ao_vivo |
-| `sat+0x2A` | u16 | flag | 4 ativa, 2 arquivo alocado pelo gerente | create/destroy | check | ao_vivo |
-| `sat+0x30` | ptr | bloco raiz | blocos irmãos encadeados por deslocamento relativo em +0x20 | create | check | ao_vivo |
+| `sat+0x20` | u16[3] | chão / rampa / parede | contagens por classe (polígonos ordenados assim) | create | getFloor (inferido) | ao_vivo |
+| `sat+0x2A` | u16 | flag | 4 ativa, 2 arquivo alocado pelo gerente | create/destroy | check (inferido) | ao_vivo |
+| `sat+0x30` | ptr | bloco raiz | blocos irmãos encadeados por deslocamento relativo em +0x20 | create | check (inferido) | ao_vivo |
 | `sat+0x60` | ptr | arquivo (cSatFile) | cabeçalho 0x14 | create | — | ao_vivo |
-| `sat+0x70` | mat4 | matriz | — | setMatrix | — | ao_vivo |
-| `sat+0xB0` | mat4 | inversa | — | setMatrix | — | ao_vivo |
+| `sat+0x70` | mat4 | matriz | — | setMatrix (gc) | — | ao_vivo |
+| `sat+0xB0` | mat4 | inversa | — | setMatrix (gc) | — | ao_vivo |
 
 Funções:
 
@@ -458,9 +466,9 @@ Provada por projeção da raiz, pés e cabeça do inimigo dentro da caixa desenh
 
 | deslocamento | tipo | campo | significado | quem escreve | quem lê | prova |
 |---|---|---|---|---|---|---|
-| `0x003CA220` | vec3 | olho | anda com o jogador e orbita quando ele vira | CameraMove | — | foto, ao_vivo |
-| `0x003CA230` | vec3 | alvo | projeta no centro da tela; tronco do jogador | CameraMove | bancada/personagens.py (direção 'à frente') | foto, ao_vivo |
-| `0x004327C0` | mat4 | visão-projeção | vetor-linha × matriz; w = distância ao olho em mm | 0x252830 (4 sq, todo quadro) | renderizador | vigia, foto |
+| `0x003CA220` | vec3 | olho | anda com o jogador e orbita quando ele vira | CameraMove (gc) | — | foto, ao_vivo |
+| `0x003CA230` | vec3 | alvo | projeta no centro da tela; tronco do jogador | CameraMove (gc) | bancada/personagens.py (direção 'à frente') | foto, ao_vivo |
+| `0x004327C0` | mat4 | visão-projeção | vetor-linha × matriz; w = distância ao olho em mm | 0x252830 (4 sq, todo quadro) | renderizador (inferido) | vigia, foto |
 | `0x00432840` | mat4 | tela | x = 256 − (x/w)·1104,64; y = 224 + (y/w)·1706,67 (512×448) | — | — | foto |
 
 Funções:
@@ -481,10 +489,10 @@ Formato da ferramenta pública RE4-PS2-BIN-TOOL, validado ao vivo (altura sob o 
 
 | deslocamento | tipo | campo | significado | quem escreve | quem lê | prova |
 |---|---|---|---|---|---|---|
-| `bin+0x00` | u8[0x50] | cabeçalho | assinatura em 0x30; +0xA nº de materiais; +0xC tabela de materiais (16 bytes cada, +12 ponteiro do nó) | arquivo | desenho, terreno.py | ao_vivo |
+| `bin+0x00` | u8[0x50] | cabeçalho | assinatura em 0x30; +0xA nº de materiais; +0xC tabela de materiais (16 bytes cada, +12 ponteiro do nó) | arquivo | terreno.py | ao_vivo |
 | `nó` | u16, u8, u8 | total, segmentos−1, ossos | — | arquivo | terreno.py | ao_vivo |
 | `segmento` | cabeçalhos 0x10 | linhas e fator | pesos se h1[12]==0 && h1[14]>1; h2[0] nº de linhas; fator float em h2+0xC; linhas de 24 bytes com xyz int16; IndexComplement +14 == 0 fecha o triângulo da tira | arquivo | terreno.py | ao_vivo |
-| `cObj+0x10` | mat4 | matriz do objeto | mundo = vértice × fator × matriz (escala 10 embutida) | matUpdate | desenho, terreno.py | ao_vivo |
+| `cObj+0x10` | mat4 | matriz do objeto | mundo = vértice × fator × matriz (escala 10 embutida) | matUpdate (gc) | terreno.py | ao_vivo |
 
 Funções:
 
@@ -504,7 +512,7 @@ EstSet(pai, idx=−1, &pos, &rot, est, kind, flags, u8) cria um efeito; est 0x58
 
 | deslocamento | tipo | campo | significado | quem escreve | quem lê | prova |
 |---|---|---|---|---|---|---|
-| `est+0x0` | u8[0xC] | entrada da tabela Est | formato não lido | arquivo EFF | EstSet | ao_vivo |
+| `est+0x0` | u8[0xC] | entrada da tabela Est | formato não lido | arquivo EFF (inferido) | EstSet | ao_vivo |
 
 Funções:
 
@@ -525,9 +533,84 @@ Só o bit de tiro foi visto.
 
 | deslocamento | tipo | campo | significado | quem escreve | quem lê | prova |
 |---|---|---|---|---|---|---|
-| `0x00` | u32 | botões | bit 0x80 = tiro; demais botões não mapeados | leitura do pad | joyFireOn/Off/Trg 0x0024BE78..0x0024BF50 | ao_vivo |
+| `0x00` | u32 | botões | bit 0x80 = tiro; demais botões não mapeados | leitura do pad (inferido) | joyFireOn/Off/Trg 0x0024BE78..0x0024BF50 (inferido) | ao_vivo |
 
 Pendências:
 
 - mapear os botões (base do botão de salto da LC-17)
+
+<a id="eventos"></a>
+## Eventos e cutscenes (Event, EventMgr, blocos EVS)
+
+- **Raiz:** EventMgr (0x00205B90..0x00207470 nomeadas no índice); raiz dos dados não localizada
+- **Estado:** não lida
+
+Nada lido no PS2. É o que prepara colisão e animação dos personagens de cena (LC-18).
+
+Funções:
+
+- `0x00206280 / 0x00206740 / 0x00206EA0 / 0x00206BE8; 0x00202DD8` EventMgr::EvtReadExec / EvtFree / SetFunc / SetBin; Event::RunEvtCancel: pontos de entrada pelo nome
+
+Pendências:
+
+- ler EvtReadExec e o formato dos blocos EVS
+
+<a id="blocos_sala"></a>
+## Arquivo de sala (blocos SMD/SMX, LIT, SAR, EFF, TEX, ITM/ETM/ETS, CAM, BLK, EVS/FSE/AEV/ITA)
+
+- **Raiz:** não localizada no PS2 (no GameCube, pG->pRoom e pCore)
+- **Estado:** não lida
+
+Só os nomes dos blocos vêm do GameCube. No PS2 só se leu o que já está em memória (colisão SAR, objetos SMD, lista ESL).
+
+Pendências:
+
+- achar o arquivo da sala no AFS e o índice de blocos em memória
+
+<a id="pzl"></a>
+## Tabuleiro da maleta (pzlPlayer, pzlBoard, pzlPiece)
+
+- **Raiz:** criado pela tela da maleta 0x0111F4E0 (módulo do menu); vive só com a tela aberta
+- **Tamanho:** pzlPiece 0x2C; até 121 peças
+- **Estado:** não lida
+
+Lido só o suficiente para dar um item (peça: +0x14/+0x18 posição, +0x20 orientação, +0x24 item; tamanhos 10x6, 11x7, 12x8, 15x8, extra 6x12). Campos não tabelados.
+
+Funções:
+
+- `0x0025FD10 / 0x002601B0 / 0x002602A0 / 0x002607D8; 0x0025FB88` pzlPlayer::init / save / appendExtraPiece / putPiece; pzlBoard::cellState: lidas em 28/10 para a regra de encaixe
+
+Pendências:
+
+- tabelar pzlBoard e pzlPiece
+
+<a id="snr2"></a>
+## Cabeçalho SNR2 do módulo realocável (.rel)
+
+- **Raiz:** início de cada .rel (tabela de módulos +0x88)
+- **Tamanho:** 16 palavras de cabeçalho
+- **Estado:** parcial
+
+Lido para o realocador próprio (bancada/snr2.py, validado contra os módulos vivos): +4 lista de realocações simbólicas e +8 contagem, +0xC tabela de seções de 12 bytes e +0x10 contagem, +0x18 entrada dos construtores, +0x20 tabela de ponteiros e +0x24 contagem, +0x28 alinhamento 0x80, +0x2C tamanho, +0x34 fluxo de realocações comprimido; seções tipo 0 endereço, 1 importado por nome, 2 e 3 definidos. Não tabelado campo a campo aqui.
+
+Funções:
+
+- `0x002A56B8` ligador: ver módulos
+
+Pendências:
+
+- tabelar os 16 campos com quem lê cada um no ligador
+
+<a id="tipos_inimigo"></a>
+## Tabela de tipos de inimigo (0x003C8F40)
+
+- **Raiz:** 0x003C8F40; estática
+- **Tamanho:** 64 entradas
+- **Estado:** não lida
+
+Tabela de salto por tipo usada pela função de dano; os 64 casos não foram nomeados.
+
+Pendências:
+
+- nomear os 64 casos pelo C decompilado (LifeDownSet2)
 

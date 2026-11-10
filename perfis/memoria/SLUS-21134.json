@@ -29,11 +29,11 @@
     "lista_da_sala": {"endereco": "0x0042DEE4", "formato": "EM_LIST: 255 entradas de 32 bytes por estágio (arquivos emleon00..09.esl do AFS; emgirl* nas partes da Ashley): +0 flags (bit 0 vivo, bit 1 já criado, 7 = evento consumido), +1 tipo, +2 variante, +3, +4 u32, +8 vida, +0xB, +0xC/+0xE/+0x10 posição em cm (i16), +0x12/+0x14/+0x16 rotação (i16, 2π/32768), +0x18 u16 estágio<<8 | sala, +0x1A i16 ×1000", "significado": "os roteiros da sala criam a entrada i com EmSetFromList2(i); EmSetEvent(struct) cria de uma struct avulsa com o mesmo formato (é o que o mestre usa)", "origem": "EmSetFromList2 0x001BD538 e EmSetEvent 0x001BD800 decompiladas em 29/10"},
     "tipos": {"0x00": "jogador (pl00)", "0x02": "cSubLeon (pl10, Leon de cena; a criação trava)", "0x03": "cSubAshley (pl11/pl15/pl18 por traje; nasce num ponto fixo próprio)", "0x04": "cSubLuis (pl14; ponto fixo próprio)", "0x0E": "cPl0e (pl0e, lancha; nasce onde pedido)", "0x0F": "cPl0f (pl0f, lancha do Del Lago; alocador especial; nasce onde pedido)", "0x12": "aldeão (em12, vida 500)", "0x15": "aldeão da vila (em15)", "0x23": "corvo (em23, vida 10)", "0x25": "em25 (alocador especial; desenha errado quando criado por evento)", "0x28": "em28 (vida 100)", "0x2A": "em2a", "nota": "nomes de classe lidos nas tabelas de seções dos .rel da ISO (bancada/modulos.py); demais em10..em4f sem nome amigável ainda; pl02 = cPlAda (jogável), pl12 = cSubAda (de cena, sem .dat próprio: com o modelo pl02 nasce e anda, mas o jogo trava na colisão segundos depois), pl06 cPlHunk, pl0a cPlKlauser, pl0d cPlWesker, pl1a cSubSubLeon"},
     "vetor_anexos": {"endereco": "0x017BCDF0", "passo": "0xED0", "slots": 5, "significado": "vetor de objetos presos a personagens (armas, cabeças); mesmo formato", "origem": "descoberta em 27/10"},
-    "campos": {"cabecalho": {"deslocamento": "0x000", "tipo": "u32", "significado": "0x0B002077 no jogador, 0x02002077 no inimigo de aldeia, 0x02002067 em aves, 0x0200686F em atores parados; bit 16 ligado = morto ou inativo (visto em duas mortes; provisório)"}, "posicao": {"deslocamento": "0x040", "tipo": "vec3", "significado": "posição dos pés no mundo, em mm; cópias em 0x0C0, 0x130 e 0x290"}, "ossos": {"deslocamento": "0x110", "tipo": "ptr", "significado": "ponteiro para a raiz do esqueleto (pool de nós de 0x270 bytes)"}, "animacao": {"deslocamento": "0x2FC", "tipo": "u16", "significado": "identificador da animação corrente (118 andando, 184 reação ao tiro, 103 morto no inimigo de aldeia); provisório"}, "anexo": {"deslocamento": "0x710", "tipo": "ptr", "significado": "ponteiro para o objeto preso (arma); zera na morte e o objeto some do vetor de anexos"}, "tipo": {"deslocamento": "0x11C", "tipo": "u8", "significado": "tipo da entidade para o dano: 0 jogador, 1 a 13 parceira e aliados, 16 ou mais inimigos (tabela de salto por tipo em 0x003C8F40)"}, "vida": {"deslocamento": "0x4B0", "tipo": "i16", "significado": "vida atual: Ganado de aldeia 500, aves 10, atores parados 1000, jogador 1200 (espelho de 0x0042DA76)", "origem": "vigia de escrita em 28/10: a instrução 0x001C2AA8 da função de dano escreveu 248 no primeiro tiro e 0 na morte", "validacao": "três tiros com o jogador no controle: 500 → 248 → ... → 0, cabeçalho ganhou o bit 16 na morte"}, "vida_maxima": {"deslocamento": "0x4B2", "tipo": "i16", "significado": "vida máxima da entidade"}, "registro_de_acerto": {"deslocamento": "0x4D0", "tipo": "struct", "significado": "sub-bloco usado pelo tratador de acerto do inimigo (0x01BADAF0); +0x3CA dele (+0x89A do slot) guarda o dano restante do acerto"}},
+    "campos": {"cabecalho": {"deslocamento": "0x000", "tipo": "u32", "significado": "0x0B002077 no jogador, 0x02002077 no inimigo de aldeia, 0x02002067 em aves, 0x0200686F em atores parados; bit 16 ligado = morto ou inativo (visto em duas mortes; provisório)"}, "posicao": {"deslocamento": "0x0C0", "tipo": "vec3", "significado": "posição dos pés no mundo, em mm (EmSetEvent grava aqui); +0x130 é a posição anterior; +0x040 é a linha de translação da matriz de mundo em +0x010 e +0x290 outra cópia. Substituído pelo bloco estruturas.cEm (10/11)"}, "ossos": {"deslocamento": "0x110", "tipo": "ptr", "significado": "ponteiro para a raiz do esqueleto (pool de nós de 0x270 bytes)"}, "animacao": {"deslocamento": "0x2FC", "tipo": "u16", "significado": "identificador da animação corrente (118 andando, 184 reação ao tiro, 103 morto no inimigo de aldeia); provisório"}, "anexo": {"deslocamento": "0x710", "tipo": "ptr", "significado": "ponteiro para o objeto preso (arma); zera na morte e o objeto some do vetor de anexos"}, "tipo": {"deslocamento": "0x11C", "tipo": "u8", "significado": "tipo da entidade para o dano: 0 jogador, 1 a 13 parceira e aliados, 16 ou mais inimigos (tabela de salto por tipo em 0x003C8F40)"}, "vida": {"deslocamento": "0x4B0", "tipo": "i16", "significado": "vida atual: Ganado de aldeia 500, aves 10, atores parados 1000, jogador 1200 (espelho de 0x0042DA76)", "origem": "vigia de escrita em 28/10: a instrução 0x001C2AA8 da função de dano escreveu 248 no primeiro tiro e 0 na morte", "validacao": "três tiros com o jogador no controle: 500 → 248 → ... → 0, cabeçalho ganhou o bit 16 na morte"}, "vida_maxima": {"deslocamento": "0x4B2", "tipo": "i16", "significado": "vida máxima da entidade"}, "registro_de_acerto": {"deslocamento": "0x4D0", "tipo": "struct", "significado": "sub-bloco usado pelo tratador de acerto do inimigo (0x01BADAF0); +0x3CA dele (+0x89A do slot) guarda o dano restante do acerto"}},
     "lista_de_tarefas": {"endereco": "0x0048A000", "significado": "lista encadeada de tarefas do quadro: triplas (objeto, função 0x00257F98 ou 0x00258AC0, próxima); serve para enumerar quem está ativo", "origem": "descoberta em 27/10"},
     "validacao": "posição do slot 11 (inimigo do estado 91) projetada com a câmera cai na caixa desenhada do inimigo em 4 de 5 quadros válidos (tronco e cabeça; os pés saem pela borda inferior num deles); no quinto, durante a reação ao tiro, os três pontos ficam 8 px à esquerda da caixa",
     "pendente": "tabela de tipos de inimigo (0x3C8F40) sem nomes; vida do inimigo e munição fechadas",
-    "funcoes": {"dano": {"endereco": "0x001C2618", "assinatura": "dano(entidade, quantidade, variacao, flags) -> vida restante", "significado": "única função que desconta vida: jogador (vida global, com fator de dificuldade e flags de invencibilidade em +0x7EE8 do bloco 0x425BA0), parceira (0x0042DA7A) e inimigos (+0x4B0 da entidade); variação ≠ 0 soma rand % (2·variação) − variação; flags bit 0 = não mata (deixa 1)", "origem": "lida em 28/10 a partir do vigia de escrita"}, "tratar_acerto_inimigo": {"endereco": "0x01BADAF0", "significado": "módulo de inimigos: aplica o acerto de um tiro ao inimigo chamando calcular_dano_tiro e dano", "origem": "chamador da função de dano com base no slot do Ganado"}, "calcular_dano_tiro": {"endereco": "0x01BF4458", "significado": "calcula a quantidade de dano do acerto a partir do tipo de tiro (+0x2E do registro) e da zona atingida"}, "registrar_acerto": {"endereco": "0x001BB580", "significado": "preenche o registro de acerto da entidade (chamada pela bala e por outras fontes de dano)"}, "bloco_do_jogador": {"endereco": "0x00425BA0", "significado": "bloco global de status do jogador, apontado por 0x00325308; vida em +0x7ED6, máxima +0x7ED8, parceira +0x7EDA/+0x7EDC, dificuldade +0x7EC4, flags de invencibilidade e vida cheia em +0x7EE8 (64 bits)"}, "entidade_do_jogador": {"endereco": "0x004203D0", "significado": "ponteiro para a entidade do jogador (slot 0 do vetor)"}}
+    "funcoes": {"dano": {"endereco": "0x001C2618", "assinatura": "dano(entidade, quantidade, variacao, flags) -> vida restante", "significado": "única função que desconta vida: jogador (vida global, com fator de dificuldade; vida reposta quando personagem +0x7EEA == 1 e +0x7EED == 2, ver estruturas.pG), parceira (0x0042DA7A) e inimigos (+0x4B0 da entidade); variação ≠ 0 soma rand % (2·variação) − variação; flags bit 0 = não mata (deixa 1)", "origem": "lida em 28/10 a partir do vigia de escrita"}, "tratar_acerto_inimigo": {"endereco": "0x01BADAF0", "significado": "módulo de inimigos: aplica o acerto de um tiro ao inimigo chamando calcular_dano_tiro e dano", "origem": "chamador da função de dano com base no slot do Ganado"}, "calcular_dano_tiro": {"endereco": "0x01BF4458", "significado": "calcula a quantidade de dano do acerto a partir do tipo de tiro (+0x2E do registro) e da zona atingida"}, "registrar_acerto": {"endereco": "0x001BB580", "significado": "preenche o registro de acerto da entidade (chamada pela bala e por outras fontes de dano)"}, "bloco_do_jogador": {"endereco": "0x00425BA0", "significado": "bloco global de status do jogador, apontado por 0x00325308; vida em +0x7ED6, máxima +0x7ED8, parceira +0x7EDA/+0x7EDC, dificuldade +0x7EC4; o que foi lido como 'flags de 64 bits em +0x7EE8' é a leitura de 8 bytes que testa personagem (+0x7EEA) e +0x7EED. Substituído pelo bloco estruturas.pG (10/11)"}, "entidade_do_jogador": {"endereco": "0x004203D0", "significado": "ponteiro para a entidade do jogador (slot 0 do vetor)"}}
   },
   "intocavel": [],
   "acoes_de_mundo": [],
@@ -71,7 +71,7 @@
         "resumo": "Estado global da partida: sala, vida, dificuldade, personagem, lista de inimigos da sala e sinalizadores. A decompilação do GameCube nomeia o equivalente (GLOBAL_WK), mas os deslocamentos do PS2 são outros; os nomes abaixo entre parênteses são os do GameCube quando o papel bate.",
         "campos": [
           {"d": "0x5C", "t": "u32", "n": "sinalizadores de sistema", "s": "a função de dano testa o bit 0x40000000 (com pSys+8 == 0) e readEmList o bit 0x2000; nome não determinado", "e": "não lido", "l": "LifeDownSet2, readEmList", "p": "decompilado"},
-          {"d": "0x70", "t": "s32", "n": "(Speed?)", "s": "readEmList recarrega a lista quando este valor é negativo e a lista mudou; papel não determinado", "e": "não lido", "l": "readEmList", "p": "decompilado"},
+          {"d": "0x70", "t": "s32", "n": "não nomeado", "s": "readEmList recarrega a lista quando este valor é negativo e a lista mudou; papel não determinado", "e": "não lido", "l": "readEmList", "p": "decompilado"},
           {"d": "0x7EB8", "t": "u16", "n": "sala (room_id)", "s": "byte baixo = sala, byte alto = estágio; chave de cRoomData::checkPassed e das tabelas por sala", "e": "troca de sala (não lida)", "l": "EmSetFromList2, readEmList, MercSysInitRoom, cRoomData::checkPassed e dezenas de funções", "p": "decompilado, ao_vivo"},
           {"d": "0x7EC4", "t": "u8", "n": "dificuldade adaptativa (Game_level)", "s": "0 a 10; fator do jogador 0,1·dif + 0,5; do inimigo 2,0 − 0,2·dif abaixo de 6, senão 1,0 − 0,03·(dif − 5)", "e": "não lido (GameAddPoint no GameCube)", "l": "LifeDownSet2", "p": "decompilado, ao_vivo"},
           {"d": "0x7ED5", "t": "s8", "n": "lista de inimigos carregada (em_list_no)", "s": "número do arquivo .esl em memória; −1 = nenhuma", "e": "readEmList", "l": "EmSetFromList2, readEmList", "p": "decompilado"},
@@ -101,15 +101,15 @@
         "tamanho": "0x38",
         "resumo": "Pool fixo de 60 personagens de 0xED0 bytes; o vetor é alocado no heap (0x01789F40 no estado 91) e deve ser lido por +0 a cada sessão. Lista de vivos encadeada por cEm+0x4.",
         "campos": [
-          {"d": "0x00", "t": "ptr", "n": "pArray", "s": "vetor de personagens (heap)", "e": "arrayAlloc", "l": "EmSetEvent, EmSetFromList2, tudo que percorre personagens", "p": "decompilado, ao_vivo"},
-          {"d": "0x04", "t": "u32", "n": "nArray", "s": "60", "e": "arrayAlloc", "l": "at()", "p": "decompilado, ao_vivo"},
-          {"d": "0x08", "t": "u32", "n": "size", "s": "0xED0 (passo do vetor)", "e": "construtor", "l": "at()", "p": "decompilado, ao_vivo"},
+          {"d": "0x00", "t": "ptr", "n": "pArray", "s": "vetor de personagens (heap)", "e": "arrayAlloc (gc)", "l": "EmSetEvent, EmSetFromList2, tudo que percorre personagens", "p": "decompilado, ao_vivo"},
+          {"d": "0x04", "t": "u32", "n": "nArray", "s": "60", "e": "arrayAlloc (gc)", "l": "at() (gc)", "p": "decompilado, ao_vivo"},
+          {"d": "0x08", "t": "u32", "n": "size", "s": "0xED0 (passo do vetor)", "e": "construtor (gc)", "l": "at() (gc)", "p": "decompilado, ao_vivo"},
           {"d": "0x0C", "t": "u8", "n": "flag", "s": "", "e": "construtor", "l": "", "p": "gc"},
           {"d": "0x10", "t": "ptr", "n": "pAlive", "s": "cabeça da lista de vivos (cEm+0x4 = próximo)", "e": "create/destroy", "l": "move, getEmPtr", "p": "gc"},
           {"d": "0x34", "t": "u32", "n": "Guid", "s": "próximo serial de modelo", "e": "construct", "l": "", "p": "gc"}
         ],
         "funcoes": [
-          {"nome": "cEmMgr::create (tipo comum)", "endereco": "0x00110378", "papel": "pega uma vaga e constrói o cEm do tipo (vagas do fim para os tipos 0x0F e 0x25: 0x00117B00)"},
+          {"nome": "função sem nome (criar vaga)", "endereco": "0x00110378", "papel": "recebe o EmMgr, pega uma vaga e constrói o cEm do tipo; para os tipos 0x0F e 0x25 é a 0x00117B00 (vagas do fim). Nomes não vêm da tabela de símbolos"},
           {"nome": "EmSetEvent(EM_LIST*)", "endereco": "0x001BD800", "papel": "cria de uma struct avulsa; devolve o cEm ou errEm (0); marca a struct com 7 e chama o método virtual +0x2C do tipo"},
           {"nome": "EmSetFromList2(i, checar_usada)", "endereco": "0x001BD538", "papel": "cria a entrada i da lista da sala; recusa se sala/estágio não batem, já criada, id 0 ou bit usado"},
           {"nome": "GetEmPtrFromList / GetEmIdFromList / EmListIsAlive", "endereco": "0x001BD9E8 / 0x001BDAA8 / 0x001BDB38", "papel": "consultas por índice da lista"},
@@ -125,27 +125,27 @@
         "tamanho": "0xED0 por vaga (cEm mais a área livre do tipo, que começa em 0x3E0 no GameCube e não foi delimitada no PS2)",
         "resumo": "Mesma estrutura para jogador, parceira, inimigos e objetos-inimigo (caixas, portas, árvores). Os deslocamentos do PS2 diferem dos do GameCube; só entram aqui os provados no PS2.",
         "campos": [
-          {"d": "0x000", "t": "u32", "n": "be_flag", "s": "bit 0 vivo; 0x200/0x400 pedido de morte (vivo = (be_flag & 0x201) == 1); bit 16 ligou nas duas mortes vistas; cabeçalho 0x0B002077 no jogador, 0x02002077 no aldeão", "e": "cManager (create/destroy)", "l": "isAlive em todo laço de personagens", "p": "foto, vigia"},
-          {"d": "0x004", "t": "ptr", "n": "pNext", "s": "próximo vivo (lista de EmMgr+0x10)", "e": "cManager", "l": "cManager", "p": "gc"},
-          {"d": "0x008", "t": "ptr", "n": "tabela virtual", "s": "EmSetEvent chama *(vt+0x2C)(this + *(s16*)(vt+0x28)) logo após preencher a struct", "e": "construtor do tipo", "l": "EmSetEvent", "p": "decompilado"},
-          {"d": "0x010", "t": "mat4", "n": "matriz de mundo (cCoord)", "s": "4×4 de floats; +0x40 é a linha de translação (o que S8-00 chamou de 'posição com cópias')", "e": "matUpdate a cada quadro", "l": "desenho, partes", "p": "foto"},
-          {"d": "0x0C0", "t": "vec3", "n": "pos", "s": "posição dos pés em mm", "e": "EmSetEvent (lista ×10), movimento, colisão (encaixe no chão e empurrão de parede), canal (teleporte)", "l": "tudo", "p": "decompilado, ao_vivo"},
+          {"d": "0x000", "t": "u32", "n": "be_flag", "s": "bit 0 vivo; 0x200/0x400 pedido de morte (vivo = (be_flag & 0x201) == 1); bit 16 ligou nas duas mortes vistas; cabeçalho 0x0B002077 no jogador, 0x02002077 no aldeão", "e": "cManager (gc)", "l": "isAlive em todo laço de personagens (gc)", "p": "foto, vigia"},
+          {"d": "0x004", "t": "ptr", "n": "pNext", "s": "próximo vivo (lista de EmMgr+0x10)", "e": "cManager (gc)", "l": "cManager (gc)", "p": "gc"},
+          {"d": "0x008", "t": "ptr", "n": "tabela virtual", "s": "EmSetEvent chama *(vt+0x2C)(this + *(s16*)(vt+0x28)) logo após preencher a struct", "e": "construtor do tipo (inferido)", "l": "EmSetEvent", "p": "decompilado"},
+          {"d": "0x010", "t": "mat4", "n": "matriz de mundo (cCoord)", "s": "4×4 de floats, conferida na foto inimigo1 (S8-00): três linhas unitárias da rotação em y (ang +0xD4 = 1,75 rad) e a linha +0x40 igual a pos; é o que S8-00 chamou de 'posição com cópias'", "e": "matUpdate a cada quadro (gc)", "l": "desenho, partes (inferido)", "p": "foto"},
+          {"d": "0x0C0", "t": "vec3", "n": "pos", "s": "posição dos pés em mm", "e": "EmSetEvent (lista ×10), movimento, colisão (encaixe no chão e empurrão de parede), canal (teleporte)", "l": "jumpCheck, EmSetEvent (distância ao jogador), tudo o mais (inferido)", "p": "decompilado, ao_vivo"},
           {"d": "0x0D0", "t": "vec3", "n": "ang", "s": "rotação em radianos (lista × π/16384); +0xD4 = eixo y (frente)", "e": "EmSetEvent, movimento, canal", "l": "desenho, salto (jumpCheck)", "p": "decompilado, ao_vivo"},
-          {"d": "0x110", "t": "ptr", "n": "pList (partes)", "s": "primeira cParts; cada parte: +0x80 posição de mundo, +0x90 anterior, +0xA0 anterior-anterior, +0x110 próxima parte. No teleporte é preciso escrever as três posições de todas as partes", "e": "partsWorldCalc a cada quadro", "l": "colisão (varredura anterior→atual), desenho", "p": "foto, ao_vivo"},
-          {"d": "0x11C", "t": "u8", "n": "id (tipo)", "s": "0 jogador, 1 a 13 parceira e aliados, ≥ 16 inimigos (ramo da função de dano; tabela por tipo 0x003C8F40)", "e": "construtor do tipo", "l": "LifeDownSet2", "p": "decompilado, ao_vivo"},
-          {"d": "0x11D", "t": "u8", "n": "type (variante)", "s": "byte +2 da EM_LIST", "e": "EmSetEvent, EmSetFromList2", "l": "rotinas do tipo", "p": "decompilado"},
-          {"d": "0x130", "t": "vec3", "n": "pos_old", "s": "posição antes do movimento do quadro; EmSetEvent copia pos para cá", "e": "EmSetEvent, updateOldPos", "l": "colisão", "p": "decompilado, ao_vivo"},
-          {"d": "0x140", "t": "vec3", "n": "Wall_norm", "s": "normal da parede que empurrou o modelo; zero sem parede", "e": "colisão de cenário", "l": "movimento", "p": "gc, ao_vivo"},
-          {"d": "0x150", "t": "ptr", "n": "pFloor_norm", "s": "normal do chão (câmera de ombro inclina com ela)", "e": "getFloor", "l": "câmera", "p": "gc, ao_vivo"},
-          {"d": "0x190", "t": "ptr", "n": "pModelInfo", "s": "cModelInfo: +0xC model_addr (.bin do modelo em memória)", "e": "modelInit", "l": "desenho, terreno.py", "p": "ao_vivo"},
+          {"d": "0x110", "t": "ptr", "n": "pList (partes)", "s": "primeira cParts; cada parte: +0x80 posição de mundo, +0x90 anterior, +0xA0 anterior-anterior, +0x110 próxima parte. No teleporte é preciso escrever as três posições de todas as partes", "e": "partsWorldCalc a cada quadro (gc)", "l": "colisão (varredura anterior→atual), desenho", "p": "foto, ao_vivo"},
+          {"d": "0x11C", "t": "u8", "n": "id (tipo)", "s": "0 jogador, 1 a 13 parceira e aliados, ≥ 16 inimigos (ramo da função de dano; tabela por tipo 0x003C8F40)", "e": "construtor do tipo (inferido)", "l": "LifeDownSet2", "p": "decompilado, ao_vivo"},
+          {"d": "0x11D", "t": "u8", "n": "type (variante)", "s": "byte +2 da EM_LIST", "e": "EmSetEvent, EmSetFromList2", "l": "rotinas do tipo (inferido)", "p": "decompilado"},
+          {"d": "0x130", "t": "vec3", "n": "pos_old", "s": "posição antes do movimento do quadro; EmSetEvent copia pos para cá", "e": "EmSetEvent, updateOldPos (gc)", "l": "colisão", "p": "decompilado, ao_vivo"},
+          {"d": "0x140", "t": "vec3", "n": "Wall_norm", "s": "normal da parede que empurrou o modelo; zero sem parede", "e": "colisão de cenário (gc)", "l": "movimento (gc)", "p": "gc, ao_vivo"},
+          {"d": "0x150", "t": "ptr", "n": "pFloor_norm", "s": "normal do chão (câmera de ombro inclina com ela)", "e": "getFloor (gc)", "l": "câmera (gc)", "p": "gc, ao_vivo"},
+          {"d": "0x190", "t": "ptr", "n": "pModelInfo", "s": "cModelInfo: +0xC model_addr (.bin do modelo em memória)", "e": "modelInit (gc)", "l": "desenho (inferido), terreno.py", "p": "ao_vivo"},
           {"d": "0x290", "t": "vec3", "n": "cópia da posição", "s": "muda junto com +0xC0 nas fotos; papel não lido", "e": "não lido", "l": "não lido", "p": "foto"},
-          {"d": "0x2FC", "t": "u16", "n": "animação corrente", "s": "118 andando, 184 reação ao tiro, 103 morto (aldeão); provisório", "e": "motionSet", "l": "", "p": "foto"},
-          {"d": "0x320", "t": "cAtariInfo", "n": "atari (corpo de colisão)", "s": "ver a estrutura cAtariInfo", "e": "cAtariInfo::init/move", "l": "SatMgr::check, EmAtCheck", "p": "decompilado, ao_vivo"},
-          {"d": "0x480", "t": "ptr", "n": "base do módulo do tipo", "s": "", "e": "construtor", "l": "", "p": "foto"},
-          {"d": "0x498", "t": "f32", "n": "l_pl", "s": "distância² ao jogador no plano xz (EmSetEvent calcula na criação)", "e": "EmSetEvent, move", "l": "rotinas do tipo", "p": "decompilado"},
-          {"d": "0x49C", "t": "f32", "n": "l_sub", "s": "distância² à parceira; 1e16 na criação", "e": "EmSetEvent, move", "l": "rotinas do tipo", "p": "decompilado"},
-          {"d": "0x4A4", "t": "f32", "n": "Guard_r", "s": "raio de guarda = EM_LIST+0x1A × 1000", "e": "EmSetEvent, EmSetFromList2", "l": "rotinas do tipo", "p": "decompilado"},
-          {"d": "0x4AC", "t": "u32", "n": "flag", "s": "= EM_LIST+4", "e": "EmSetEvent, EmSetFromList2", "l": "rotinas do tipo", "p": "decompilado"},
+          {"d": "0x2FC", "t": "u16", "n": "animação corrente", "s": "118 andando, 184 reação ao tiro, 103 morto (aldeão); provisório", "e": "motionSet (gc)", "l": "", "p": "foto"},
+          {"d": "0x320", "t": "cAtariInfo", "n": "atari (corpo de colisão)", "s": "ver a estrutura cAtariInfo", "e": "cAtariInfo::init/move", "l": "SatMgr::check, EmAtCheck (gc)", "p": "decompilado, ao_vivo"},
+          {"d": "0x480", "t": "ptr", "n": "base do módulo do tipo", "s": "", "e": "construtor (inferido)", "l": "", "p": "foto"},
+          {"d": "0x498", "t": "f32", "n": "l_pl", "s": "distância² ao jogador no plano xz (EmSetEvent calcula na criação)", "e": "EmSetEvent, move (gc)", "l": "rotinas do tipo (inferido)", "p": "decompilado"},
+          {"d": "0x49C", "t": "f32", "n": "l_sub", "s": "distância² à parceira; 1e16 na criação", "e": "EmSetEvent, move (gc)", "l": "rotinas do tipo (inferido)", "p": "decompilado"},
+          {"d": "0x4A4", "t": "f32", "n": "Guard_r", "s": "raio de guarda = EM_LIST+0x1A × 1000", "e": "EmSetEvent, EmSetFromList2", "l": "rotinas do tipo (inferido)", "p": "decompilado"},
+          {"d": "0x4AC", "t": "u32", "n": "flag", "s": "= EM_LIST+4", "e": "EmSetEvent, EmSetFromList2", "l": "rotinas do tipo (inferido)", "p": "decompilado"},
           {"d": "0x4B0", "t": "s16", "n": "hp (vida)", "s": "= EM_LIST+8; aldeão 500, corvo 10, atores parados 1000, jogador 1200 (espelho da vida global)", "e": "EmSetEvent, LifeDownSet2 (instrução 0x1C2AA8)", "l": "LifeDownSet2, HUD do inimigo", "p": "vigia, decompilado, ao_vivo"},
           {"d": "0x4B2", "t": "s16", "n": "hp_max", "s": "= EM_LIST+8", "e": "EmSetEvent", "l": "", "p": "decompilado, ao_vivo"},
           {"d": "0x4BD", "t": "u8", "n": "set", "s": "= EM_LIST+3", "e": "EmSetEvent", "l": "", "p": "decompilado"},
@@ -168,20 +168,22 @@
         "tamanho": "0x64 (Vec de 16 bytes no PS2)",
         "resumo": "Layout do GameCube com o Vec de 12 bytes trocado pelo de 16: os deslocamentos abaixo foram conferidos ao vivo nos campos marcados.",
         "campos": [
-          {"d": "0x00", "t": "vec4", "n": "m_offset", "s": "deslocamento em relação ao modelo", "e": "init", "l": "getPos", "p": "gc"},
-          {"d": "0x10", "t": "f32", "n": "m_radius", "s": "400 no jogador", "e": "init/set", "l": "polySphereCk", "p": "ao_vivo"},
-          {"d": "0x14", "t": "f32", "n": "m_radius2", "s": "", "e": "init/set", "l": "", "p": "gc"},
-          {"d": "0x18", "t": "f32", "n": "m_height", "s": "meia altura", "e": "init", "l": "", "p": "gc"},
-          {"d": "0x1C", "t": "s16", "n": "m_parts_no", "s": "parte que o corpo segue (+1), 0 = o modelo", "e": "init", "l": "getPos", "p": "gc"},
-          {"d": "0x1E", "t": "u16", "n": "m_flag", "s": "0x1301 no jogador: 0x100 colide com cenário (Sca), 0x200 com personagens (Oba), bits 3-4 prioridade de empurrão, bit 0 linha", "e": "on/off/setPriority", "l": "SatMgr::check, EmAtCheck", "p": "ao_vivo"},
-          {"d": "0x40", "t": "vec4", "n": "m_Pos", "s": "posição de mundo deste quadro (= cEm+0x360)", "e": "move", "l": "colisão", "p": "ao_vivo"},
-          {"d": "0x50", "t": "vec4", "n": "m_oldPos", "s": "posição do quadro anterior (= cEm+0x370)", "e": "move", "l": "colisão (varredura)", "p": "ao_vivo"},
-          {"d": "0x60", "t": "ptr", "n": "m_pList", "s": "próximo corpo da cadeia", "e": "init", "l": "DrawOba", "p": "gc"}
+          {"d": "0x00", "t": "vec4", "n": "m_offset", "s": "deslocamento em relação ao modelo", "e": "init (gc)", "l": "getPos (gc)", "p": "gc"},
+          {"d": "0x10", "t": "f32", "n": "m_radius", "s": "400 no jogador (foto inimigo1: +0x330 da vaga 0 = 400,0)", "e": "cAtariInfo::move (interpola para +0x20 em +0x28 quadros), init/set (gc)", "l": "polySphereCk", "p": "decompilado, ao_vivo"},
+          {"d": "0x14", "t": "f32", "n": "m_radius2", "s": "", "e": "cAtariInfo::move (interpola para +0x24)", "l": "", "p": "decompilado"},
+          {"d": "0x18", "t": "f32", "n": "m_height", "s": "meia altura", "e": "init (gc)", "l": "", "p": "gc"},
+          {"d": "0x1C", "t": "s16", "n": "m_parts_no", "s": "parte que o corpo segue (+1), 0 = o modelo", "e": "init (gc)", "l": "getPos (gc)", "p": "gc"},
+          {"d": "0x1E", "t": "u16", "n": "m_flag", "s": "0x1301 no jogador: 0x100 colide com cenário (Sca), 0x200 com personagens (Oba), bits 3-4 prioridade de empurrão, bit 0 linha", "e": "on/off/setPriority (gc)", "l": "SatMgr::check, EmAtCheck (gc)", "p": "ao_vivo"},
+          {"d": "0x20", "t": "f32[2]", "n": "m_radius_n, m_radius2_n", "s": "raios-alvo da interpolação", "e": "set (gc)", "l": "cAtariInfo::move", "p": "decompilado"},
+          {"d": "0x28", "t": "u16", "n": "m_hokan", "s": "quadros restantes da interpolação dos raios", "e": "cAtariInfo::move (decrementa)", "l": "cAtariInfo::move", "p": "decompilado"},
+          {"d": "0x40", "t": "vec4", "n": "m_Pos", "s": "posição de mundo deste quadro (= cEm+0x360; foto inimigo1: pos com y + 876)", "e": "não lido no PS2 (EmAtCheck no GameCube); o move não escreve aqui", "l": "colisão", "p": "foto, ao_vivo"},
+          {"d": "0x50", "t": "vec4", "n": "m_oldPos", "s": "posição do quadro anterior (= cEm+0x370)", "e": "não lido no PS2", "l": "colisão (varredura)", "p": "foto, ao_vivo"},
+          {"d": "0x60", "t": "ptr", "n": "m_pList", "s": "próximo corpo da cadeia", "e": "init (gc)", "l": "DrawOba (gc)", "p": "gc"}
         ],
         "funcoes": [
           {"nome": "cAtariInfo::init / set / move / setPriority", "endereco": "0x001A6078 / 0x001A60C8 / 0x001A6240 / 0x001A6348", "papel": "ciclo do corpo de colisão"}
         ],
-        "pendencias": ["+0x20..+0x3C (raios de interpolação, hokan, stat, pMod, radius3) só por nome"]
+        "pendencias": ["+0x2A stat, +0x2C pMod, +0x30 radius3 só por nome; quem escreve m_Pos/m_oldPos no PS2"]
       },
       {
         "id": "EM_LIST",
@@ -215,16 +217,16 @@
         "tamanho": "item de 14 bytes × 384 vagas",
         "resumo": "A maleta é um tabuleiro remontado a cada abertura a partir do vetor (pzlPlayer); a posição gravada no item é o centro da peça em meias-células.",
         "campos": [
-          {"d": "0x0C", "t": "ptr", "n": "item equipado", "s": "ponteiro para a vaga do item equipado", "e": "equipar", "l": "cItemMgr::bulletNumCurrent", "p": "decompilado, ao_vivo"},
-          {"d": "0x10", "t": "u16", "n": "id do item equipado", "s": "", "e": "equipar", "l": "", "p": "decompilado"},
-          {"d": "0x14", "t": "ptr", "n": "vetor de itens", "s": "384 vagas de 14 bytes (heap)", "e": "construtor", "l": "at, search, pzlPlayer::init", "p": "decompilado, ao_vivo"},
+          {"d": "0x0C", "t": "ptr", "n": "item equipado", "s": "ponteiro para a vaga do item equipado", "e": "equipar (inferido)", "l": "cItemMgr::bulletNumCurrent", "p": "decompilado, ao_vivo"},
+          {"d": "0x10", "t": "u16", "n": "id do item equipado", "s": "", "e": "equipar (inferido)", "l": "", "p": "decompilado"},
+          {"d": "0x14", "t": "ptr", "n": "vetor de itens", "s": "384 vagas de 14 bytes (heap)", "e": "construtor (inferido)", "l": "at, search, pzlPlayer::init", "p": "decompilado, ao_vivo"},
           {"d": "0x18", "t": "ptr", "n": "última vaga tocada", "s": "bancada/inventario.py aponta para a vaga dada", "e": "get", "l": "", "p": "decompilado"},
-          {"d": "0x1C", "t": "u32", "n": "quantidade de vagas", "s": "384", "e": "construtor", "l": "at", "p": "decompilado"},
-          {"d": "item+0x0", "t": "u16", "n": "id", "s": "0x23 pistola, 0x04 balas de pistola, 0x05 erva verde, 0x7C faca, 0x35 lança-foguetes, 0xAC/0xAD tesouros ou chaves", "e": "construct", "l": "tudo", "p": "decompilado, ao_vivo"},
-          {"d": "item+0x2", "t": "u16", "n": "quantidade", "s": "reserva de munição no item de balas; 1 nas armas", "e": "get, reload", "l": "HUD", "p": "decompilado, ao_vivo"},
+          {"d": "0x1C", "t": "u32", "n": "quantidade de vagas", "s": "384", "e": "construtor (inferido)", "l": "at", "p": "decompilado"},
+          {"d": "item+0x0", "t": "u16", "n": "id", "s": "0x23 pistola, 0x04 balas de pistola, 0x05 erva verde, 0x7C faca, 0x35 lança-foguetes, 0xAC/0xAD tesouros ou chaves", "e": "construct", "l": "search, num, pzlPlayer::init", "p": "decompilado, ao_vivo"},
+          {"d": "item+0x2", "t": "u16", "n": "quantidade", "s": "reserva de munição no item de balas; 1 nas armas", "e": "get, reload", "l": "reload, HUD (inferido)", "p": "decompilado, ao_vivo"},
           {"d": "item+0x4", "t": "u8", "n": "flags", "s": "bit 0 = vaga ocupada", "e": "construct", "l": "pzlPlayer::init", "p": "decompilado"},
           {"d": "item+0x5", "t": "u8", "n": "dono", "s": "comparado com +0x13 do gerenciador", "e": "construct", "l": "pzlPlayer::init", "p": "decompilado"},
-          {"d": "item+0x6", "t": "u16", "n": "níveis", "s": "melhorias da arma em 4 bits cada", "e": "construct, loja", "l": "arm", "p": "decompilado"},
+          {"d": "item+0x6", "t": "u16", "n": "níveis", "s": "melhorias da arma em 4 bits cada", "e": "construct, loja (inferido)", "l": "arm (gc)", "p": "decompilado"},
           {"d": "item+0x8", "t": "u16", "n": "balas no pente × 8", "s": "valor >> 3; armas de carga (0x34, 0x37, 0x53) usam +0x6", "e": "construct, reload, trigger", "l": "bulletNumCurrent (HUD)", "p": "decompilado, ao_vivo"},
           {"d": "item+0xA", "t": "u8[2]", "n": "centro da peça (x, y)", "s": "meias-células; canto = centro − centro da peça da tabela", "e": "pzlPlayer::save, dar_item_se_couber", "l": "pzlPlayer::init", "p": "decompilado, ao_vivo"},
           {"d": "item+0xC", "t": "u8", "n": "orientação", "s": "0 a 7", "e": "pzlPlayer::save", "l": "pzlPlayer::init", "p": "decompilado"},
@@ -271,7 +273,7 @@
         "campos": [
           {"d": "0x80", "t": "u16", "n": "tipo", "s": "0 = vaga livre", "e": "carregador, bancada/modulos.py", "l": "SearchEmModule", "p": "decompilado, ao_vivo"},
           {"d": "0x82", "t": "u16", "n": "flags", "s": "1 .rel alocado, 2 ligado, 4 .dat alocado; InitModule libera os alocados", "e": "carregador", "l": "InitModule", "p": "decompilado, ao_vivo"},
-          {"d": "0x84", "t": "ptr", "n": ".dat", "s": "", "e": "carregador", "l": "construtor do tipo", "p": "decompilado, ao_vivo"},
+          {"d": "0x84", "t": "ptr", "n": ".dat", "s": "", "e": "carregador", "l": "construtor do tipo (inferido)", "p": "decompilado, ao_vivo"},
           {"d": "0x88", "t": "ptr", "n": ".rel", "s": "", "e": "carregador", "l": "ligador", "p": "decompilado, ao_vivo"},
           {"d": "0x8C", "t": "u32", "n": "tamanho do .dat", "s": "arredondado a 0x800", "e": "carregador", "l": "InitModule", "p": "decompilado"},
           {"d": "0x90", "t": "u32", "n": "tamanho do .rel", "s": "arredondado a 0x800", "e": "carregador", "l": "InitModule", "p": "decompilado"},
@@ -298,7 +300,7 @@
         "tamanho": "2628 arquivos",
         "resumo": "Cabeçalho 'AFS', contagem, pares (deslocamento, tamanho), nomes de 48 bytes no fim. Só os .dat/.rel de personagem e os .esl foram usados; os blocos da sala (SMD/SMX, LIT, SAR, EFF, TEX, ITM/ETM/ETS, CAM, BLK, EVS/FSE/AEV/ITA no GameCube) ainda não foram mapeados no PS2.",
         "campos": [
-          {"d": "0x00", "t": "char[4]", "n": "assinatura", "s": "'AFS\\0'", "e": "disco", "l": "cDvd", "p": "ao_vivo"},
+          {"d": "0x00", "t": "char[4]", "n": "assinatura", "s": "'AFS\\0'", "e": "disco", "l": "cDvd (inferido)", "p": "ao_vivo"},
           {"d": "0x04", "t": "u32", "n": "quantidade", "s": "2628", "e": "disco", "l": "", "p": "ao_vivo"},
           {"d": "0x08", "t": "u32[2][n+1]", "n": "(deslocamento, tamanho)", "s": "última entrada aponta para os nomes", "e": "disco", "l": "bancada/modulos.py", "p": "ao_vivo"},
           {"d": "nomes", "t": "char[48][n]", "n": "nomes", "s": "32 bytes de nome mais atributos", "e": "disco", "l": "bancada/modulos.py", "p": "ao_vivo"}
@@ -317,14 +319,14 @@
         "tamanho": "entrada 0x350",
         "resumo": "Cada tarefa do jogo é uma thread do kernel com semáforo; TaskSleep marca a tarefa corrente, sinaliza o escalonador e espera o próprio semáforo. Por isso uma função que dorme, chamada pela chamada remota, trava a thread sequestrada. Só o código foi lido; nada conferido ao vivo.",
         "campos": [
-          {"d": "0x04", "t": "u8", "n": "estado", "s": "TaskExec grava 1; TaskSleep grava (estado & 0x80) | 2", "e": "TaskExec, TaskSleep", "l": "escalonador, SceExec", "p": "decompilado"},
+          {"d": "0x04", "t": "u8", "n": "estado", "s": "TaskExec grava 1; TaskSleep grava (estado & 0x80) | 2", "e": "TaskExec, TaskSleep", "l": "SceExec, escalonador (inferido)", "p": "decompilado"},
           {"d": "0x05", "t": "u8", "n": "tipo", "s": "0x17 normal (TaskExec), 0x16 tarefa de roteiro (SceExec); escolhe o semáforo sinalizado em TaskSleep", "e": "TaskExec, SceExec", "l": "TaskSleep", "p": "decompilado"},
           {"d": "0x0C", "t": "u32", "n": "semáforo da tarefa", "s": "WaitSema em TaskSleep", "e": "criação", "l": "TaskSleep", "p": "decompilado"},
           {"d": "0x10", "t": "u8", "n": "sinalizador (kind)", "s": "SceExec copia o da tarefa corrente ou grava 1", "e": "SceExec", "l": "", "p": "decompilado"},
-          {"d": "0x14", "t": "u16", "n": "contador de sono", "s": "quadros a dormir (TaskSleep)", "e": "TaskSleep", "l": "escalonador", "p": "decompilado"},
-          {"d": "0x18", "t": "u32", "n": "argumento", "s": "3º argumento de TaskExec", "e": "TaskExec", "l": "entrada da tarefa", "p": "decompilado"},
+          {"d": "0x14", "t": "u16", "n": "contador de sono", "s": "quadros a dormir (TaskSleep)", "e": "TaskSleep", "l": "escalonador (inferido)", "p": "decompilado"},
+          {"d": "0x18", "t": "u32", "n": "argumento", "s": "3º argumento de TaskExec", "e": "TaskExec", "l": "entrada da tarefa (inferido)", "p": "decompilado"},
           {"d": "0x340", "t": "ptr", "n": "função (cópia)", "s": "", "e": "TaskExec", "l": "", "p": "decompilado"},
-          {"d": "0x344", "t": "ptr", "n": "função", "s": "2º argumento de TaskExec", "e": "TaskExec", "l": "escalonador", "p": "decompilado"}
+          {"d": "0x344", "t": "ptr", "n": "função", "s": "2º argumento de TaskExec", "e": "TaskExec", "l": "escalonador (inferido)", "p": "decompilado"}
         ],
         "funcoes": [
           {"nome": "TaskExec(no, func, arg) / TaskSleep(quadros) / TaskChain / TaskKill", "endereco": "0x00255F90 / 0x00256010 / 0x00256090 / 0x00256198", "papel": "tarefas; TaskExec só prepara a entrada (0x002562B8 == 0), quem inicia é o escalonador"},
@@ -345,21 +347,21 @@
           {"d": "0x00", "t": "u32", "n": "tag", "s": "elo da lista ordenada", "e": "SceAtInit", "l": "sceAtGetOtAddr", "p": "gc"},
           {"d": "0x04", "t": "AREA_HIT_DATA", "n": "area", "s": "volume do gatilho (0x30 bytes)", "e": "SceAtInit", "l": "SceAtHitCheck", "p": "gc"},
           {"d": "0x34", "t": "u8", "n": "be_flg", "s": "bit 0 habilitada, bit 1 ativa, bit 2 alocada em tempo de execução (SceAtCreate*)", "e": "SceAtSetEnable", "l": "SceAtCheckEnable", "p": "gc"},
-          {"d": "0x35", "t": "u8", "n": "id (tipo da área)", "s": "0 normal, 1 porta, 2 exec, 3 item, 4 sinalizador, 5 mensagem, 7 salto, 8 save, 9 sombra, 10 dano, 11 colisão de roteiro, 12 câmera, 13 campo, 14 agachar, 15 chave (SKEY), 16 escada, 17 usar, 18 esconder, 19 teleporte, 20 item-pai, 21 arame da Ada (nomes do GameCube; o 15 confere no PS2)", "e": "arquivo AEV", "l": "SceAtExecute (tabela por tipo), SceAtDataSet_exec", "p": "decompilado"},
-          {"d": "0x36", "t": "u8", "n": "no (número da área)", "s": "chave de SceAtPtr(no); itens do ITA + 0x80", "e": "arquivo", "l": "SceAtPtr", "p": "decompilado"},
-          {"d": "0x38", "t": "u8", "n": "trg_type", "s": "bits de estado que disparam (1/2/4), bit 3 botão de ação, bit 7 desativa após usar; SceAtDataSet_exec troca com cópia em +0x3B", "e": "SceAtDataSet_exec", "l": "SceAtExecute", "p": "decompilado"},
+          {"d": "0x35", "t": "u8", "n": "id (tipo da área)", "s": "0 normal, 1 porta, 2 exec, 3 item, 4 sinalizador, 5 mensagem, 7 salto, 8 save, 9 sombra, 10 dano, 11 colisão de roteiro, 12 câmera, 13 campo, 14 agachar, 15 chave (SKEY), 16 escada, 17 usar, 18 esconder, 19 teleporte, 20 item-pai, 21 arame da Ada (nomes do GameCube; o 15 confere no PS2)", "e": "arquivo AEV (inferido)", "l": "SceAtDataSet_exec, SceAtExecute (inferido)", "p": "decompilado"},
+          {"d": "0x36", "t": "u8", "n": "no (número da área)", "s": "chave de SceAtPtr(no); itens do ITA + 0x80", "e": "arquivo (inferido)", "l": "SceAtPtr", "p": "decompilado"},
+          {"d": "0x38", "t": "u8", "n": "trg_type", "s": "bits de estado que disparam (1/2/4), bit 3 botão de ação, bit 7 desativa após usar; SceAtDataSet_exec troca com cópia em +0x3B", "e": "SceAtDataSet_exec", "l": "SceAtExecute (inferido)", "p": "decompilado"},
           {"d": "0x39", "t": "u8", "n": "target_type", "s": "1 jogador, 2 inimigo, 8 parceira", "e": "arquivo", "l": "SceAtHitCheck", "p": "gc"},
-          {"d": "0x3A", "t": "u8", "n": "task_level", "s": "prioridade do SceExec (máx 0x14; 0 = chamar direto)", "e": "SceAtDataSet_exec", "l": "SceAtExecute", "p": "decompilado"},
-          {"d": "0x3B", "t": "u8", "n": "trg_type_bak", "s": "", "e": "SceAtDataSet_exec", "l": "SceAtDataReset", "p": "decompilado"},
-          {"d": "0x3C", "t": "ptr", "n": "pParam", "s": "argumento da função", "e": "SceAtDataSet_exec", "l": "SceAtExecute", "p": "decompilado"},
-          {"d": "0x40", "t": "ptr", "n": "pFunc", "s": "função da área (tarefa de roteiro)", "e": "SceAtDataSet_exec", "l": "SceAtExecute", "p": "decompilado"},
+          {"d": "0x3A", "t": "u8", "n": "task_level", "s": "prioridade do SceExec (máx 0x14; 0 = chamar direto)", "e": "SceAtDataSet_exec", "l": "SceAtExecute (inferido)", "p": "decompilado"},
+          {"d": "0x3B", "t": "u8", "n": "trg_type_bak", "s": "", "e": "SceAtDataSet_exec", "l": "SceAtDataReset (inferido)", "p": "decompilado"},
+          {"d": "0x3C", "t": "ptr", "n": "pParam", "s": "argumento da função", "e": "SceAtDataSet_exec", "l": "SceAtExecute (inferido)", "p": "decompilado"},
+          {"d": "0x40", "t": "ptr", "n": "pFunc", "s": "função da área (tarefa de roteiro)", "e": "SceAtDataSet_exec", "l": "SceAtExecute (inferido)", "p": "decompilado"},
           {"d": "0x44", "t": "u8", "n": "priority", "s": "índice na tabela de ordenação (0..15)", "e": "arquivo", "l": "SceExec", "p": "gc"},
-          {"d": "0x45", "t": "u8", "n": "kind", "s": "sinalizador passado ao SceExec", "e": "SceAtDataSet_exec", "l": "SceExec", "p": "decompilado"},
+          {"d": "0x45", "t": "u8", "n": "kind", "s": "sinalizador passado ao SceExec", "e": "SceAtDataSet_exec", "l": "SceExec (inferido)", "p": "decompilado"},
           {"d": "0x4C", "t": "ptr", "n": "pParent", "s": "modelo pai (a área acompanha)", "e": "SceAtSetParent", "l": "SceAtGetCenterPos", "p": "gc"},
-          {"d": "0x60", "t": "u8[0x40]", "n": "dados por tipo", "s": "porta: posição, ângulo, estágio/sala destino, chave; item: posição, modelo, id, quantidade, sinalizador de salvamento; colisão de roteiro: pSat, pEat, atributos; tipo 15: +0x60/+0x64 função e argumento, +0x68 nível, +0x69 kind (lido no PS2)", "e": "arquivo, SceAtDataSet_*", "l": "função por tipo", "p": "gc"}
+          {"d": "0x60", "t": "u8[0x40]", "n": "dados por tipo", "s": "porta: posição, ângulo, estágio/sala destino, chave; item: posição, modelo, id, quantidade, sinalizador de salvamento; colisão de roteiro: pSat, pEat, atributos; tipo 15: +0x60 argumento, +0x64 função, +0x68 nível, +0x69 kind (lido no PS2)", "e": "arquivo, SceAtDataSet_*", "l": "função por tipo", "p": "gc"}
         ],
         "funcoes": [
-          {"nome": "SceAtPtr(no) / SceAtDataSet_exec(no, nível, trg, arg, func, kind)", "endereco": "0x0026A750 / 0x0026A8A8", "papel": "achar e armar uma área (função e argumento)"},
+          {"nome": "SceAtPtr(no) / SceAtDataSet_exec(no, nível, trg, func, arg, kind)", "endereco": "0x0026A750 / 0x0026A8A8", "papel": "achar e armar uma área: o 4º argumento vai para +0x40 (função) e o 5º para +0x3C (argumento); no tipo 15, +0x64 e +0x60"},
           {"nome": "SceAtSetEnable / SceAtCheckEnable / SceAtHitCheck / SceAtExecute", "endereco": "0x0026A9C8 / 0x0026AA80 / 0x0026AAB0 / 0x0026AAE0", "papel": "habilitar, testar e executar áreas"},
           {"nome": "SceAtCreateExecAt / SceAtCreateItemAt / SceAtSetItemModel", "endereco": "0x0026C458 / 0x0026C898 / 0x0026D790", "papel": "criar áreas e itens em tempo de execução (candidatas a ação do mestre)"},
           {"nome": "SceAtExecRoomJump / SceAtSetDoorFunc", "endereco": "0x0026B0C8 / 0x0026A868", "papel": "troca de sala por porta"},
@@ -376,11 +378,11 @@
         "tamanho": "cManager 0x20+; cSat 0xF0",
         "resumo": "Medido em S9-02-colisao-e-terreno: chão gerado do modelo visual e registrado como peça pelo create do jogo; aceito pelo jogo.",
         "campos": [
-          {"d": "mgr+0x00", "t": "ptr", "n": "pArray", "s": "vetor de cSat", "e": "arrayAlloc", "l": "check, hitCheck2", "p": "decompilado, ao_vivo"},
+          {"d": "mgr+0x00", "t": "ptr", "n": "pArray", "s": "vetor de cSat", "e": "arrayAlloc (gc)", "l": "check, hitCheck2", "p": "decompilado, ao_vivo"},
           {"d": "mgr+0x04", "t": "u32", "n": "nArray", "s": "20 vagas", "e": "", "l": "", "p": "ao_vivo"},
           {"d": "mgr+0x08", "t": "u32", "n": "size", "s": "0xF0", "e": "", "l": "", "p": "ao_vivo"},
-          {"d": "mgr+0x10", "t": "ptr", "n": "pAlive", "s": "lista de peças vivas", "e": "create/destroy", "l": "check", "p": "ao_vivo"},
-          {"d": "mgr+0x1C", "t": "u32", "n": "type", "s": "0 SatMgr, 1 EatMgr; copiado para SEck em hitCheck2; os filtros de atributo (PL_NOHIT 0x00400000 etc.) só valem com 0", "e": "construtor", "l": "hitCheck2", "p": "decompilado, ao_vivo"},
+          {"d": "mgr+0x10", "t": "ptr", "n": "pAlive", "s": "lista de peças vivas", "e": "create/destroy", "l": "check (inferido)", "p": "ao_vivo"},
+          {"d": "mgr+0x1C", "t": "u32", "n": "type", "s": "0 SatMgr, 1 EatMgr; copiado para SEck em hitCheck2; os filtros de atributo (PL_NOHIT 0x00400000 etc.) só valem com 0", "e": "construtor (inferido)", "l": "hitCheck2", "p": "decompilado, ao_vivo"},
           {"d": "sat+0x00", "t": "u32", "n": "be_flag", "s": "bit 0 vivo", "e": "create/destroy", "l": "", "p": "ao_vivo"},
           {"d": "sat+0x0C", "t": "ptr", "n": "vértices", "s": "Vec de 12 bytes no arquivo", "e": "create", "l": "polySphereCk", "p": "decompilado, ao_vivo"},
           {"d": "sat+0x10", "t": "ptr", "n": "normais", "s": "", "e": "create", "l": "", "p": "ao_vivo"},
@@ -388,12 +390,12 @@
           {"d": "sat+0x18", "t": "ptr", "n": "polígonos", "s": "0x14 bytes: v0..v2, normal, e0..e2, reserva, status u32 (atributos: 0x40 chão, 0x80 parede, 0x80000 saltável, 0x400000 não colide com o jogador)", "e": "create", "l": "polySphereCk, hitCheck2", "p": "decompilado, ao_vivo"},
           {"d": "sat+0x1C", "t": "u16", "n": "nº de vértices", "s": "", "e": "create", "l": "", "p": "ao_vivo"},
           {"d": "sat+0x1E", "t": "u16", "n": "nº de polígonos", "s": "máx 8192 (polyBit 0x400)", "e": "create", "l": "", "p": "ao_vivo"},
-          {"d": "sat+0x20", "t": "u16[3]", "n": "chão / rampa / parede", "s": "contagens por classe (polígonos ordenados assim)", "e": "create", "l": "getFloor", "p": "ao_vivo"},
-          {"d": "sat+0x2A", "t": "u16", "n": "flag", "s": "4 ativa, 2 arquivo alocado pelo gerente", "e": "create/destroy", "l": "check", "p": "ao_vivo"},
-          {"d": "sat+0x30", "t": "ptr", "n": "bloco raiz", "s": "blocos irmãos encadeados por deslocamento relativo em +0x20", "e": "create", "l": "check", "p": "ao_vivo"},
+          {"d": "sat+0x20", "t": "u16[3]", "n": "chão / rampa / parede", "s": "contagens por classe (polígonos ordenados assim)", "e": "create", "l": "getFloor (inferido)", "p": "ao_vivo"},
+          {"d": "sat+0x2A", "t": "u16", "n": "flag", "s": "4 ativa, 2 arquivo alocado pelo gerente", "e": "create/destroy", "l": "check (inferido)", "p": "ao_vivo"},
+          {"d": "sat+0x30", "t": "ptr", "n": "bloco raiz", "s": "blocos irmãos encadeados por deslocamento relativo em +0x20", "e": "create", "l": "check (inferido)", "p": "ao_vivo"},
           {"d": "sat+0x60", "t": "ptr", "n": "arquivo (cSatFile)", "s": "cabeçalho 0x14", "e": "create", "l": "", "p": "ao_vivo"},
-          {"d": "sat+0x70", "t": "mat4", "n": "matriz", "s": "", "e": "setMatrix", "l": "", "p": "ao_vivo"},
-          {"d": "sat+0xB0", "t": "mat4", "n": "inversa", "s": "", "e": "setMatrix", "l": "", "p": "ao_vivo"}
+          {"d": "sat+0x70", "t": "mat4", "n": "matriz", "s": "", "e": "setMatrix (gc)", "l": "", "p": "ao_vivo"},
+          {"d": "sat+0xB0", "t": "mat4", "n": "inversa", "s": "", "e": "setMatrix (gc)", "l": "", "p": "ao_vivo"}
         ],
         "funcoes": [
           {"nome": "cSatMgr::create(dados) / create(laje: pos, ang, 4 cantos de 16 B, altura, attr, 0x200)", "endereco": "0x001A32D0 / 0x001A33A8", "papel": "registrar peça (provadas pelo canal)"},
@@ -412,9 +414,9 @@
         "tamanho": "",
         "resumo": "Provada por projeção da raiz, pés e cabeça do inimigo dentro da caixa desenhada (S8-00). A matriz é escrita a cada quadro por quatro `sq` em 0x252830 (thread de jogo), que serve de âncora para a chamada remota.",
         "campos": [
-          {"d": "0x003CA220", "t": "vec3", "n": "olho", "s": "anda com o jogador e orbita quando ele vira", "e": "CameraMove", "l": "", "p": "foto, ao_vivo"},
-          {"d": "0x003CA230", "t": "vec3", "n": "alvo", "s": "projeta no centro da tela; tronco do jogador", "e": "CameraMove", "l": "bancada/personagens.py (direção 'à frente')", "p": "foto, ao_vivo"},
-          {"d": "0x004327C0", "t": "mat4", "n": "visão-projeção", "s": "vetor-linha × matriz; w = distância ao olho em mm", "e": "0x252830 (4 sq, todo quadro)", "l": "renderizador", "p": "vigia, foto"},
+          {"d": "0x003CA220", "t": "vec3", "n": "olho", "s": "anda com o jogador e orbita quando ele vira", "e": "CameraMove (gc)", "l": "", "p": "foto, ao_vivo"},
+          {"d": "0x003CA230", "t": "vec3", "n": "alvo", "s": "projeta no centro da tela; tronco do jogador", "e": "CameraMove (gc)", "l": "bancada/personagens.py (direção 'à frente')", "p": "foto, ao_vivo"},
+          {"d": "0x004327C0", "t": "mat4", "n": "visão-projeção", "s": "vetor-linha × matriz; w = distância ao olho em mm", "e": "0x252830 (4 sq, todo quadro)", "l": "renderizador (inferido)", "p": "vigia, foto"},
           {"d": "0x00432840", "t": "mat4", "n": "tela", "s": "x = 256 − (x/w)·1104,64; y = 224 + (y/w)·1706,67 (512×448)", "e": "", "l": "", "p": "foto"}
         ],
         "funcoes": [
@@ -430,10 +432,10 @@
         "tamanho": "",
         "resumo": "Formato da ferramenta pública RE4-PS2-BIN-TOOL, validado ao vivo (altura sob o jogador bate em 3 cm). É a base do terreno gerado (S9-02).",
         "campos": [
-          {"d": "bin+0x00", "t": "u8[0x50]", "n": "cabeçalho", "s": "assinatura em 0x30; +0xA nº de materiais; +0xC tabela de materiais (16 bytes cada, +12 ponteiro do nó)", "e": "arquivo", "l": "desenho, terreno.py", "p": "ao_vivo"},
+          {"d": "bin+0x00", "t": "u8[0x50]", "n": "cabeçalho", "s": "assinatura em 0x30; +0xA nº de materiais; +0xC tabela de materiais (16 bytes cada, +12 ponteiro do nó)", "e": "arquivo", "l": "terreno.py", "p": "ao_vivo"},
           {"d": "nó", "t": "u16, u8, u8", "n": "total, segmentos−1, ossos", "s": "", "e": "arquivo", "l": "terreno.py", "p": "ao_vivo"},
           {"d": "segmento", "t": "cabeçalhos 0x10", "n": "linhas e fator", "s": "pesos se h1[12]==0 && h1[14]>1; h2[0] nº de linhas; fator float em h2+0xC; linhas de 24 bytes com xyz int16; IndexComplement +14 == 0 fecha o triângulo da tira", "e": "arquivo", "l": "terreno.py", "p": "ao_vivo"},
-          {"d": "cObj+0x10", "t": "mat4", "n": "matriz do objeto", "s": "mundo = vértice × fator × matriz (escala 10 embutida)", "e": "matUpdate", "l": "desenho, terreno.py", "p": "ao_vivo"}
+          {"d": "cObj+0x10", "t": "mat4", "n": "matriz do objeto", "s": "mundo = vértice × fator × matriz (escala 10 embutida)", "e": "matUpdate (gc)", "l": "terreno.py", "p": "ao_vivo"}
         ],
         "funcoes": [
           {"nome": "SetObjSmd / GetModelInfoAddr / GetPartsAddr", "endereco": "0x00275E28 / 0x0022E7D8 / 0x0022E7A0", "papel": "objetos de cenário e partes: não lidas"}
@@ -448,7 +450,7 @@
         "tamanho": "",
         "resumo": "EstSet(pai, idx=−1, &pos, &rot, est, kind, flags, u8) cria um efeito; est 0x58+id do objeto etc (caixa 0x59 kind 4, barril 0x6A kind 0, tocha kinds 1-3), 0x10 = conjunto da sala (162 kinds), 1 comum, 3 jogador, 0 sangue, 0xCD compartilhado. Provado pelo canal (efeito.py).",
         "campos": [
-          {"d": "est+0x0", "t": "u8[0xC]", "n": "entrada da tabela Est", "s": "formato não lido", "e": "arquivo EFF", "l": "EstSet", "p": "ao_vivo"}
+          {"d": "est+0x0", "t": "u8[0xC]", "n": "entrada da tabela Est", "s": "formato não lido", "e": "arquivo EFF (inferido)", "l": "EstSet", "p": "ao_vivo"}
         ],
         "funcoes": [
           {"nome": "EstSet", "endereco": "0x001FAF80", "papel": "criar efeito (provada pelo canal)"},
@@ -464,11 +466,16 @@
         "tamanho": "",
         "resumo": "Só o bit de tiro foi visto.",
         "campos": [
-          {"d": "0x00", "t": "u32", "n": "botões", "s": "bit 0x80 = tiro; demais botões não mapeados", "e": "leitura do pad", "l": "joyFireOn/Off/Trg 0x0024BE78..0x0024BF50", "p": "ao_vivo"}
+          {"d": "0x00", "t": "u32", "n": "botões", "s": "bit 0x80 = tiro; demais botões não mapeados", "e": "leitura do pad (inferido)", "l": "joyFireOn/Off/Trg 0x0024BE78..0x0024BF50 (inferido)", "p": "ao_vivo"}
         ],
         "funcoes": [],
         "pendencias": ["mapear os botões (base do botão de salto da LC-17)"]
-      }
+      },
+      {"id": "eventos", "nome": "Eventos e cutscenes (Event, EventMgr, blocos EVS)", "status": "nao_lida", "raiz": "EventMgr (0x00205B90..0x00207470 nomeadas no índice); raiz dos dados não localizada", "tamanho": "", "resumo": "Nada lido no PS2. É o que prepara colisão e animação dos personagens de cena (LC-18).", "campos": [], "funcoes": [{"nome": "EventMgr::EvtReadExec / EvtFree / SetFunc / SetBin; Event::RunEvtCancel", "endereco": "0x00206280 / 0x00206740 / 0x00206EA0 / 0x00206BE8; 0x00202DD8", "papel": "pontos de entrada pelo nome"}], "pendencias": ["ler EvtReadExec e o formato dos blocos EVS"]},
+      {"id": "blocos_sala", "nome": "Arquivo de sala (blocos SMD/SMX, LIT, SAR, EFF, TEX, ITM/ETM/ETS, CAM, BLK, EVS/FSE/AEV/ITA)", "status": "nao_lida", "raiz": "não localizada no PS2 (no GameCube, pG->pRoom e pCore)", "tamanho": "", "resumo": "Só os nomes dos blocos vêm do GameCube. No PS2 só se leu o que já está em memória (colisão SAR, objetos SMD, lista ESL).", "campos": [], "funcoes": [], "pendencias": ["achar o arquivo da sala no AFS e o índice de blocos em memória"]},
+      {"id": "pzl", "nome": "Tabuleiro da maleta (pzlPlayer, pzlBoard, pzlPiece)", "status": "nao_lida", "raiz": "criado pela tela da maleta 0x0111F4E0 (módulo do menu); vive só com a tela aberta", "tamanho": "pzlPiece 0x2C; até 121 peças", "resumo": "Lido só o suficiente para dar um item (peça: +0x14/+0x18 posição, +0x20 orientação, +0x24 item; tamanhos 10x6, 11x7, 12x8, 15x8, extra 6x12). Campos não tabelados.", "campos": [], "funcoes": [{"nome": "pzlPlayer::init / save / appendExtraPiece / putPiece; pzlBoard::cellState", "endereco": "0x0025FD10 / 0x002601B0 / 0x002602A0 / 0x002607D8; 0x0025FB88", "papel": "lidas em 28/10 para a regra de encaixe"}], "pendencias": ["tabelar pzlBoard e pzlPiece"]},
+      {"id": "snr2", "nome": "Cabeçalho SNR2 do módulo realocável (.rel)", "status": "parcial", "raiz": "início de cada .rel (tabela de módulos +0x88)", "tamanho": "16 palavras de cabeçalho", "resumo": "Lido para o realocador próprio (bancada/snr2.py, validado contra os módulos vivos): +4 lista de realocações simbólicas e +8 contagem, +0xC tabela de seções de 12 bytes e +0x10 contagem, +0x18 entrada dos construtores, +0x20 tabela de ponteiros e +0x24 contagem, +0x28 alinhamento 0x80, +0x2C tamanho, +0x34 fluxo de realocações comprimido; seções tipo 0 endereço, 1 importado por nome, 2 e 3 definidos. Não tabelado campo a campo aqui.", "campos": [], "funcoes": [{"nome": "ligador", "endereco": "0x002A56B8", "papel": "ver módulos"}], "pendencias": ["tabelar os 16 campos com quem lê cada um no ligador"]},
+      {"id": "tipos_inimigo", "nome": "Tabela de tipos de inimigo (0x003C8F40)", "status": "nao_lida", "raiz": "0x003C8F40; estática", "tamanho": "64 entradas", "resumo": "Tabela de salto por tipo usada pela função de dano; os 64 casos não foram nomeados.", "campos": [], "funcoes": [], "pendencias": ["nomear os 64 casos pelo C decompilado (LifeDownSet2)"]}
     ]
   }
 }

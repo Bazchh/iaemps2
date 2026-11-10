@@ -26,10 +26,16 @@ def celula(texto):
     return str(texto).replace("|", "\\|").replace("\n", " ") or "—"
 
 
+def determinado(celula_):
+    """Quem escreve / quem lê conta só quando vem de prova no PS2: nem vazio, nem 'não lido', nem só o nome do
+    GameCube '(gc)', nem dedução '(inferido)'."""
+    return bool(celula_) and not any(m in celula_ for m in ("não lid", "(gc)", "(inferido)"))
+
+
 def cobertura(estrutura):
     campos = estrutura["campos"]
     com_prova = sum(1 for c in campos if provas_de(c) & PROVAS_FORTES)
-    com_fluxo = sum(1 for c in campos if c["e"] and c["l"] and "não lido" not in c["e"] and "não lido" not in c["l"])
+    com_fluxo = sum(1 for c in campos if determinado(c["e"]) and determinado(c["l"]))
     return len(campos), com_prova, com_fluxo
 
 
@@ -48,8 +54,9 @@ def gerar(perfil):
     w("## Cobertura")
     w("")
     w("Uma linha por estrutura: campos descritos, campos com prova no PS2 (não só nome do GameCube), campos com quem")
-    w("escreve e quem lê determinados, e o estado. O critério de aceite do card (três campos por estrutura conferidos")
-    w("ao vivo pelo cliente) ainda não foi aplicado a nenhuma linha.")
+    w("escreve e quem lê determinados por prova (células marcadas '(gc)' ou '(inferido)' não contam), e o estado.")
+    w("As estruturas sem campo são as que ninguém leu ainda. O critério de aceite do card (três campos por estrutura")
+    w("conferidos ao vivo pelo cliente) ainda não foi aplicado a nenhuma linha.")
     w("")
     w("| estrutura | raiz | campos | com prova no PS2 | com escreve e lê | estado |")
     w("|---|---|---|---|---|---|")
