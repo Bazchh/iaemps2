@@ -71,8 +71,9 @@ teleporte confiável (posição, posição anterior e todas as partes); verifica
   andarilho com detecção refinada **nunca terminou**. Os números acima são da versão anterior.
 - O scratchpad de 30/10 foi apagado pela limpeza de temporários. `andarilho.py`, `salto_check.py` e
   `gravidade2.py` são o texto exato lido em 30/10; `terreno.py` foi reconstruído a partir da cópia das 15:07 e dos
-  remendos registrados na transcrição (todos reaplicados, compila) e **não foi executado de novo**. Tratar como
-  reconstruído até rodar.
+  remendos registrados na transcrição (todos reaplicados, compila). O mesmo método, aplicado aos três scripts
+  anteriores, reproduziu byte a byte o texto lido, o que valida a reconstrução; ainda assim `terreno.py` **não
+  foi executado de novo**.
 - Mapeamento dos botões do controle (0x431948) para um botão de salto: não iniciado.
 
 ## Lacunas registradas (voltam na LC-17)
