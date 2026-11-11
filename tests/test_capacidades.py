@@ -11,6 +11,7 @@ import json
 import struct
 from pathlib import Path
 
+from iaemps2.bancada import capacidades as cap
 from iaemps2.bancada import modulos as md
 from iaemps2.bancada import personagens as pz
 from iaemps2.ponte.cliente import AREA_DO_MESTRE, Cliente
@@ -38,6 +39,7 @@ CHAVES = {
     "risco",
     "estado",
     "prova",
+    "ensaio",
 }
 ESTADOS = {"provada", "provada_sem_ferramenta", "provada_em_script", "candidata", "trava"}
 EXECUTAVEL = (0x00100000, 0x00300000)
@@ -68,11 +70,19 @@ def test_catalogo_tem_a_forma_esperada() -> None:
         assert set(c) == CHAVES, c["id"]
         assert c["estado"] in ESTADOS and c["via"] in {"chamada", "escrita", "canal_cena"}, c["id"]
         assert set(c["prova"]) == {"data", "detalhe"}, c["id"]
+        assert set(c["ensaio"]) == {"data", "resultado"}, c["id"]
         assert c["trampolim"] == (c["n_args"] > 4 or "float" in c["argumentos"]), (c["id"], "trampolim")
         if c["estado"] == "trava":
             assert c["ferramenta"] == "nenhuma", (c["id"], "trava não tem ferramenta")
         if c["estado"] == "provada":
             assert c["prova"]["data"], (c["id"], "provada sem data")
+            assert c["ferramenta"].startswith("python -m iaemps2."), (
+                c["id"],
+                "provada sem ferramenta em src/",
+            )
+            modulo, subcomando = c["ferramenta"].split()[2], c["ferramenta"].split()[3]
+            fonte = (RAIZ / "src" / Path(*modulo.split("."))).with_suffix(".py").read_text(encoding="utf-8")
+            assert f'add_parser("{subcomando}")' in fonte, (c["id"], modulo, subcomando)
         if c["estado"] == "candidata":
             assert not c["prova"]["data"], (c["id"], "candidata com data de prova")
 
@@ -105,7 +115,29 @@ def test_constantes_da_bancada_batem_com_o_catalogo() -> None:
         f"0x{md.SEARCH_EM_MODULE:08X}",
     ]
     assert por_id["consultar_modulo"]["endereco"] == [f"0x{md.SEARCH_EM_MODULE:08X}"]
-    assert por_id["vida"]["endereco"] == [f"0x{pz.BLOCO_G + 0x7ED6:08X}"]
+    assert por_id["vida"]["endereco"] == [f"0x{cap.VIDA:08X}"]
+    assert por_id["lista_viva"]["endereco"] == [f"0x{cap.EM_LIST_IS_ALIVE:08X}"]
+    assert por_id["contar_item"]["endereco"] == [f"0x{cap.CITEMMGR_NUM:08X}"]
+    assert por_id["teleporte"]["endereco"] == [f"0x{pz.EM_MGR:08X}"]
+
+
+def test_vida_e_teleporte_contra_o_simulador(tmp_path: Path) -> None:
+    with Simulador("proprio", pasta_estados=tmp_path) as sim:
+        mem = sim.jogo.memoria
+        struct.pack_into("<III", mem, pz.EM_MGR, pz.VETOR, 60, pz.PASSO)
+        struct.pack_into("<HH", mem, cap.VIDA, 700, 1200)
+        c = Cliente(porta=sim.porta or 0)
+        c.conectar()
+        assert cap.escrever_vida(c, 5000) == (700, 1200, 1200)  # limitada à máxima
+        assert cap.escrever_vida(c, 900) == (1200, 1200, 900)
+        parte = 0x01600000
+        struct.pack_into("<I", mem, pz.VETOR + cap.PARTES, parte)
+        struct.pack_into("<I", mem, parte + cap.PARTES, 0)
+        assert cap.teleportar(c, 10.0, 20.0, 30.0) == (10.0, 20.0, 30.0)
+        assert struct.unpack_from("<fff", mem, pz.VETOR + cap.POS_OLD) == (10.0, 20.0, 30.0)
+        for off in cap.PARTE_MUNDO:
+            assert struct.unpack_from("<fff", mem, parte + off) == (10.0, 20.0, 30.0)
+        c.fechar()
 
 
 def test_criar_personagem_chama_o_endereco_do_catalogo(tmp_path: Path) -> None:

@@ -57,19 +57,19 @@ def gerar(perfil):
         w(f"| {k} | {cont[k]} | {texto} |")
     w(f"| **total** | **{len(lista)}** | {sum(1 for c in lista if sorteavel(c))} entram no sorteio do aceite |")
     w("")
-    w("O critério de aceite do card (o cliente escolhe três capacidades ao acaso e cada uma funciona ao vivo como")
-    w("descrita, com o jogo seguindo) ainda não foi aplicado: as sorteáveis são as de estado 'provada'. O que está")
-    w("marcado 'trava' não entra no catálogo de ações do S8-03.")
+    w("Critério de aceite do card (o cliente escolhe três capacidades ao acaso, sem semente, e cada uma funciona ao vivo")
+    w(f"como descrita, com o jogo seguindo): **{cp['aceite_cliente']}**. As escolhíveis são as de estado 'provada'. O que")
+    w("está marcado 'trava' não entra no catálogo de ações do S8-03.")
     w("")
     w("## Tabela")
     w("")
-    w("| capacidade | função | endereço | via | argumentos | trampolim | ferramenta | estado | prova |")
-    w("|---|---|---|---|---|---|---|---|---|")
+    w("| capacidade | função | endereço | via | argumentos | trampolim | ferramenta | estado | prova | ensaio |")
+    w("|---|---|---|---|---|---|---|---|---|---|")
     for c in lista:
         w(
             f"| [{celula(c['nome'])}](#{c['id']}) | {celula(c['funcao'])} | {celula(', '.join(c['endereco']))} | "
             f"{VIAS[c['via']]} | {c['n_args']} | {'sim' if c['trampolim'] else 'não'} | {celula(c['ferramenta'])} | "
-            f"{c['estado']} | {celula(c['prova']['data'] or '—')} |"
+            f"{c['estado']} | {celula(c['prova']['data'] or '—')} | {celula(c['ensaio']['data'].split(',')[0] if c['ensaio']['data'] else '—')} |"
         )
     w("")
     for k, texto in ESTADOS.items():
@@ -96,6 +96,7 @@ def gerar(perfil):
             w(f"- **Como desfazer:** {c['desfazer']}")
             w(f"- **Risco / causa da trava:** {c['risco']}")
             w(f"- **Prova:** {c['prova']['data'] or 'nenhuma'}; {c['prova']['detalhe']}")
+            w(f"- **Ensaio:** {c['ensaio']['data'] or '—'}; {c['ensaio']['resultado']}")
             w("")
     return "\n".join(linhas) + "\n"
 

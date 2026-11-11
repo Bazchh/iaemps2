@@ -1146,7 +1146,8 @@
   "capacidades": {
     "versao": 1,
     "data": "2026-11-11",
-    "nota": "Catálogo de capacidades (S9-03): o que o mestre pode acionar no jogo de abertura pela chamada remota, por escrita de memória ou pela camada de cena, com argumentos, pré-condições, efeito, volta e risco. Fonte única: docs/fonte/gerar_capacidades.py gera docs/Capacidades-SLUS-21134.md daqui. Estados: 'provada' = chamada ou escrita com registro datado e ferramenta em src/ que roda hoje; 'provada_sem_ferramenta' = registro datado, sem ferramenta; 'provada_em_script' = só em script de reversa/colisao (uma execução, 30/10); 'candidata' = lida no C, nunca acionada; 'trava' = acionar congela o jogo ou não faz nada (causa registrada). Só 'provada' entra no sorteio do aceite e no catálogo de ações do S8-03. Substitui modulos.chamada_remota.funcoes_provadas.",
+    "nota": "Catálogo de capacidades (S9-03): o que o mestre pode acionar no jogo de abertura pela chamada remota, por escrita de memória ou pela camada de cena, com argumentos, pré-condições, efeito, volta e risco. Fonte única: docs/fonte/gerar_capacidades.py gera docs/Capacidades-SLUS-21134.md daqui. Estados: 'provada' = chamada ou escrita com registro datado e comando em src/ (python -m iaemps2.bancada…) que roda hoje; 'provada_sem_ferramenta' = registro datado, sem ferramenta; 'provada_em_script' = só em script de reversa/colisao (uma execução, 30/10); 'candidata' = lida no C, nunca acionada; 'trava' = acionar congela o jogo ou não faz nada (causa registrada). Só 'provada' entra no sorteio do aceite e no catálogo de ações do S8-03. Substitui modulos.chamada_remota.funcoes_provadas.",
+    "aceite_cliente": "pendente",
     "regra_geral": "funções que dormem pelo escalonador do jogo (carga do disco, SceSleep, TaskSleep) nunca são chamadas; chamadas só com o jogador parado; em partida só leitura e escrita de memória; estado salvo num slot do mestre antes de cada ação com efeito (o slot 95 é evidência da conferência do S9-02: copiar o .p2s antes de regravar)",
     "lista": [
       {
@@ -1160,12 +1161,13 @@
         "via": "chamada",
         "trampolim": false,
         "ferramenta": "python -m iaemps2.bancada.personagens criar <tipo> [--vida N] [--distancia M] [--variante V]",
-        "pre_condicoes": ["módulo do tipo residente (bancada/modulos.py listar; carregar se não estiver)", "tipo que obedece à posição: 0x12, 0x15, 0x23, 0x28, 0x2A, 0x0E, 0x0F; 0x03 e 0x04 nascem em ponto fixo próprio", "jogador parado (chamada imediata, não ancorada)", "salva o estado no slot 95 antes"],
+        "pre_condicoes": ["módulo do tipo residente (bancada/modulos.py listar; carregar se não estiver)", "tipo que obedece à posição: 0x12, 0x15, 0x23, 0x28, 0x2A, 0x0E, 0x0F; 0x03 e 0x04 nascem em ponto fixo próprio", "jogador parado (chamada imediata, não ancorada)", "salva o estado no slot 95 antes", "conferir o retorno de carregar_modulo antes de criar: criar sem módulo congela o jogo (reproduzido em 11/11)"],
         "efeito": "o personagem nasce a 2 m à frente, na direção da câmera, e anda; devolve a vaga no vetor",
         "desfazer": "não provado por personagem: SceDestroyEm apaga o tipo inteiro; recarregar o estado salvo é a volta provada",
         "risco": "tipo sem módulo residente congela o jogo (o carregador dorme); tipo 2 (cSubLeon) deixa a thread perdida; cSubAda (pl12) nasce e o jogo congela segundos depois na colisão; 0x25 desenha errado; os módulos de personagem disputam vagas de textura (cabelo do Leon trocado com pl10)",
         "estado": "provada",
-        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "aldeões 0x12 (quatro), corvos, 0x2A, 0x21, lanchas 0x0E/0x0F criados e andando; 8 a 17 ms"}
+        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "aldeões 0x12 (quatro), corvos, 0x2A, 0x21, lanchas 0x0E/0x0F criados e andando; 8 a 17 ms"},
+        "ensaio": {"data": "11/11/2026, estado 96, sala 0x0100, pelo autor (ensaio antes do aceite)", "resultado": "aldeão 0x12 criado a 3 m em 14 ms (vaga 13), andou; estado 95 regravado pela ferramenta e restaurado da cópia depois"}
       },
       {
         "id": "destruir_tipo",
@@ -1183,7 +1185,8 @@
         "desfazer": "recriar com criar_personagem; ou recarregar o estado salvo",
         "risco": "apaga o tipo inteiro, não um personagem; destruir o que o jogador usa congela",
         "estado": "provada",
-        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "usada ao liberar módulos (em25, pl0f) antes de InitModule"}
+        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "usada ao liberar módulos (em25, pl0f) antes de InitModule"},
+        "ensaio": {"data": "11/11/2026, estado 96, sala 0x0100, pelo autor (ensaio antes do aceite)", "resultado": "SceDestroyEm(0x21, 0x21) dentro de liberar 0x21: sem personagem do tipo vivo, jogo seguiu"}
       },
       {
         "id": "carregar_modulo",
@@ -1196,12 +1199,13 @@
         "via": "chamada",
         "trampolim": true,
         "ferramenta": "python -m iaemps2.bancada.modulos carregar <tipo> [--dat N --rel N]",
-        "pre_condicoes": ["vaga livre na tabela de módulos (4; liberar uma antes)", "memória do jogo para .dat e .rel (mem_alloc não confere limite)", "ISO acessível (lê os dois arquivos do BIO4DAT.AFS)"],
+        "pre_condicoes": ["vaga livre na tabela de módulos (4; liberar uma antes)", "memória do jogo para .dat e .rel (mem_alloc não confere limite)", "ISO acessível (lê os dois arquivos do BIO4DAT.AFS)", "memória livre no heap do jogo: mem_alloc devolve 0 quando não cabe (em15.dat de 3,6 MB não coube na sala 0x0100 em 11/11)"],
         "efeito": "o tipo passa a ter módulo residente; criar_personagem funciona para ele",
         "desfazer": "liberar_modulo (InitModule) depois de destruir os personagens do tipo",
         "risco": "mem_alloc devolveu endereço sobre dados vivos em 30/10 (queda do jogo): conferir a faixa devolvida; tipo 2 (cSubLeon) não termina a ligação; módulos de personagem trocam texturas entre si",
         "estado": "provada",
-        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "pl11, pl14, pl0e, pl0f, em25 e pl12 carregados e confirmados por SearchEmModule"}
+        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "pl11, pl14, pl0e, pl0f, em25 e pl12 carregados e confirmados por SearchEmModule"},
+        "ensaio": {"data": "11/11/2026, estado 96, sala 0x0100, pelo autor (ensaio antes do aceite)", "resultado": "carregar 0x15 na sala 0x0100: mem_alloc(0x376000) devolveu 0 (sem memória para o em15.dat de 3,6 MB com a sala de 5,2 MB carregada); a ferramenta parou com erro sem tocar no jogo. Carga de módulo grande nesta sala não cabe"}
       },
       {
         "id": "liberar_modulo",
@@ -1219,7 +1223,8 @@
         "desfazer": "carregar_modulo de novo",
         "risco": "liberar com personagem vivo do tipo: comportamento não lido",
         "estado": "provada",
-        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "liberações antes de carregar os tipos de teste"}
+        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "liberações antes de carregar os tipos de teste"},
+        "ensaio": {"data": "11/11/2026, estado 96, sala 0x0100, pelo autor (ensaio antes do aceite)", "resultado": "entrada 2 (tipo 0x21) liberada; tabela com 3 módulos depois"}
       },
       {
         "id": "consultar_modulo",
@@ -1237,7 +1242,8 @@
         "desfazer": "nada a desfazer",
         "risco": "nenhum conhecido",
         "estado": "provada",
-        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "confirmação de cada módulo carregado"}
+        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "confirmação de cada módulo carregado"},
+        "ensaio": {"data": "11/11/2026, estado 96, sala 0x0100, pelo autor (ensaio antes do aceite)", "resultado": "modulos listar: em12, em2a, em21, pl0e residentes"}
       },
       {
         "id": "lista_viva",
@@ -1249,13 +1255,14 @@
         "argumentos": "índice na EM_LIST (0..255); devolve 0 ou 1",
         "via": "chamada",
         "trampolim": false,
-        "ferramenta": "sem ferramenta própria (Cliente.chamar)",
+        "ferramenta": "python -m iaemps2.bancada.capacidades lista-viva <i>",
         "pre_condicoes": [],
         "efeito": "só consulta",
         "desfazer": "nada a desfazer",
         "risco": "nenhum conhecido",
         "estado": "provada",
-        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "primeira prova da chamada remota: EmListIsAlive(15) = 1 em 17 ms"}
+        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "primeira prova da chamada remota: EmListIsAlive(15) = 1 em 17 ms"},
+        "ensaio": {"data": "11/11/2026, estado 96, sala 0x0100, pelo autor (ensaio antes do aceite)", "resultado": "EmListIsAlive(3) = 0 e (20) = 1: bate com o bit 0 da be_flag das entradas lidas no S9-02"}
       },
       {
         "id": "contar_item",
@@ -1267,13 +1274,14 @@
         "argumentos": "this = 0x003CE148, id do item (u16); devolve a contagem",
         "via": "chamada",
         "trampolim": false,
-        "ferramenta": "sem ferramenta própria (Cliente.chamar)",
+        "ferramenta": "python -m iaemps2.bancada.capacidades contar-item <id>",
         "pre_condicoes": [],
         "efeito": "só consulta",
         "desfazer": "nada a desfazer",
         "risco": "nenhum conhecido",
         "estado": "provada",
-        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "cItemMgr::num(pistola) = 1"}
+        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "cItemMgr::num(pistola) = 1"},
+        "ensaio": {"data": "11/11/2026, estado 96, sala 0x0100, pelo autor (ensaio antes do aceite)", "resultado": "cItemMgr::num(0x23) = 1, (0x04) = 15: bate com o inventário lido"}
       },
       {
         "id": "dar_item_pela_funcao",
@@ -1291,7 +1299,8 @@
         "desfazer": "não provado (remover item não foi chamado); recarregar o estado salvo",
         "risco": "nenhum visto nas três provas",
         "estado": "provada_sem_ferramenta",
-        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "erva, 10 balas e a arma 0x2C"}
+        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "erva, 10 balas e a arma 0x2C"},
+        "ensaio": {"data": "", "resultado": "não ensaiado"}
       },
       {
         "id": "somar_dinheiro",
@@ -1309,7 +1318,8 @@
         "desfazer": "não provado (valor negativo não foi chamado); o campo em pG não foi localizado",
         "risco": "nenhum visto",
         "estado": "provada_sem_ferramenta",
-        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "5000 pesetas"}
+        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "5000 pesetas"},
+        "ensaio": {"data": "", "resultado": "não ensaiado"}
       },
       {
         "id": "vida",
@@ -1321,31 +1331,33 @@
         "argumentos": "valor 0..vida máxima (pG+0x7ED8)",
         "via": "escrita",
         "trampolim": false,
-        "ferramenta": "sem ferramenta própria (Cliente.pedir WRITE16)",
+        "ferramenta": "python -m iaemps2.bancada.capacidades vida <valor>",
         "pre_condicoes": ["respeitar a vida máxima", "fora de evento (SceEventStart guarda o estado de dano do jogador)"],
         "efeito": "a barra de vida muda na hora",
         "desfazer": "escrever o valor anterior",
-        "risco": "zero mata o jogador",
+        "risco": "zero deve matar o jogador (não medido); a ferramenta limita a 0..máxima",
         "estado": "provada",
-        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "vida cheia escrita em 0x0042DA76"}
+        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "vida cheia escrita em 0x0042DA76"},
+        "ensaio": {"data": "11/11/2026, estado 96, sala 0x0100, pelo autor (ensaio antes do aceite)", "resultado": "1200 → 1100 → 1200, relida igual"}
       },
       {
         "id": "teleporte",
         "nome": "Teleportar o jogador",
         "funcao": "escrita em cEm (vaga 0)",
-        "endereco": ["0x01789F40"],
-        "simbolo": "pos +0xC0, pos_old +0x130 e, em cada parte da cadeia +0x110, +0x80/+0x90/+0xA0",
+        "endereco": ["0x004203B0"],
+        "simbolo": "EmMgr lido ao vivo (vetor e passo); na vaga 0: pos +0xC0, pos_old +0x130 e, em cada parte da cadeia +0x110, +0x80/+0x90/+0xA0",
         "n_args": 0,
         "argumentos": "posição em mm (x, y, z)",
         "via": "escrita",
         "trampolim": false,
-        "ferramenta": "reversa/colisao/andarilho.py escrever_pos (fora de src/)",
+        "ferramenta": "python -m iaemps2.bancada.capacidades teleporte <x> <y> <z> [--relativo]",
         "pre_condicoes": ["ponto do chão original ou até 3 m acima (árvores têm caixa de colisão enorme e empurram dezenas de metros)", "escrever também as partes, senão a varredura de parede arrasta o jogador até a primeira parede no caminho"],
         "efeito": "o jogador aparece no ponto",
         "desfazer": "escrever a posição anterior",
         "risco": "ponto dentro de objeto é rejeitado (empurrado para longe); +0x80 é deslocamento local e foi escrito com posição de mundo: funcionou sem explicação medida",
         "estado": "provada",
-        "prova": {"data": "29/10/2026 (receita +0x40/+0xC0/+0x130, com o cliente no controle) e 30/10/2026 (andarilho, 10 459 passos)", "detalhe": "duas receitas; a do andarilho é a completa"}
+        "prova": {"data": "29/10/2026 (receita +0x40/+0xC0/+0x130, com o cliente no controle) e 30/10/2026 (andarilho, 10 459 passos)", "detalhe": "duas receitas; a do andarilho é a completa"},
+        "ensaio": {"data": "11/11/2026, estado 96, sala 0x0100, pelo autor (ensaio antes do aceite)", "resultado": "+1 m em x e volta: o jogo encaixou y no chão (125 mm do pedido)"}
       },
       {
         "id": "dar_item_por_escrita",
@@ -1363,7 +1375,8 @@
         "desfazer": "não provado; recarregar o estado salvo",
         "risco": "item removido pelo jogo após aparecer numa prova (carga 0 na primeira gravação); tipos 9 e 10 não tratados",
         "estado": "provada",
-        "prova": {"data": "28/10/2026 (docs/medicoes/S8-01-vigia.md)", "detalhe": "munição exata e itens dados; validado contra o decompilado"}
+        "prova": {"data": "28/10/2026 (docs/medicoes/S8-01-vigia.md)", "detalhe": "munição exata e itens dados; validado contra o decompilado"},
+        "ensaio": {"data": "11/11/2026, estado 96, sala 0x0100, pelo autor (ensaio antes do aceite)", "resultado": "não ensaiado em 11/11 (prova de 28/10)"}
       },
       {
         "id": "esconder_cenario",
@@ -1375,13 +1388,14 @@
         "argumentos": "hash da textura ou da forma, duração",
         "via": "canal_cena",
         "trampolim": false,
-        "ferramenta": "Cliente.cena_regra / cena_limpar",
+        "ferramenta": "python -m iaemps2.bancada.capacidades esconder <hash> [--segundos S] (materiais lista os hashes; mostrar remove)",
         "pre_condicoes": ["assinaturas da cena conhecidas (S7-01)"],
         "efeito": "o pedaço some da tela pelo tempo pedido",
         "desfazer": "cena_limpar",
         "risco": "nenhum visto",
         "estado": "provada",
-        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "cenário escondido por 20 s (45 materiais)"}
+        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "cenário escondido por 20 s (45 materiais)"},
+        "ensaio": {"data": "11/11/2026, estado 96, sala 0x0100, pelo autor (ensaio antes do aceite)", "resultado": "regra no material 092c951410a6beda (área 2 111 688) por 5 s e removida; estatística da regra conferida (ver ferramenta)"}
       },
       {
         "id": "criar_peca_de_colisao",
@@ -1399,7 +1413,8 @@
         "desfazer": "zerar be_flag e flag da peça e Mem_free do arquivo",
         "risco": "chamada durante a partida coincidiu com duas quedas; peça errada prende ou derruba o jogador",
         "estado": "provada_em_script",
-        "prova": {"data": "30/10/2026, uma execução, scripts em reversa/colisao (docs/medicoes/S9-02-colisao-e-terreno.md); sem ferramenta em src/", "detalhe": "chão de 7148 triângulos e laje; o cliente subiu o morro"}
+        "prova": {"data": "30/10/2026, uma execução, scripts em reversa/colisao (docs/medicoes/S9-02-colisao-e-terreno.md); sem ferramenta em src/", "detalhe": "chão de 7148 triângulos e laje; o cliente subiu o morro"},
+        "ensaio": {"data": "", "resultado": "não ensaiado"}
       },
       {
         "id": "criar_efeito",
@@ -1417,7 +1432,8 @@
         "desfazer": "não lido (o efeito acaba sozinho)",
         "risco": "kind inexistente: comportamento não lido",
         "estado": "provada_em_script",
-        "prova": {"data": "30/10/2026, uma execução, scripts em reversa/colisao (docs/medicoes/S9-02-colisao-e-terreno.md); sem ferramenta em src/", "detalhe": "efeitos criados na frente do jogador"}
+        "prova": {"data": "30/10/2026, uma execução, scripts em reversa/colisao (docs/medicoes/S9-02-colisao-e-terreno.md); sem ferramenta em src/", "detalhe": "efeitos criados na frente do jogador"},
+        "ensaio": {"data": "", "resultado": "não ensaiado"}
       },
       {
         "id": "testar_salto",
@@ -1435,7 +1451,8 @@
         "desfazer": "nada a desfazer",
         "risco": "nenhum visto",
         "estado": "provada_em_script",
-        "prova": {"data": "30/10/2026, uma execução, scripts em reversa/colisao (docs/medicoes/S9-02-colisao-e-terreno.md); sem ferramenta em src/", "detalhe": "10 de 30 muros aceitos"}
+        "prova": {"data": "30/10/2026, uma execução, scripts em reversa/colisao (docs/medicoes/S9-02-colisao-e-terreno.md); sem ferramenta em src/", "detalhe": "10 de 30 muros aceitos"},
+        "ensaio": {"data": "", "resultado": "não ensaiado"}
       },
       {
         "id": "liberar_memoria",
@@ -1451,9 +1468,10 @@
         "pre_condicoes": ["bloco vindo do mem_alloc e sem uso"],
         "efeito": "memória liberada",
         "desfazer": "nada a desfazer",
-        "risco": "liberar bloco em uso: queda",
+        "risco": "liberar bloco em uso deve derrubar o jogo (não medido)",
         "estado": "provada_em_script",
-        "prova": {"data": "30/10/2026, uma execução, scripts em reversa/colisao (docs/medicoes/S9-02-colisao-e-terreno.md); sem ferramenta em src/", "detalhe": "arquivos de peça liberados"}
+        "prova": {"data": "30/10/2026, uma execução, scripts em reversa/colisao (docs/medicoes/S9-02-colisao-e-terreno.md); sem ferramenta em src/", "detalhe": "arquivos de peça liberados"},
+        "ensaio": {"data": "", "resultado": "não ensaiado"}
       },
       {
         "id": "criar_area_de_roteiro",
@@ -1471,7 +1489,8 @@
         "desfazer": "não lido",
         "risco": "não lido",
         "estado": "candidata",
-        "prova": {"data": "", "detalhe": "só o índice de símbolos; nunca chamada"}
+        "prova": {"data": "", "detalhe": "só o índice de símbolos; nunca chamada"},
+        "ensaio": {"data": "", "resultado": "não ensaiado"}
       },
       {
         "id": "criar_item_no_chao",
@@ -1489,7 +1508,8 @@
         "desfazer": "não lido",
         "risco": "não lido",
         "estado": "candidata",
-        "prova": {"data": "", "detalhe": "só o índice de símbolos; nunca chamada"}
+        "prova": {"data": "", "detalhe": "só o índice de símbolos; nunca chamada"},
+        "ensaio": {"data": "", "resultado": "não ensaiado"}
       },
       {
         "id": "ligar_area",
@@ -1507,7 +1527,8 @@
         "desfazer": "chamar com o valor oposto",
         "risco": "não lido",
         "estado": "candidata",
-        "prova": {"data": "", "detalhe": "lida no C em 11/11"}
+        "prova": {"data": "", "detalhe": "lida no C em 11/11"},
+        "ensaio": {"data": "", "resultado": "não ensaiado"}
       },
       {
         "id": "armar_area",
@@ -1523,9 +1544,10 @@
         "pre_condicoes": ["área existente"],
         "efeito": "não observado",
         "desfazer": "não lido",
-        "risco": "função errada executada pelo escalonador de roteiro: queda",
+        "risco": "função errada executada pelo escalonador de roteiro deve derrubar o jogo (não medido)",
         "estado": "candidata",
-        "prova": {"data": "", "detalhe": "lida no C em 10/11"}
+        "prova": {"data": "", "detalhe": "lida no C em 10/11"},
+        "ensaio": {"data": "", "resultado": "não ensaiado"}
       },
       {
         "id": "criar_da_lista",
@@ -1543,7 +1565,8 @@
         "desfazer": "não lido",
         "risco": "sem módulo residente: congela (mesma causa de criar_sem_modulo)",
         "estado": "candidata",
-        "prova": {"data": "", "detalhe": "lida no C em 29/10"}
+        "prova": {"data": "", "detalhe": "lida no C em 29/10"},
+        "ensaio": {"data": "", "resultado": "não ensaiado"}
       },
       {
         "id": "dar_dano",
@@ -1559,9 +1582,10 @@
         "pre_condicoes": ["personagem vivo"],
         "efeito": "não observado (lido: desconta vida com escala pela dificuldade e dá pontos)",
         "desfazer": "escrever a vida de volta (cEm+0x4B0)",
-        "risco": "mata o personagem; no jogador desconta pG+0x7ED6",
+        "risco": "deve matar o personagem com dano ≥ vida (lido no C, não medido); no jogador desconta pG+0x7ED6",
         "estado": "candidata",
-        "prova": {"data": "", "detalhe": "lida no C em 28/10 e 11/11 (tabela de tipos 0x3B8F40)"}
+        "prova": {"data": "", "detalhe": "lida no C em 28/10 e 11/11 (tabela de tipos 0x3B8F40)"},
+        "ensaio": {"data": "", "resultado": "não ensaiado"}
       },
       {
         "id": "consultar_vivo",
@@ -1579,7 +1603,8 @@
         "desfazer": "EmListSetAlive com o valor oposto",
         "risco": "não lido",
         "estado": "candidata",
-        "prova": {"data": "", "detalhe": "só o índice de símbolos"}
+        "prova": {"data": "", "detalhe": "só o índice de símbolos"},
+        "ensaio": {"data": "", "resultado": "não ensaiado"}
       },
       {
         "id": "tocar_cutscene",
@@ -1597,7 +1622,8 @@
         "desfazer": "—",
         "risco": "dorme pelo escalonador (SceSleep, cDvd); travou três vezes em 29/10, inclusive ancorada na thread de jogo pela matriz da câmera",
         "estado": "trava",
-        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "três travamentos registrados"}
+        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "três travamentos registrados"},
+        "ensaio": {"data": "", "resultado": "não ensaiado"}
       },
       {
         "id": "trocar_sala",
@@ -1613,9 +1639,10 @@
         "pre_condicoes": [],
         "efeito": "—",
         "desfazer": "—",
-        "risco": "carrega a sala do disco pelo carregador que dorme (TaskSleep): mesma causa dos travamentos de 29/10",
+        "risco": "trava por leitura, nunca acionada: carrega a sala do disco pelo carregador que dorme (TaskSleep), a mesma causa dos travamentos observados em 29/10",
         "estado": "trava",
-        "prova": {"data": "", "detalhe": "lida no C; não chamada por causa do carregador"}
+        "prova": {"data": "", "detalhe": "lida no C; nunca chamada"},
+        "ensaio": {"data": "", "resultado": "não ensaiado"}
       },
       {
         "id": "carregar_modulo_pelo_jogo",
@@ -1633,7 +1660,8 @@
         "desfazer": "—",
         "risco": "dorme por TaskSleep: a thread sequestrada nunca volta (três provas em 29/10)",
         "estado": "trava",
-        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "jogo congelado"}
+        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "jogo congelado"},
+        "ensaio": {"data": "", "resultado": "não ensaiado"}
       },
       {
         "id": "recarregar_lista",
@@ -1649,9 +1677,10 @@
         "pre_condicoes": [],
         "efeito": "—",
         "desfazer": "—",
-        "risco": "lê pelo cDvd e dorme",
+        "risco": "trava por leitura, nunca acionada: lê pelo cDvd e dorme (mesma causa dos travamentos observados em 29/10)",
         "estado": "trava",
-        "prova": {"data": "", "detalhe": "lida no C em 10/11"}
+        "prova": {"data": "", "detalhe": "lida no C em 10/11; nunca chamada"},
+        "ensaio": {"data": "", "resultado": "não ensaiado"}
       },
       {
         "id": "iniciar_tarefa",
@@ -1669,7 +1698,8 @@
         "desfazer": "—",
         "risco": "a tarefa fica pendente: só o escalonador do jogo inicia tarefas (vagas 7 e 1 em 29/10)",
         "estado": "trava",
-        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "tarefa pendente, sem efeito"}
+        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "tarefa pendente, sem efeito"},
+        "ensaio": {"data": "", "resultado": "não ensaiado"}
       },
       {
         "id": "criar_sem_modulo",
@@ -1687,7 +1717,8 @@
         "desfazer": "—",
         "risco": "o jogo chama o carregador do disco, que dorme: jogo congelado (29/10)",
         "estado": "trava",
-        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "jogo congelado"}
+        "prova": {"data": "29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md)", "detalhe": "jogo congelado"},
+        "ensaio": {"data": "11/11/2026, estado 96, sala 0x0100, pelo autor (ensaio antes do aceite)", "resultado": "reproduzido sem querer: EmSetEvent de 0x15 depois da carga falhar; chamada perdida em 5 s, os quadros do jogo pararam (68835 fixo); recuperado por LOAD_STATE 96"}
       }
     ]
   }
