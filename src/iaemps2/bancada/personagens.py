@@ -30,9 +30,13 @@ from iaemps2.ponte import protocolo as p
 from iaemps2.ponte.cliente import AREA_DO_MESTRE, Cliente, ResultadoChamada
 
 EM_MGR = 0x004203B0
+# valores do jogo de abertura na maioria das salas; os comandos leem o EmMgr ao vivo (vetor_personagens), porque a
+# inicialização da sala (0x00217EE0) grava passo 0x1470 em sete salas (0x11F, 0x332, 0x31C, 0x31B, 0x228, 0x221,
+# 0x51C) e o vetor vem do heap. As constantes ficam para os scripts de reversa e os testes.
 VETOR = 0x01789F40
 PASSO = 0xED0
 SLOTS = 60
+PASSOS_CONHECIDOS = (0xED0, 0x1470)
 EM_SET_EVENT = 0x001BD800
 # a matriz da câmera é escrita a cada quadro pela thread de jogo (4 `sq` em 0x252830): ancorar a chamada nesse
 # acesso faz a função rodar nessa thread, onde ela pode dormir pelo escalonador (carregar do disco o módulo de um
@@ -90,8 +94,17 @@ def ler_vec3(c: Cliente, endereco: int) -> tuple[float, float, float]:
     return (float(x), float(y), float(z))
 
 
-def ler_personagem(c: Cliente, slot: int) -> Personagem:
-    base = VETOR + slot * PASSO
+def vetor_personagens(c: Cliente) -> tuple[int, int, int]:
+    """Lê o EmMgr ao vivo: (endereço do vetor, passo, vagas). Recusa valores fora do que o jogo de abertura usa."""
+    corpo = c.pedir(*(p.comando(p.Codigo.READ32, struct.pack("<I", EM_MGR + 4 * i)) for i in range(3)))
+    vetor, vagas, passo = struct.unpack_from("<III", corpo, 0)
+    if not (0x00100000 <= vetor < 0x02000000) or passo not in PASSOS_CONHECIDOS or not 0 < vagas <= 256:
+        raise RuntimeError(f"EmMgr fora do esperado: vetor {vetor:#x}, passo {passo:#x}, vagas {vagas}")
+    return int(vetor), int(passo), int(vagas)
+
+
+def ler_personagem(c: Cliente, slot: int, vetor: int = VETOR, passo: int = PASSO) -> Personagem:
+    base = vetor + slot * passo
     corpo = c.pedir(
         p.comando(p.Codigo.READ32, struct.pack("<I", base)),
         p.comando(p.Codigo.READ8, struct.pack("<I", base + 0x11C)),
@@ -105,7 +118,8 @@ def ler_personagem(c: Cliente, slot: int) -> Personagem:
 
 
 def listar_personagens(c: Cliente) -> list[Personagem]:
-    return [ler_personagem(c, s) for s in range(SLOTS)]
+    vetor, passo, vagas = vetor_personagens(c)
+    return [ler_personagem(c, s, vetor, passo) for s in range(vagas)]
 
 
 def sala_atual(c: Cliente) -> int:
@@ -116,7 +130,8 @@ def sala_atual(c: Cliente) -> int:
 def criar_personagem(
     c: Cliente, tipo: int, vida: int = 1000, distancia_mm: float = 2000.0, variante: int = 0
 ) -> tuple[ResultadoChamada, Personagem | None]:
-    jogador = ler_vec3(c, VETOR + 0xC0)
+    vetor, passo, vagas = vetor_personagens(c)
+    jogador = ler_vec3(c, vetor + 0xC0)
     posicao = a_frente(jogador, ler_vec3(c, CAMERA_OLHO), ler_vec3(c, CAMERA_ALVO), distancia_mm)
     dados = montar_struct(tipo, variante, vida, posicao, sala_atual(c))
     c.pedir(
@@ -124,9 +139,9 @@ def criar_personagem(
     )
     # com o módulo do tipo residente (ver bancada/modulos.py) a criação não dorme: chamada imediata
     r = c.chamar(EM_SET_EVENT, (AREA_DO_MESTRE,), tempo_limite_ms=5000)
-    if not r.ok or r.v0 == 0 or not (VETOR <= r.v0 < VETOR + SLOTS * PASSO):  # errEm vale 0
+    if not r.ok or r.v0 == 0 or not (vetor <= r.v0 < vetor + vagas * passo):  # errEm vale 0
         return r, None
-    return r, ler_personagem(c, (r.v0 - VETOR) // PASSO)
+    return r, ler_personagem(c, (r.v0 - vetor) // passo, vetor, passo)
 
 
 def _cliente() -> Cliente:
@@ -144,10 +159,12 @@ def _linha(q: Personagem) -> str:
 def listar(_: argparse.Namespace) -> int:
     c = _cliente()
     try:
+        vetor, passo, vagas = vetor_personagens(c)
         vivos = [q for q in listar_personagens(c) if q.cabecalho]
-        jogador = ler_vec3(c, VETOR + 0xC0)
+        jogador = ler_vec3(c, vetor + 0xC0)
         print(
-            f"sala {sala_atual(c):04x}; jogador em ({jogador[0]:.0f}, {jogador[1]:.0f}, {jogador[2]:.0f}); {len(vivos)} slots usados"
+            f"sala {sala_atual(c):04x}; vetor {vetor:#x} passo {passo:#x} ({vagas} vagas); jogador em "
+            f"({jogador[0]:.0f}, {jogador[1]:.0f}, {jogador[2]:.0f}); {len(vivos)} slots usados"
         )
     finally:
         c.fechar()
