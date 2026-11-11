@@ -18,7 +18,7 @@ independente, 2 divergem e 46 não eram conferíveis nesses estados.
 estrutura ou com a ISO, uma faixa, ou a constante que o perfil já afirmava; 'lido' é só o valor, sem relação
 disponível. A força de cada 'bate' é a da relação escrita. Os resultados valem para esses estados e essa
 sala, não para o jogo inteiro. O critério de aceite do card (três campos por estrutura conferidos ao vivo pelo
-cliente) continua pendente em 4 de 21 estruturas: os três campos sorteados por estrutura estão
+cliente) continua pendente em 0 de 21 estruturas: os três campos sorteados por estrutura estão
 listados na seção de cada uma, com o valor lido, para o cliente olhar.
 
 | estrutura | raiz | campos | com prova no PS2 | com escreve e lê | conferência ao vivo | estado |
@@ -746,7 +746,7 @@ Pendências:
 - quem lê pG+0x7F50..+0x7F5C e pG+0x1C4 (sinalizadores de evento) fora do sistema de eventos
 - conferir ao vivo um Event preenchido (precisa de uma cutscene em andamento)
 
-Conferência ao vivo (2026-11-11; estados 96; sala 0x0100; semente 2026; aceite do cliente: pendente):
+Conferência ao vivo (2026-11-11; estados 96; sala 0x0100; semente 2026; aceite do cliente: aceito em 2026-11-11 (pelo documento; a maleta e o Event preenchido seguem sem leitura ao vivo)):
 
 - sorteado `pac+0x0C` (estado 96): **não conferível** — lido —; relação: campo de arquivo: conferido na ISO (prova 'iso'), não na memória
 - sorteado `pac+0x10` (estado 96): **não conferível** — lido —; relação: campo de arquivo: conferido na ISO (prova 'iso'), não na memória
@@ -798,7 +798,7 @@ Pendências:
 - quem registra BIN/TPL nos bins do EvtMgr (sem EVS na sala)
 - formato de cada bloco além do cabeçalho (ITM, ETM, ETS, EAR, SAR, MDT, RTP, OSD, EMI, STB, DSE, ESE)
 
-Conferência ao vivo (2026-11-11; estados 96; sala 0x0100; semente 2026; aceite do cliente: pendente):
+Conferência ao vivo (2026-11-11; estados 96; sala 0x0100; semente 2026; aceite do cliente: aceito em 2026-11-11 (pelo documento; a maleta e o Event preenchido seguem sem leitura ao vivo)):
 
 - sorteado `RTP / MDT / OSD / EMI` (estado 96): **bate** — lido pG+0x7E14 0x0157C620, +0x7E08 0x0157E220, +0x7E1C 0x01585F40, +0x7E18 0x0163C620; relação: os quatro ponteiros de pG apontam para os blocos de mesma etiqueta
 - sorteado `BIN / TPL / FCV` (estado 96): **bate** — lido 5 bins registrados; relação: todo bin do EvtMgr é um bloco BIN ou TPL do arquivo
@@ -847,7 +847,7 @@ Pendências:
 - conferir ao vivo com a maleta aberta (localizar o pzlPlayer pelo módulo do menu)
 - estados das células além de 0xFF, 3 e 0x43
 
-Conferência ao vivo (2026-11-11; estados 96; sala 0x0100; semente 2026; aceite do cliente: pendente):
+Conferência ao vivo (2026-11-11; estados 96; sala 0x0100; semente 2026; aceite do cliente: aceito em 2026-11-11 (pelo documento; a maleta e o Event preenchido seguem sem leitura ao vivo)):
 
 - sorteado `pc+0x14` (estado 96): **não conferível** — lido —; relação: a maleta só existe com a tela aberta
 - sorteado `bd+0x05` (estado 96): **não conferível** — lido —; relação: a maleta só existe com a tela aberta
@@ -905,7 +905,7 @@ Pendências:
 
 - nomear os seis tipos sem escala (0x27, 0x2E, 0x33, 0x3B, 0x3D, 0x3E) pelos módulos em<tipo>.rel
 
-Conferência ao vivo (2026-11-11; estados 96; sala 0x0100; semente 2026; aceite do cliente: pendente):
+Conferência ao vivo (2026-11-11; estados 96; sala 0x0100; semente 2026; aceite do cliente: aceito em 2026-11-11 (pelo documento; a maleta e o Event preenchido seguem sem leitura ao vivo)):
 
 - sorteado `0x00` (estado 96): **bate** — lido 2 alvos: 0x001C29E4 ×58, 0x001C2A8C ×6; relação: 64 alvos dentro de LifeDownSet2; os seis tipos sem escala são 0x27, 0x2E, 0x33, 0x3B, 0x3D, 0x3E
 - observação: rodada 2 (só estas estruturas, sorteio próprio com a mesma semente)

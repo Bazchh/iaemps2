@@ -909,7 +909,7 @@
           "sala": "0x0100",
           "semente": 2026,
           "sorteados": ["pac+0x0C", "pac+0x10", "pac+0x04"],
-          "aceite_cliente": "pendente",
+          "aceite_cliente": "aceito em 2026-11-11 (pelo documento; a maleta e o Event preenchido seguem sem leitura ao vivo)",
           "campos": {
             "mgr+0x1C": {"resultado": "bate", "estado": 96, "lido": "''", "relacao": "vazio sem Event vivo (0 vivos)"},
             "mgr+0x4C": {"resultado": "bate", "estado": 96, "lido": "0000000000000000000000000000000000000000000000000000000000000000", "relacao": "zerado sem evento"},
@@ -997,7 +997,7 @@
           "sala": "0x0100",
           "semente": 2026,
           "sorteados": ["RTP / MDT / OSD / EMI", "BIN / TPL / FCV", "FSE"],
-          "aceite_cliente": "pendente",
+          "aceite_cliente": "aceito em 2026-11-11 (pelo documento; a maleta e o Event preenchido seguem sem leitura ao vivo)",
           "campos": {
             "0x00": {"resultado": "bate", "estado": 96, "lido": "49", "relacao": "pG+0x48 = 0x0119A140 no heap; contagem plausível"},
             "0x04": {"resultado": "bate", "estado": 96, "lido": "000000000000000000000000", "relacao": "zeros"},
@@ -1062,7 +1062,7 @@
           "sala": "0x0100",
           "semente": 2026,
           "sorteados": ["pc+0x14", "bd+0x05", "pl+0x00"],
-          "aceite_cliente": "pendente",
+          "aceite_cliente": "aceito em 2026-11-11 (pelo documento; a maleta e o Event preenchido seguem sem leitura ao vivo)",
           "campos": {
             "pl+0x00": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "a maleta só existe com a tela aberta"},
             "pl+0x04": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "a maleta só existe com a tela aberta"},
@@ -1134,7 +1134,7 @@
           "sala": "0x0100",
           "semente": 2026,
           "sorteados": ["0x00"],
-          "aceite_cliente": "pendente",
+          "aceite_cliente": "aceito em 2026-11-11 (pelo documento; a maleta e o Event preenchido seguem sem leitura ao vivo)",
           "campos": {
             "0x00": {"resultado": "bate", "estado": 96, "lido": "2 alvos: 0x001C29E4 ×58, 0x001C2A8C ×6", "relacao": "64 alvos dentro de LifeDownSet2; os seis tipos sem escala são 0x27, 0x2E, 0x33, 0x3B, 0x3D, 0x3E"}
           },
