@@ -40,6 +40,25 @@ analyzeHeadless <pasta_projeto> <nome> -import <exe> -processor "r5900:LE:32:def
    do `--` vêm as funções a decompilar, e `+endereco` decompila também quem a chama. O `cmd.exe` parte argumentos
    em `=` e trata `^` como escape, por isso os separadores são `:` e `+`.
 
+## Mapa completo (S9-01)
+
+Decisão do cliente em 29/10: mapear o jogo inteiro, não sob demanda.
+
+1. Todas as funções do executável e dos módulos vivos na foto: o mesmo comando acima com `-- todas` (não refaz o
+   que já existe em `<pasta_saida>`).
+2. Módulos da ISO que não estavam carregados: `python -m iaemps2.bancada.snr2 <pasta_modulos>` lê cada `.rel`
+   do `BIO4DAT.AFS`, realoca com o realocador próprio (formato SNR2, lido no ligador do jogo) para endereços virtuais
+   a partir de 0x08000000 e grava `<modulo>.bin`, `<modulo>.csv` (símbolos que o módulo declara) e `lote.txt`.
+   Validação: realocado para a base em que o jogo carregou, o `.rel` difere da memória viva só nas palavras de tempo
+   de execução.
+3. `... -postScript MontarMemoriaEDecompilar.java <foto> <saida> lote:<pasta>/lote.txt -- todas` monta um bloco
+   executável por módulo, aplica os símbolos e decompila.
+4. `python -m iaemps2.bancada.mapa <saida>/funcoes.csv <pasta_modulos>/modulos.csv perfis/memoria/<serial>.funcoes.csv`
+   gera o índice versionado: endereço, nome, módulo, subsistema, tamanho, chamadores.
+
+`refrescar:inicio-fim` recarrega os bytes de uma faixa a partir de uma foto nova (módulo carregado depois da foto
+que criou os blocos).
+
 ## Decisões
 
 - O produto lê e aciona o jogo por fora, pelo emulador; não altera o disco nem o executável.
