@@ -19,7 +19,7 @@ Catálogo de capacidades (S9-03): o que o mestre pode acionar no jogo de abertur
 | **total** | **30** | 11 entram no sorteio do aceite |
 
 Critério de aceite do card (o cliente escolhe três capacidades ao acaso, sem semente, e cada uma funciona ao vivo
-como descrita, com o jogo seguindo): **pendente**. As escolhíveis são as de estado 'provada'. O que
+como descrita, com o jogo seguindo): **aceito em 2026-11-11: vida, esconder cenário e criar personagem vistos na tela pelo cliente (escolha delegada ao autor); a vida caiu de novo depois por golpe do aldeão criado, não pela escrita**. As escolhíveis são as de estado 'provada'. O que
 está marcado 'trava' não entra no catálogo de ações do S8-03.
 
 ## Tabela

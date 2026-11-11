@@ -1147,7 +1147,7 @@
     "versao": 1,
     "data": "2026-11-11",
     "nota": "Catálogo de capacidades (S9-03): o que o mestre pode acionar no jogo de abertura pela chamada remota, por escrita de memória ou pela camada de cena, com argumentos, pré-condições, efeito, volta e risco. Fonte única: docs/fonte/gerar_capacidades.py gera docs/Capacidades-SLUS-21134.md daqui. Estados: 'provada' = chamada ou escrita com registro datado e comando em src/ (python -m iaemps2.bancada…) que roda hoje; 'provada_sem_ferramenta' = registro datado, sem ferramenta; 'provada_em_script' = só em script de reversa/colisao (uma execução, 30/10); 'candidata' = lida no C, nunca acionada; 'trava' = acionar congela o jogo ou não faz nada (causa registrada). Só 'provada' entra no sorteio do aceite e no catálogo de ações do S8-03. Substitui modulos.chamada_remota.funcoes_provadas.",
-    "aceite_cliente": "pendente",
+    "aceite_cliente": "aceito em 2026-11-11: vida, esconder cenário e criar personagem vistos na tela pelo cliente (escolha delegada ao autor); a vida caiu de novo depois por golpe do aldeão criado, não pela escrita",
     "regra_geral": "funções que dormem pelo escalonador do jogo (carga do disco, SceSleep, TaskSleep) nunca são chamadas; chamadas só com o jogador parado; em partida só leitura e escrita de memória; estado salvo num slot do mestre antes de cada ação com efeito (o slot 95 é evidência da conferência do S9-02: copiar o .p2s antes de regravar)",
     "lista": [
       {
