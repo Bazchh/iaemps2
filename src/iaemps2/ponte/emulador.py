@@ -24,6 +24,7 @@ class Capacidades:
     velocidade: bool
     resultado_estado: bool
     cena: bool = False  # camada de cena (fase 4)
+    vigia: bool = False  # vigia de memória (fase 2)
 
     @property
     def modo(self) -> str:
@@ -67,6 +68,7 @@ def consultar_capacidades(cliente: Cliente) -> Capacidades:
         velocidade=bool(mascara & p.CAP_VELOCIDADE),
         resultado_estado=bool(mascara & p.CAP_RESULTADO_ESTADO),
         cena=bool(mascara & p.CAP_CENA),
+        vigia=bool(mascara & p.CAP_VIGIA),
     )
 
 
