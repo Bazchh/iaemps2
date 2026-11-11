@@ -1,41 +1,49 @@
 # Estruturas e tabelas do jogo de abertura (Resident Evil 4, SLUS-21134 1.01)
 
-Documento gerado de `perfis/memoria/SLUS-21134.json` (bloco `estruturas`, versão 1, 2026-11-10) por
+Documento gerado de `perfis/memoria/SLUS-21134.json` (bloco `estruturas`, versão 2, 2026-11-11) por
 `docs/fonte/gerar_estruturas.py`. Não editar à mão: mudar o perfil e gerar de novo. Entrega do card S9-02.
 
-Fonte única do documento de estruturas (S9-02): docs/fonte/gerar_estruturas.py gera docs/Estruturas-SLUS-21134.md daqui. Deslocamentos em hexadecimal; endereços estáticos são do executável SLUS-21134 1.01; o que é dinâmico (heap, módulo realocado) vem com a raiz estática e o caminho. Provas: decompilado = lido no C decompilado do PS2 (S9-01); vigia = vigia de escrita do fork (S8-01); foto = diferença entre fotos da memória (S8-00); ao_vivo = lido ou escrito pelo canal com efeito conferido; publica = fonte pública conferida ao vivo; gc = só o nome ou o papel vem da decompilação do GameCube, sem prova no PS2.
+Fonte única do documento de estruturas (S9-02): docs/fonte/gerar_estruturas.py gera docs/Estruturas-SLUS-21134.md daqui. Deslocamentos em hexadecimal; endereços estáticos são do executável SLUS-21134 1.01; o que é dinâmico (heap, módulo realocado) vem com a raiz estática e o caminho. Provas: decompilado = lido no C decompilado do PS2 (S9-01); vigia = vigia de escrita do fork (S8-01); foto = diferença entre fotos da memória (S8-00); ao_vivo = lido ou escrito pelo canal com efeito conferido; publica = fonte pública conferida ao vivo; gc = só o nome ou o papel vem da decompilação do GameCube, sem prova no PS2. Conferência ao vivo (11/11/2026): reversa/estruturas/conferir.py lê cada campo pelo canal e confere por relação independente do perfil (EM_LIST × cEm, soma das classes de polígonos, matriz × inversa, projeção da câmera, AFS lido na ISO, lista de áreas pela raiz do código); só leitura, estados 96 (jogo do cliente) e 95 (gravado pelos scripts de 30/10), sala 0x0100, uma execução de cada; três campos por estrutura sorteados com semente registrada. O aceite do card é do cliente e continua pendente: a conferência automática só prepara a lista do que ele olha.
 
 ## Cobertura
 
 Uma linha por estrutura: campos descritos, campos com prova no PS2 (não só nome do GameCube), campos com quem
-escreve e quem lê determinados por prova (células marcadas '(gc)' ou '(inferido)' não contam), e o estado.
-As estruturas sem campo são as que ninguém leu ainda. O critério de aceite do card (três campos por estrutura
-conferidos ao vivo pelo cliente) ainda não foi aplicado a nenhuma linha.
+escreve e quem lê determinados por prova (células marcadas '(gc)' ou '(inferido)' não contam), o resultado da
+conferência ao vivo automática e o estado. As estruturas sem campo são as que ninguém leu ainda.
 
-| estrutura | raiz | campos | com prova no PS2 | com escreve e lê | estado |
-|---|---|---|---|---|---|
-| [Bloco global do jogo (pG, GLOBAL_WK)](#pg) | 0x00425BA0 (apontado por 0x00325308); estático | 15 | 15 | 4 | parcial |
-| [Gerente de personagens (EmMgr, cManager<cEm>)](#emmgr) | 0x004203B0; estático. Ponteiro do jogador pPL em 0x004203D0 | 6 | 3 | 1 | lida |
-| [Personagem (cEm; cUnit → cCoord → cModel → cEm)](#cem) | EmMgr+0 + 0xED0 × vaga; dinâmico (heap). Vaga 0 = jogador (pPL) | 28 | 27 | 4 | parcial |
-| [Corpo de colisão do personagem (cAtariInfo, em cEm+0x320)](#catariinfo) | cEm+0x320 | 11 | 7 | 1 | parcial |
-| [Entrada da lista de inimigos da sala (EM_LIST, 32 bytes)](#em_list) | pG+0x8344 + 0x20 × i (0x0042DEE4); arquivos emleon00..09.esl do AFS (emgirl* nas partes da Ashley) | 12 | 11 | 11 | lida |
-| [Inventário: gerenciador de itens (cItemMgr) e item](#citemmgr) | 0x003CE148; estático. Vetor de itens no heap (0x010F6540 no estado 91), lido por +0x14 | 14 | 14 | 7 | lida |
-| [Tabelas de peças e de armas](#tabelas_itens) | peças 0x00326DE8 (ITEM_PIECE_INFO); armas 0x003A99C0 (43 entradas, contagem em 0x002F0200); alocações do inventário 0x00433F80; estáticas | 10 | 10 | 6 | lida |
-| [Módulos de personagem (tabela de módulos, arquivos por tipo, SNR2)](#modulos) | tabela de módulos 0x00455E50 (4 entradas de 0x98); arquivos por tipo 0x00328458 (+tipo × 8; 0x003286D8 / 0x00328958 / 0x00328BD8 por modo de personagem); estáticas. Código e dados dos módulos no heap (mem_alloc) | 11 | 11 | 8 | lida |
-| [Arquivos da ISO (BIO4DAT.AFS)](#afs) | ISO, setor 446273 (2048 bytes por setor) | 4 | 4 | 2 | parcial |
-| [Tarefas e threads (escalonador do jogo)](#tarefas) | tabela de tarefas 0x00451688 (20 entradas de 0x350); tarefa corrente em 0x00451680; semáforos do kernel 0x004558CC / 0x004558D0; estáticas | 8 | 8 | 2 | parcial |
-| [Sistema de cenas: áreas de roteiro (SceAt) e eventos (Event/EventMgr)](#cenas) | lista ordenada percorrida por sceAtSetOtStart 0x002661B0 / sceAtGetOtAddr 0x002661C0; registros SCE_AT_DATA de 0xA0 bytes (itens SCE_AT_ITEM de 0xB0) vindos dos blocos AEV/ITA da sala | 15 | 8 | 7 | parcial |
-| [Colisão de cenário (SatMgr, EatMgr, cSat, cSatFile)](#colisao) | SatMgr 0x0041AF10 (personagens), EatMgr 0x0041AF30 (balas, objetos, câmera); SEck 0x0041B578; estáticos. Peças (cSat de 0xF0) no vetor de 20 vagas de cada gerente; a da sala é a primeira | 18 | 18 | 2 | lida |
-| [Câmera](#camera) | olho 0x003CA220, alvo 0x003CA230, matriz visão-projeção 0x004327C0, transformação de tela 0x00432840; estáticos | 4 | 4 | 0 | lida |
-| [Modelo visual (.bin) e objetos de cenário](#modelo_visual) | tabela de objetos da sala 0x004568AC (ponteiros cObj); SMD em 0x004568A0; estáticos. Modelos no heap | 4 | 4 | 3 | lida |
-| [Efeitos (EstSet, tabela Est)](#efeitos) | gerente em *0x004203A4; tabela Est em gerente+0x7400 (0xC por id); Esp em gerente+0x6000 | 1 | 1 | 0 | parcial |
-| [Controle (joystick)](#controle) | 0x00431948; estático | 1 | 1 | 0 | parcial |
-| [Eventos e cutscenes (Event, EventMgr, blocos EVS)](#eventos) | EventMgr (0x00205B90..0x00207470 nomeadas no índice); raiz dos dados não localizada | 0 | 0 | 0 | não lida |
-| [Arquivo de sala (blocos SMD/SMX, LIT, SAR, EFF, TEX, ITM/ETM/ETS, CAM, BLK, EVS/FSE/AEV/ITA)](#blocos_sala) | não localizada no PS2 (no GameCube, pG->pRoom e pCore) | 0 | 0 | 0 | não lida |
-| [Tabuleiro da maleta (pzlPlayer, pzlBoard, pzlPiece)](#pzl) | criado pela tela da maleta 0x0111F4E0 (módulo do menu); vive só com a tela aberta | 0 | 0 | 0 | não lida |
-| [Cabeçalho SNR2 do módulo realocável (.rel)](#snr2) | início de cada .rel (tabela de módulos +0x88) | 0 | 0 | 0 | parcial |
-| [Tabela de tipos de inimigo (0x003C8F40)](#tipos_inimigo) | 0x003C8F40; estática | 0 | 0 | 0 | não lida |
-| **total** | | **162** | **146** | **58** | 8 lidas, 9 parciais, 4 não lidas |
+Conferência ao vivo automática (2026-11-11; estados 95, 96; uma execução por estado):
+126 campos batem com uma relação independente do perfil, 34 foram lidos sem relação
+independente, 2 divergem e 1 não eram conferíveis nesses estados.
+'Bate' significa que o valor lido satisfez uma relação que não vem do próprio perfil (outro campo, outra estrutura,
+a ISO, aritmética); 'lido' é só o valor, sem relação disponível. Os resultados valem para esses estados e essa
+sala, não para o jogo inteiro. O critério de aceite do card (três campos por estrutura conferidos ao vivo pelo
+cliente) continua pendente em 21 de 21 estruturas: os três campos sorteados por estrutura estão
+listados na seção de cada uma, com o valor lido, para o cliente olhar.
+
+| estrutura | raiz | campos | com prova no PS2 | com escreve e lê | conferência ao vivo | estado |
+|---|---|---|---|---|---|---|
+| [Bloco global do jogo (pG, GLOBAL_WK)](#pg) | 0x00425BA0 (apontado por 0x00325308); estático | 15 | 15 | 4 | 11 batem, 3 lidos, 1 divergem, 0 não conferíveis | parcial |
+| [Gerente de personagens (EmMgr, cManager<cEm>)](#emmgr) | 0x004203B0; estático. Ponteiro do jogador pPL em 0x004203D0 | 6 | 4 | 1 | 4 batem, 2 lidos, 0 divergem, 0 não conferíveis | lida |
+| [Personagem (cEm; cUnit → cCoord → cModel → cEm)](#cem) | EmMgr+0 + 0xED0 × vaga; dinâmico (heap). Vaga 0 = jogador (pPL) | 28 | 28 | 4 | 26 batem, 2 lidos, 0 divergem, 0 não conferíveis | parcial |
+| [Corpo de colisão do personagem (cAtariInfo, em cEm+0x320)](#catariinfo) | cEm+0x320 | 11 | 7 | 1 | 7 batem, 4 lidos, 0 divergem, 0 não conferíveis | parcial |
+| [Entrada da lista de inimigos da sala (EM_LIST, 32 bytes)](#em_list) | pG+0x8344 + 0x20 × i (0x0042DEE4); arquivos emleon00..09.esl do AFS (emgirl* nas partes da Ashley) | 12 | 11 | 11 | 6 batem, 6 lidos, 0 divergem, 0 não conferíveis | lida |
+| [Inventário: gerenciador de itens (cItemMgr) e item](#citemmgr) | 0x003CE148; estático. Vetor de itens no heap (0x010F6540 no estado 91), lido por +0x14 | 14 | 14 | 7 | 13 batem, 1 lidos, 0 divergem, 0 não conferíveis | lida |
+| [Tabelas de peças e de armas](#tabelas_itens) | peças 0x00326DE8 (ITEM_PIECE_INFO); armas 0x003A99C0 (43 entradas, contagem em 0x002F0200); alocações do inventário 0x00433F80; estáticas | 10 | 10 | 6 | 9 batem, 1 lidos, 0 divergem, 0 não conferíveis | lida |
+| [Módulos de personagem (tabela de módulos, arquivos por tipo, SNR2)](#modulos) | tabela de módulos 0x00455E50 (4 entradas de 0x98); arquivos por tipo 0x00328458 (+tipo × 8; 0x003286D8 / 0x00328958 / 0x00328BD8 por modo de personagem); estáticas. Código e dados dos módulos no heap (mem_alloc) | 11 | 11 | 8 | 9 batem, 2 lidos, 0 divergem, 0 não conferíveis | lida |
+| [Arquivos da ISO (BIO4DAT.AFS)](#afs) | ISO, setor 446273 (2048 bytes por setor) | 4 | 4 | 2 | 4 batem, 0 lidos, 0 divergem, 0 não conferíveis | parcial |
+| [Tarefas e threads (escalonador do jogo)](#tarefas) | tabela de tarefas 0x00451688 (20 entradas de 0x350); tarefa corrente em 0x00451680; semáforos do kernel 0x004558CC / 0x004558D0; estáticas | 8 | 8 | 2 | 3 batem, 4 lidos, 1 divergem, 0 não conferíveis | parcial |
+| [Sistema de cenas: áreas de roteiro (SceAt) e eventos (Event/EventMgr)](#cenas) | lista ordenada com cabeça em *0x004563F0 + 0x8C (sceAtSetOtStart), percorrida por sceAtGetOtAddr 0x002661C0; registros SCE_AT_DATA de 0xA0 bytes (itens SCE_AT_ITEM de 0xB0) vindos dos blocos AEV/ITA da sala | 15 | 9 | 7 | 8 batem, 7 lidos, 0 divergem, 0 não conferíveis | parcial |
+| [Colisão de cenário (SatMgr, EatMgr, cSat, cSatFile)](#colisao) | SatMgr 0x0041AF10 (personagens), EatMgr 0x0041AF30 (balas, objetos, câmera); SEck 0x0041B578; estáticos. Peças (cSat de 0xF0) no vetor de 20 vagas de cada gerente; a da sala é a primeira | 18 | 18 | 2 | 18 batem, 0 lidos, 0 divergem, 0 não conferíveis | lida |
+| [Câmera](#camera) | olho 0x003CA220, alvo 0x003CA230, matriz visão-projeção 0x004327C0, transformação de tela 0x00432840; estáticos | 4 | 4 | 0 | 4 batem, 0 lidos, 0 divergem, 0 não conferíveis | lida |
+| [Modelo visual (.bin) e objetos de cenário](#modelo_visual) | scrObjTbl 0x004568AC aponta para um vetor no heap de ponteiros cObj (105 na sala 0x0100); os cObj vivem no segundo gerente de objetos cObjMgr 0x00431D40 (cManager: vetor × 293 vagas de 0x4F0; o primeiro, 0x00431D20, tem 100); SMD em 0x004568A0; estáticos. Modelos no heap | 4 | 4 | 3 | 2 batem, 1 lidos, 0 divergem, 1 não conferíveis | lida |
+| [Efeitos (EstSet, tabela Est)](#efeitos) | gerente em *0x004203A4; tabela Est em gerente+0x7400 (0xC por id); Esp em gerente+0x6000 | 1 | 1 | 0 | 1 batem, 0 lidos, 0 divergem, 0 não conferíveis | parcial |
+| [Controle (joystick)](#controle) | 0x00431948; estático | 1 | 1 | 0 | 0 batem, 1 lidos, 0 divergem, 0 não conferíveis | parcial |
+| [Eventos e cutscenes (Event, EventMgr, blocos EVS)](#eventos) | EventMgr (0x00205B90..0x00207470 nomeadas no índice); raiz dos dados não localizada | 0 | 0 | 0 | sem campos | não lida |
+| [Arquivo de sala (blocos SMD/SMX, LIT, SAR, EFF, TEX, ITM/ETM/ETS, CAM, BLK, EVS/FSE/AEV/ITA)](#blocos_sala) | não localizada no PS2 (no GameCube, pG->pRoom e pCore) | 0 | 0 | 0 | sem campos | não lida |
+| [Tabuleiro da maleta (pzlPlayer, pzlBoard, pzlPiece)](#pzl) | criado pela tela da maleta 0x0111F4E0 (módulo do menu); vive só com a tela aberta | 0 | 0 | 0 | sem campos | não lida |
+| [Cabeçalho SNR2 do módulo realocável (.rel)](#snr2) | início de cada .rel (tabela de módulos +0x88) | 1 | 1 | 0 | 1 batem, 0 lidos, 0 divergem, 0 não conferíveis | parcial |
+| [Tabela de tipos de inimigo (0x003C8F40)](#tipos_inimigo) | 0x003C8F40; estática | 0 | 0 | 0 | sem campos | não lida |
+| **total** | | **163** | **150** | **58** | | 8 lidas, 9 parciais, 4 não lidas |
 
 Legenda das provas: **decompilado** = lido no C decompilado do PS2; **vigia** = vigia de escrita do fork; **foto** = diferença entre fotos da memória; **ao_vivo** = lido ou escrito pelo canal com efeito conferido; **publica** = fonte pública conferida ao vivo; **gc** = nome ou papel vindo da decompilação do GameCube, sem prova no PS2.
 
@@ -62,7 +70,7 @@ Estado global da partida: sala, vida, dificuldade, personagem, lista de inimigos
 | `0x7EE8` | u8 | traje (pl_costume) | 0 a 5 | não lido | escolha da tabela de arquivos por tipo | publica |
 | `0x7EEA` | u8 | personagem (pl_type) | 0 Leon, 1 Ashley, 2 Ada, 3 HUNK, 4 Krauser, 5 Wesker (nomes do GameCube); escolhe a tabela de arquivos de módulo | não lido | LifeDownSet2 (== 1), bancada/modulos.py | decompilado, ao_vivo |
 | `0x7EED` | u8 | não nomeado | LifeDownSet2: com valor 2, o jogador de tipo 1 e a parceira de tipo 3 não perdem vida (reposta ao máximo). Era descrito como 'flags de invencibilidade de 64 bits em +0x7EE8'; o C mostra uma leitura de 8 bytes que testa só +0x7EEA e +0x7EED | não lido | LifeDownSet2 | decompilado |
-| `0x7F60` | u32[12][8] | entradas da lista já usadas (Em_flg) | 32 bytes por lista de inimigos; um bit por entrada (bit 31 − índice da palavra); EmSetFromList2 recusa a entrada com o bit ligado | não lido (morte do inimigo no GameCube) | EmSetFromList2 | decompilado |
+| `0x7F60` | u32[12][8] | entradas da lista já usadas (Em_flg) | 32 bytes por lista de inimigos; um bit por entrada (bit 31 − índice da palavra); EmSetFromList2 recusa a entrada com o bit ligado. NÃO confirmado ao vivo: no estado 95, com as entradas 3..14, 18, 19, 29, 38 e 39 criadas, a lista 0 tinha só os bits 3, 4, 5, 16, 17 e 255 ligados (decodificação bit 31 − índice) — a regra de bits é outra ou o campo é outro | não lido (morte do inimigo no GameCube) | EmSetFromList2 | decompilado |
 | `0x8344` | EM_LIST[256] | lista de inimigos da sala (Em_list) | = 0x0042DEE4; 0x2000 bytes lidos do arquivo .esl pelo readEmList (cDvd, dorme pelo escalonador); zerada se a leitura falha | readEmList | EmSetFromList2, GetEmPtrFromList, GetEmIdFromList, EmListIsAlive | decompilado, ao_vivo |
 | `0xB3B0` | s32 | não nomeado | readEmList recarrega a lista quando vale 3 | não lido | readEmList | decompilado |
 
@@ -77,6 +85,14 @@ Pendências:
 - nomear +0x5C, +0x70, +0x7EED e +0xB3B0 pelo C (quem escreve)
 - dinheiro (peseta), capítulo, tempo de jogo e sinalizadores de roteiro (Scenario_flg, Key_flg, Room_flg) no PS2: só os nomes do GameCube
 - conferir ao vivo três campos sorteados (critério de aceite do S9-02)
+- Em_flg (+0x7F60): a relação 'um bit por entrada criada' não bateu ao vivo; ler quem escreve no C
+
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+
+- sorteado `0x70` (estado 96): **bate** — lido 0; relação: negativo só quando a lista precisa ser recarregada
+- sorteado `0x7ED6` (estado 96): **bate** — lido 1200; relação: cEm do jogador +0x4B0 = 1200; faixa 0..2400
+- sorteado `0x7EDC` (estado 96): **bate** — lido 600; relação: ≥ vida da parceira 600
+- divergência em `0x7F60` (estado 95): lido lista 0: 6 bits; relação: entradas criadas [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 18, 19, 29, 38, 39] ⊆ bits ligados [3, 4, 5, 16, 17, 255]
 
 <a id="emmgr"></a>
 ## Gerente de personagens (EmMgr, cManager<cEm>)
@@ -93,7 +109,7 @@ Pool fixo de 60 personagens de 0xED0 bytes; o vetor é alocado no heap (0x01789F
 | `0x04` | u32 | nArray | 60 | arrayAlloc (gc) | at() (gc) | decompilado, ao_vivo |
 | `0x08` | u32 | size | 0xED0 (passo do vetor) | construtor (gc) | at() (gc) | decompilado, ao_vivo |
 | `0x0C` | u8 | flag | — | construtor | — | gc |
-| `0x10` | ptr | pAlive | cabeça da lista de vivos (cEm+0x4 = próximo) | create/destroy | move, getEmPtr | gc |
+| `0x10` | ptr | pAlive | cabeça da lista de vivos (cEm+0x4 = próximo) | create/destroy | move, getEmPtr | gc, ao_vivo |
 | `0x34` | u32 | Guid | próximo serial de modelo | construct | — | gc |
 
 Funções:
@@ -108,6 +124,12 @@ Pendências:
 
 - pSUB (parceira) e o restante do gerente (+0x14..+0x30) só com nome do GameCube
 
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+
+- sorteado `0x10` (estado 96): **bate** — lido 0x01795100; relação: cadeia por +0x4 tem 15 nós; vagas com be_flag vivo = 15
+- sorteado `0x00` (estado 96): **bate** — lido 0x01789F40; relação: no heap; pPL 0x01789F40 = pArray (vaga 0 = jogador)
+- sorteado `0x04` (estado 96): **bate** — lido 60; relação: 60 vagas
+
 <a id="cem"></a>
 ## Personagem (cEm; cUnit → cCoord → cModel → cEm)
 
@@ -120,12 +142,12 @@ Mesma estrutura para jogador, parceira, inimigos e objetos-inimigo (caixas, port
 | deslocamento | tipo | campo | significado | quem escreve | quem lê | prova |
 |---|---|---|---|---|---|---|
 | `0x000` | u32 | be_flag | bit 0 vivo; 0x200/0x400 pedido de morte (vivo = (be_flag & 0x201) == 1); bit 16 ligou nas duas mortes vistas; cabeçalho 0x0B002077 no jogador, 0x02002077 no aldeão | cManager (gc) | isAlive em todo laço de personagens (gc) | foto, vigia |
-| `0x004` | ptr | pNext | próximo vivo (lista de EmMgr+0x10) | cManager (gc) | cManager (gc) | gc |
+| `0x004` | ptr | pNext | próximo vivo (lista de EmMgr+0x10); a cadeia percorrida ao vivo cobre exatamente as vagas com be_flag vivo (15 e 35 nós) | cManager (gc) | cManager (gc) | gc, ao_vivo |
 | `0x008` | ptr | tabela virtual | EmSetEvent chama *(vt+0x2C)(this + *(s16*)(vt+0x28)) logo após preencher a struct | construtor do tipo (inferido) | EmSetEvent | decompilado |
 | `0x010` | mat4 | matriz de mundo (cCoord) | 4×4 de floats, conferida na foto inimigo1 (S8-00): três linhas unitárias da rotação em y (ang +0xD4 = 1,75 rad) e a linha +0x40 igual a pos; é o que S8-00 chamou de 'posição com cópias' | matUpdate a cada quadro (gc) | desenho, partes (inferido) | foto |
 | `0x0C0` | vec3 | pos | posição dos pés em mm | EmSetEvent (lista ×10), movimento, colisão (encaixe no chão e empurrão de parede), canal (teleporte) | jumpCheck, EmSetEvent (distância ao jogador), tudo o mais (inferido) | decompilado, ao_vivo |
 | `0x0D0` | vec3 | ang | rotação em radianos (lista × π/16384); +0xD4 = eixo y (frente) | EmSetEvent, movimento, canal | desenho, salto (jumpCheck) | decompilado, ao_vivo |
-| `0x110` | ptr | pList (partes) | primeira cParts; cada parte: +0x80 posição de mundo, +0x90 anterior, +0xA0 anterior-anterior, +0x110 próxima parte. No teleporte é preciso escrever as três posições de todas as partes | partsWorldCalc a cada quadro (gc) | colisão (varredura anterior→atual), desenho | foto, ao_vivo |
+| `0x110` | ptr | pList (partes) | primeira cParts; em cada parte, +0x40 (4ª linha da matriz) é a posição de mundo, +0x80 o deslocamento local em relação ao pai (jogador: (0, 1076, 0) na raiz), +0x90 e +0xA0 posições de mundo anteriores; +0x110 a próxima parte (conferido ao vivo em 11/11; o teleporte escreve +0x80/+0x90/+0xA0 e o jogo recompõe) | partsWorldCalc a cada quadro (gc) | colisão (varredura anterior→atual), desenho | foto, ao_vivo |
 | `0x11C` | u8 | id (tipo) | 0 jogador, 1 a 13 parceira e aliados, ≥ 16 inimigos (ramo da função de dano; tabela por tipo 0x003C8F40) | construtor do tipo (inferido) | LifeDownSet2 | decompilado, ao_vivo |
 | `0x11D` | u8 | type (variante) | byte +2 da EM_LIST | EmSetEvent, EmSetFromList2 | rotinas do tipo (inferido) | decompilado |
 | `0x130` | vec3 | pos_old | posição antes do movimento do quadro; EmSetEvent copia pos para cá | EmSetEvent, updateOldPos (gc) | colisão | decompilado, ao_vivo |
@@ -160,6 +182,13 @@ Pendências:
 - área livre do tipo (trabalho do em10 etc.) não delimitada
 - vetor de anexos 0x017BCDF0 (5 vagas): formato dado como igual, não lido
 
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+
+- sorteado `0x4A4` (estado 95): **bate** — lido 0; relação: EM_LIST[10]+0x1A × 1000 = 0
+- sorteado `0x498` (estado 95): **bate** — lido 2.084e+10; relação: distância² xz ao jogador calculada 2.084e+10 (5 %; o jogo atualiza por quadro)
+- sorteado `0x290` (estado 96): **bate** — lido [-96682, -295, -661]; relação: igual a pos
+- observação: 17 cEm vindos da lista, 11 com vida > 0; afastamentos do ponto da lista (mm): [0, 0, 0, 0, 0, 4, 7, 10, 20, 33, 34, 44, 115, 422, 9018, 13136, 14945]
+
 <a id="catariinfo"></a>
 ## Corpo de colisão do personagem (cAtariInfo, em cEm+0x320)
 
@@ -191,6 +220,12 @@ Pendências:
 
 - +0x2A stat, +0x2C pMod, +0x30 radius3 só por nome; quem escreve m_Pos/m_oldPos no PS2
 
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+
+- sorteado `0x50` (estado 96): **bate** — lido [-96682, 578, -661]; relação: igual a m_Pos parado
+- sorteado `0x40` (estado 96): **bate** — lido [-96682, 578, -661]; relação: pos + (0, 874, 0)
+- sorteado `0x28` (estado 96): **bate** — lido 0; relação: 0 quadros restantes com o jogador parado
+
 <a id="em_list"></a>
 ## Entrada da lista de inimigos da sala (EM_LIST, 32 bytes)
 
@@ -202,7 +237,7 @@ O roteiro da sala cria a entrada i por EmSetFromList2(i); o mestre grava uma str
 
 | deslocamento | tipo | campo | significado | quem escreve | quem lê | prova |
 |---|---|---|---|---|---|---|
-| `0x00` | u8 | be_flag | bit 0 vivo, bit 1 já criada (EmSetFromList2 recusa), bits 2/3 alternância; EmSetEvent grava 7 | EmSetFromList2, EmSetEvent | EmSetFromList2 | decompilado |
+| `0x00` | u8 | be_flag | bit 0 vivo, bit 1 já criada (EmSetFromList2 recusa), bits 2/3 alternância; EmSetEvent grava 7; ao vivo (estado 96, nenhum cEm vindo da lista) havia entradas com 0x01 e 0x06: os bits não significam 'cEm vivo agora', e sim histórico da entrada | EmSetFromList2, EmSetEvent | EmSetFromList2 | decompilado |
 | `0x01` | u8 | id (tipo) | 0 = vaga vazia; 0x0F e 0x25 nascem nas vagas do fim do vetor (alocador especial) | arquivo .esl | EmSetFromList2, EmSetEvent | decompilado, ao_vivo |
 | `0x02` | u8 | type (variante) | → cEm+0x11D | arquivo | EmSetEvent | decompilado |
 | `0x03` | u8 | set | → cEm+0x4BD | arquivo | EmSetEvent | decompilado |
@@ -214,6 +249,14 @@ O roteiro da sala cria a entrada i por EmSetFromList2(i); o mestre grava uma str
 | `0x18` | u16 | room | estágio << 8 \| sala; EmSetFromList2 exige igual a pG+0x7EB8 | arquivo | EmSetFromList2 | decompilado |
 | `0x1A` | s16 | Guard_r | × 1000 → cEm+0x4A4 | arquivo | EmSetEvent | decompilado |
 | `0x1C` | u8[4] | reserva | — | — | — | gc |
+
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+
+- sorteado `0x18` (estado 96): **bate** — lido ['0x00000100', '0x00000101', '0x00000102', '0x00000103', '0x00000104', '0x00000105', '0x00000106', '0x00000107', '0x00000108', '0x00000109', '0x0000010A', '0x0000010B', '0x0000010E']; relação: todas no estágio de pG+0x7EB8 (1)
+- sorteado `0x0C` (estado 96): **bate** — lido 255 posições; x -8958..14235 cm; relação: dentro de ±300 m
+- sorteado `0x03` (estado 96): **lido** — lido [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 26, 27, 31, 34, 35, 36, 37, 43]; relação: set
+- observação: 255 entradas ocupadas, nenhuma criada em cEm: os cruzamentos com cEm ficam para um estado com inimigo da lista
+- observação: 255 entradas ocupadas, 1 vazias; 17 criadas em cEm
 
 <a id="citemmgr"></a>
 ## Inventário: gerenciador de itens (cItemMgr) e item
@@ -255,6 +298,12 @@ Pendências:
 - tipos de item 9 e 10 em +0x6/+0x8
 - centro da peça girada (orientação 1)
 
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+
+- sorteado `0x0C` (estado 96): **bate** — lido 0x010F654E; relação: vaga 1 do vetor tem id 0x00000023
+- sorteado `item+0x6` (estado 96): **lido** — lido 0x00000000; relação: níveis da pistola
+- sorteado `0x10` (estado 96): **bate** — lido 0x00000023; relação: igual ao id da vaga apontada por +0xC
+
 <a id="tabelas_itens"></a>
 ## Tabelas de peças e de armas
 
@@ -277,6 +326,12 @@ Dados fixos do executável: forma de cada item na maleta e capacidade do pente p
 | `arma+0x6` | u8 | id do item de munição | 0xFF = nenhum; pistola → 0x04 | executável | reload | decompilado |
 | `arma+0x8` | u16[] | capacidade do pente por nível | pistola 10/13/16/19/22/25 | executável | construct, arm | decompilado, ao_vivo |
 
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+
+- sorteado `peça+0x4` (estado 96): **bate** — lido 3; relação: pistola 3
+- sorteado `peça+0x10` (estado 96): **bate** — lido 111111; relação: largura × altura de '1'
+- sorteado `arma+0x8` (estado 96): **bate** — lido [10, 13, 16, 19, 22, 25]; relação: 10/13/16/19/22/25
+
 <a id="modulos"></a>
 ## Módulos de personagem (tabela de módulos, arquivos por tipo, SNR2)
 
@@ -289,7 +344,7 @@ Cada tipo de personagem é um .dat (modelos) mais um .rel (código realocável S
 | deslocamento | tipo | campo | significado | quem escreve | quem lê | prova |
 |---|---|---|---|---|---|---|
 | `0x80` | u16 | tipo | 0 = vaga livre | carregador, bancada/modulos.py | SearchEmModule | decompilado, ao_vivo |
-| `0x82` | u16 | flags | 1 .rel alocado, 2 ligado, 4 .dat alocado; InitModule libera os alocados | carregador | InitModule | decompilado, ao_vivo |
+| `0x82` | u16 | flags | 1 .rel alocado, 2 ligado, 4 .dat alocado; InitModule libera os alocados; ao vivo a entrada do pl0e tinha só o bit 2 (ligado sem alocação por esta tabela) | carregador | InitModule | decompilado, ao_vivo |
 | `0x84` | ptr | .dat | — | carregador | construtor do tipo (inferido) | decompilado, ao_vivo |
 | `0x88` | ptr | .rel | — | carregador | ligador | decompilado, ao_vivo |
 | `0x8C` | u32 | tamanho do .dat | arredondado a 0x800 | carregador | InitModule | decompilado |
@@ -312,6 +367,16 @@ Pendências:
 
 - criação do tipo 2 (cSubLeon) deixa a thread perdida: ligação não termina
 - cSubAda (pl12) não tem .dat próprio; o sistema de cenas prepara colisão e animação de outro modo (LC-18)
+
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+
+- sorteado `arq+0x0` (estado 96): **bate** — lido [('0012', 440), ('002A', 560), ('0021', 524), ('000E', 428)]; relação: índice < 2628 e nome .dat no AFS: ['em12.dat', 'em2a.dat', 'em21.dat', 'pl0e.dat']
+- sorteado `0x80` (estado 96): **bate** — lido ['0012', '002A', '0021', '000E']; relação: tipos vivos no vetor: ['0000', '000E', '0012', '0051', '0052', '0053', '0056']; ao menos um módulo residente tem personagem vivo
+- sorteado `arq+0x6` (estado 96): **lido** — lido [1, 1, 1, 1]; relação: sem relação independente
+- observação: tipo 0012: .rel em12.rel 444692 B no AFS; tabela +0x90 = 446464 (bate)
+- observação: tipo 002A: .rel em2a.rel 48098 B no AFS; tabela +0x90 = 49152 (bate)
+- observação: tipo 0021: .rel em21.rel 51905 B no AFS; tabela +0x90 = 53248 (bate)
+- observação: tipo 000E: .rel pl0e.rel 57081 B no AFS; tabela +0x90 = 57344 (bate)
 
 <a id="afs"></a>
 ## Arquivos da ISO (BIO4DAT.AFS)
@@ -339,6 +404,12 @@ Pendências:
 - mapa dos blocos do arquivo de sala no PS2 (SAR = colisão, SMD = objetos de cenário, ESL, EVS/AEV/ITA de roteiro)
 - formato .tpl (texturas) para o conversor de modelos (LC-17)
 
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+
+- sorteado `0x08` (estado 96): **bate** — lido última entrada (1537718272, 126144); relação: todas dentro da ISO; nomes = 48 × 2628 = 126144
+- sorteado `0x00` (estado 96): **bate** — lido b'AFS\x00'; relação: lido na ISO
+- sorteado `0x04` (estado 96): **bate** — lido 2628; relação: 2628
+
 <a id="tarefas"></a>
 ## Tarefas e threads (escalonador do jogo)
 
@@ -351,7 +422,7 @@ Cada tarefa do jogo é uma thread do kernel com semáforo; TaskSleep marca a tar
 | deslocamento | tipo | campo | significado | quem escreve | quem lê | prova |
 |---|---|---|---|---|---|---|
 | `0x04` | u8 | estado | TaskExec grava 1; TaskSleep grava (estado & 0x80) \| 2 | TaskExec, TaskSleep | SceExec, escalonador (inferido) | decompilado |
-| `0x05` | u8 | tipo | 0x17 normal (TaskExec), 0x16 tarefa de roteiro (SceExec); escolhe o semáforo sinalizado em TaskSleep | TaskExec, SceExec | TaskSleep | decompilado |
+| `0x05` | u8 | tipo | 0x17 normal (TaskExec), 0x16 tarefa de roteiro (SceExec); escolhe o semáforo sinalizado em TaskSleep; ao vivo a vaga 6 tem 0x14 (função 0x001B59C8 → fila do disco cDvd 0x0041C138), valor não previsto pelo C lido | TaskExec, SceExec | TaskSleep | decompilado |
 | `0x0C` | u32 | semáforo da tarefa | WaitSema em TaskSleep | criação | TaskSleep | decompilado |
 | `0x10` | u8 | sinalizador (kind) | SceExec copia o da tarefa corrente ou grava 1 | SceExec | — | decompilado |
 | `0x14` | u16 | contador de sono | quadros a dormir (TaskSleep) | TaskSleep | escalonador (inferido) | decompilado |
@@ -370,11 +441,21 @@ Pendências:
 
 - escalonador (0x002562B8, 0x002562E0) e o início de uma tarefa pendente (TaskExec numa vaga livre ficou pendente em 29/10)
 - conferir a tabela ao vivo
+- tipo 0x14 da vaga 6 (tarefa do disco): quem grava e o que muda no escalonador
+
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+
+- sorteado `0x14` (estado 96): **lido** — lido [1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1]; relação: quadros a dormir
+- sorteado `0x0C` (estado 96): **bate** — lido [19, 20, 21, 22, 23, 24, 26, 35, 36, 37, 38]; relação: id de semáforo do kernel (pequeno)
+- sorteado `0x340` (estado 96): **bate** — lido ['0x002177B0', '0x00257390', '0x0016BC50', '0x00257390', '0x00172AA8', '0x001B59C8', '0x00267AD8', '0x01188E60', '0x01187EA8', '0x011878F8', '0x01187BB0']; relação: cópia de +0x344
+- divergência em `0x05` (estado 96): lido ['17', '17', '17', '17', '17', '17', '14', '16', '00', '00', '00', '00', '00', '00', '00', '00', '16', '16', '16', '16']; relação: 11 vagas com 0x16/0x17; outros valores vistos: [(6, '14', '0x001B59C8')]
+- observação: tarefa corrente 0x451680 = 0x00452718 (na tabela)
+- observação: tarefa corrente 0x451680 = 0x00451688 (na tabela)
 
 <a id="cenas"></a>
 ## Sistema de cenas: áreas de roteiro (SceAt) e eventos (Event/EventMgr)
 
-- **Raiz:** lista ordenada percorrida por sceAtSetOtStart 0x002661B0 / sceAtGetOtAddr 0x002661C0; registros SCE_AT_DATA de 0xA0 bytes (itens SCE_AT_ITEM de 0xB0) vindos dos blocos AEV/ITA da sala
+- **Raiz:** lista ordenada com cabeça em *0x004563F0 + 0x8C (sceAtSetOtStart), percorrida por sceAtGetOtAddr 0x002661C0; registros SCE_AT_DATA de 0xA0 bytes (itens SCE_AT_ITEM de 0xB0) vindos dos blocos AEV/ITA da sala
 - **Tamanho:** 0xA0 por área
 - **Estado:** parcial
 
@@ -382,7 +463,7 @@ Uma área de roteiro é um volume (AREA_HIT_DATA) com tipo, número, quem dispar
 
 | deslocamento | tipo | campo | significado | quem escreve | quem lê | prova |
 |---|---|---|---|---|---|---|
-| `0x00` | u32 | tag | elo da lista ordenada | SceAtInit | sceAtGetOtAddr | gc |
+| `0x00` | u32 | tag | elo da lista ordenada: cabeça em *0x004563F0 + 0x8C, fim 0xFFFFFFFF; os nós acima da cabeça são as áreas (68 na sala 0x0100) | SceAtInit | sceAtGetOtAddr | gc, ao_vivo |
 | `0x04` | AREA_HIT_DATA | area | volume do gatilho (0x30 bytes) | SceAtInit | SceAtHitCheck | gc |
 | `0x34` | u8 | be_flg | bit 0 habilitada, bit 1 ativa, bit 2 alocada em tempo de execução (SceAtCreate*) | SceAtSetEnable | SceAtCheckEnable | gc |
 | `0x35` | u8 | id (tipo da área) | 0 normal, 1 porta, 2 exec, 3 item, 4 sinalizador, 5 mensagem, 7 salto, 8 save, 9 sombra, 10 dano, 11 colisão de roteiro, 12 câmera, 13 campo, 14 agachar, 15 chave (SKEY), 16 escada, 17 usar, 18 esconder, 19 teleporte, 20 item-pai, 21 arame da Ada (nomes do GameCube; o 15 confere no PS2) | arquivo AEV (inferido) | SceAtDataSet_exec, SceAtExecute (inferido) | decompilado |
@@ -413,6 +494,14 @@ Pendências:
 - onde a lista das áreas da sala fica em memória (raiz estática de sceAtSetOtStart)
 - eventos (Event, EventMgr, blocos EVS) e como preparam colisão e animação dos personagens de cena (LC-18)
 - sinalizadores de roteiro em pG (Scenario_flg, Room_flg, Key_flg) no PS2
+
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+
+- sorteado `0x45` (estado 96): **lido** — lido [0, 1, 2]; relação: kind
+- sorteado `0x39` (estado 96): **bate** — lido [0, 1, 3]; relação: combinação de 1/2/8
+- sorteado `0x44` (estado 96): **bate** — lido [2, 5, 8]; relação: 0..15
+- observação: raiz *0x4563F0 = 0x00456270; lista a partir de 0x004562FC com 68 áreas (percorridas 83 nós)
+- observação: raiz *0x4563F0 = 0x00456270; lista a partir de 0x004562FC com 69 áreas (percorridas 84 nós)
 
 <a id="colisao"></a>
 ## Colisão de cenário (SatMgr, EatMgr, cSat, cSatFile)
@@ -456,6 +545,13 @@ Pendências:
 
 - lacunas da LC-17: travessias de parede (1,4 % dos passos) e salto nativo (10 de 30 muros)
 
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+
+- sorteado `sat+0x70` (estado 96): **bate** — lido translação [0, 0, 0]; relação: matriz × inversa = identidade
+- sorteado `mgr+0x08` (estado 96): **bate** — lido 0x000000F0; relação: 0xF0
+- sorteado `sat+0x1C` (estado 96): **bate** — lido 1249; relação: > 0
+- observação: índices de vértice dos primeiros 256 polígonos < 1249: True
+
 <a id="camera"></a>
 ## Câmera
 
@@ -479,10 +575,17 @@ Pendências:
 
 - cortes de câmera por sala e como forçar um corte (SceCamMove, CutCall)
 
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+
+- sorteado `0x003CA220` (estado 96): **bate** — lido [-97478, 1470, 356]; relação: a 2749 mm do alvo
+- sorteado `0x004327C0` (estado 96): **bate** — lido w = 2749; relação: w ≈ distância olho-alvo 2749
+- sorteado `0x003CA230` (estado 96): **bate** — lido [-95389, 1045, -1382]; relação: a 1997 mm do jogador
+- observação: matriz de tela: diagonal [-1104.64, 1706.67, -262144.0, 1.0]
+
 <a id="modelo_visual"></a>
 ## Modelo visual (.bin) e objetos de cenário
 
-- **Raiz:** tabela de objetos da sala 0x004568AC (ponteiros cObj); SMD em 0x004568A0; estáticos. Modelos no heap
+- **Raiz:** scrObjTbl 0x004568AC aponta para um vetor no heap de ponteiros cObj (105 na sala 0x0100); os cObj vivem no segundo gerente de objetos cObjMgr 0x00431D40 (cManager: vetor × 293 vagas de 0x4F0; o primeiro, 0x00431D20, tem 100); SMD em 0x004568A0; estáticos. Modelos no heap
 - **Estado:** lida
 
 Formato da ferramenta pública RE4-PS2-BIN-TOOL, validado ao vivo (altura sob o jogador bate em 3 cm). É a base do terreno gerado (S9-02).
@@ -492,7 +595,7 @@ Formato da ferramenta pública RE4-PS2-BIN-TOOL, validado ao vivo (altura sob o 
 | `bin+0x00` | u8[0x50] | cabeçalho | assinatura em 0x30; +0xA nº de materiais; +0xC tabela de materiais (16 bytes cada, +12 ponteiro do nó) | arquivo | terreno.py | ao_vivo |
 | `nó` | u16, u8, u8 | total, segmentos−1, ossos | — | arquivo | terreno.py | ao_vivo |
 | `segmento` | cabeçalhos 0x10 | linhas e fator | pesos se h1[12]==0 && h1[14]>1; h2[0] nº de linhas; fator float em h2+0xC; linhas de 24 bytes com xyz int16; IndexComplement +14 == 0 fecha o triângulo da tira | arquivo | terreno.py | ao_vivo |
-| `cObj+0x10` | mat4 | matriz do objeto | mundo = vértice × fator × matriz (escala 10 embutida) | matUpdate (gc) | terreno.py | ao_vivo |
+| `cObj+0x10` | mat4 | matriz do objeto | mundo = vértice × fator × matriz; a escala do objeto vem embutida na matriz (10 na maioria, 1 a 1,2 em alguns objetos da sala 0x0100); [3][3] = 1; cObj: +0 be_flag, +4 próximo, +8 tabela virtual | matUpdate (gc) | terreno.py | ao_vivo |
 
 Funções:
 
@@ -501,6 +604,14 @@ Funções:
 Pendências:
 
 - texturas (.tpl) e conversor de modelo novo (LC-17)
+
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+
+- sorteado `segmento` (estado 95): **não conferível** — lido —; relação: não decodificado nesta conferência
+- sorteado `nó` (estado 96): **lido** — lido 0x20030818; relação: ponteiro do nó
+- sorteado `bin+0x00` (estado 96): **bate** — lido modelo do jogador 0x00710C40: 7 materiais; relação: cabeçalho do .bin do jogador
+- observação: cObjMgr 0x431D40: vetor 0x017E05F0 × 293 de 0x000004F0; 105 dos 105 objetos da tabela estão nele
+- observação: SMD 0x4568A0 = 0x011C90A0; 105 ponteiros cObj no heap
 
 <a id="efeitos"></a>
 ## Efeitos (EstSet, tabela Est)
@@ -512,7 +623,7 @@ EstSet(pai, idx=−1, &pos, &rot, est, kind, flags, u8) cria um efeito; est 0x58
 
 | deslocamento | tipo | campo | significado | quem escreve | quem lê | prova |
 |---|---|---|---|---|---|---|
-| `est+0x0` | u8[0xC] | entrada da tabela Est | formato não lido | arquivo EFF (inferido) | EstSet | ao_vivo |
+| `est+0x0` | u8[0xC] | entrada da tabela Est | entrada de 3 palavras: +0 dados, +4 índice (contagem u32 seguida de pares), +8 marcador (0xD6 = vazia); EspGetEstAddr 0x001B81F8 aceita id < 0xD7 e devolve dados + deslocamento do kind; 13 entradas usadas na sala 0x0100 | arquivo EFF (inferido) | EspGetEstAddr 0x001B81F8 | ao_vivo, decompilado |
 
 Funções:
 
@@ -522,6 +633,10 @@ Funções:
 Pendências:
 
 - catálogo por dados dos kinds (a varredura visual foi abandonada)
+
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+
+- sorteado `est+0x0` (estado 96): **bate** — lido gerente 0x0183ACC0: 13 de 215 entradas usadas; relação: EspGetEstAddr: 3ª palavra 0xD6 = vazia
 
 <a id="controle"></a>
 ## Controle (joystick)
@@ -539,6 +654,10 @@ Pendências:
 
 - mapear os botões (base do botão de salto da LC-17)
 
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+
+- sorteado `0x00` (estado 96): **lido** — lido 0x00000000; relação: ninguém aperta botão nesta conferência
+
 <a id="eventos"></a>
 ## Eventos e cutscenes (Event, EventMgr, blocos EVS)
 
@@ -555,6 +674,10 @@ Pendências:
 
 - ler EvtReadExec e o formato dos blocos EVS
 
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+
+- sem campos no perfil: nada a conferir
+
 <a id="blocos_sala"></a>
 ## Arquivo de sala (blocos SMD/SMX, LIT, SAR, EFF, TEX, ITM/ETM/ETS, CAM, BLK, EVS/FSE/AEV/ITA)
 
@@ -566,6 +689,10 @@ Só os nomes dos blocos vêm do GameCube. No PS2 só se leu o que já está em m
 Pendências:
 
 - achar o arquivo da sala no AFS e o índice de blocos em memória
+
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+
+- sem campos no perfil: nada a conferir
 
 <a id="pzl"></a>
 ## Tabuleiro da maleta (pzlPlayer, pzlBoard, pzlPiece)
@@ -584,6 +711,10 @@ Pendências:
 
 - tabelar pzlBoard e pzlPiece
 
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+
+- sem campos no perfil: nada a conferir
+
 <a id="snr2"></a>
 ## Cabeçalho SNR2 do módulo realocável (.rel)
 
@@ -593,6 +724,10 @@ Pendências:
 
 Lido para o realocador próprio (bancada/snr2.py, validado contra os módulos vivos): +4 lista de realocações simbólicas e +8 contagem, +0xC tabela de seções de 12 bytes e +0x10 contagem, +0x18 entrada dos construtores, +0x20 tabela de ponteiros e +0x24 contagem, +0x28 alinhamento 0x80, +0x2C tamanho, +0x34 fluxo de realocações comprimido; seções tipo 0 endereço, 1 importado por nome, 2 e 3 definidos. Não tabelado campo a campo aqui.
 
+| deslocamento | tipo | campo | significado | quem escreve | quem lê | prova |
+|---|---|---|---|---|---|---|
+| `0x00` | char[4] | assinatura | 'SNR2' no início de cada .rel residente (4 módulos conferidos ao vivo); as palavras seguintes são os campos do resumo (lista de realocações, contagens, tabela de seções), já com os ponteiros realocados para o heap | arquivo .rel do AFS; ponteiros realocados pelo ligador 0x002A56B8 | ligador 0x002A56B8 e bancada/snr2.py (inferido) | ao_vivo |
+
 Funções:
 
 - `0x002A56B8` ligador: ver módulos
@@ -600,6 +735,14 @@ Funções:
 Pendências:
 
 - tabelar os 16 campos com quem lê cada um no ligador
+
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+
+- sorteado `0x00` (estado 96): **bate** — lido ['SNR2', 'SNR2', 'SNR2', 'SNR2']; relação: início de cada um dos 4 .rel residentes (tabela de módulos +0x88)
+- observação: .rel do tipo 0012: SNR2 palavras ['0x01C054DC', '0x00001719', '0x01C16A08', '0x0000021A', '0x01C054BF', '0x01BF8E80', '0x01BF8E28']
+- observação: .rel do tipo 002A: SNR2 palavras ['0x01C7170C', '0x00000126', '0x01C724D4', '0x0000011E', '0x01C716EF', '0x01C6AA20', '0x01C6A9C8']
+- observação: .rel do tipo 0021: SNR2 palavras ['0x01CDC664', '0x0000012B', '0x01CDD468', '0x00000116', '0x01CDC647', '0x01CD5968', '0x01CD5910']
+- observação: .rel do tipo 000E: SNR2 palavras ['0x01EF9718', '0x000001B2', '0x01EFAB70', '0x0000011F', '0x01EF96FD', '0x01EF2A18', '0x01EF29C0']
 
 <a id="tipos_inimigo"></a>
 ## Tabela de tipos de inimigo (0x003C8F40)
@@ -613,4 +756,9 @@ Tabela de salto por tipo usada pela função de dano; os 64 casos não foram nom
 Pendências:
 
 - nomear os 64 casos pelo C decompilado (LifeDownSet2)
+
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+
+- sem campos no perfil: nada a conferir
+- observação: primeiras 8 palavras: ['0x5F524D54', '0x00004843', '0x5F524D54', '0x004B4C43', '0x73696854', '0x54464320', '0x6E756620', '0x6F697463']
 

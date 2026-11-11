@@ -39,6 +39,29 @@ def cobertura(estrutura):
     return len(campos), com_prova, com_fluxo
 
 
+RESULTADOS = ("bate", "lido", "diverge", "não conferível")
+
+
+def conferidos(estrutura):
+    """Contagem por resultado da conferência ao vivo (bate, lido, diverge, não conferível); zeros sem conferência."""
+    cf = estrutura.get("conferencia")
+    cont = dict.fromkeys(RESULTADOS, 0)
+    if cf:
+        for r in cf["campos"].values():
+            cont[r["resultado"]] = cont.get(r["resultado"], 0) + 1
+    return cont
+
+
+def celula_conferencia(estrutura):
+    cf = estrutura.get("conferencia")
+    if not cf:
+        return "—"
+    if not estrutura["campos"]:
+        return "sem campos"
+    c = conferidos(estrutura)
+    return f"{c['bate']} batem, {c['lido']} lidos, {c['diverge']} divergem, {c['não conferível']} não conferíveis"
+
+
 def gerar(perfil):
     e = perfil["estruturas"]
     jogo = perfil["jogo"]
@@ -54,20 +77,39 @@ def gerar(perfil):
     w("## Cobertura")
     w("")
     w("Uma linha por estrutura: campos descritos, campos com prova no PS2 (não só nome do GameCube), campos com quem")
-    w("escreve e quem lê determinados por prova (células marcadas '(gc)' ou '(inferido)' não contam), e o estado.")
-    w("As estruturas sem campo são as que ninguém leu ainda. O critério de aceite do card (três campos por estrutura")
-    w("conferidos ao vivo pelo cliente) ainda não foi aplicado a nenhuma linha.")
+    w("escreve e quem lê determinados por prova (células marcadas '(gc)' ou '(inferido)' não contam), o resultado da")
+    w("conferência ao vivo automática e o estado. As estruturas sem campo são as que ninguém leu ainda.")
     w("")
-    w("| estrutura | raiz | campos | com prova no PS2 | com escreve e lê | estado |")
-    w("|---|---|---|---|---|---|")
+    com_cf = [s for s in e["lista"] if s.get("conferencia")]
+    if com_cf:
+        tot_cf = dict.fromkeys(RESULTADOS, 0)
+        for s in com_cf:
+            for k, v in conferidos(s).items():
+                tot_cf[k] += v
+        datas = sorted({s["conferencia"]["data"] for s in com_cf})
+        estados = sorted({est for s in com_cf for est in s["conferencia"]["estados"]})
+        pend = sum(1 for s in com_cf if s["conferencia"]["aceite_cliente"] == "pendente")
+        w(f"Conferência ao vivo automática ({', '.join(datas)}; estados {', '.join(map(str, estados))}; uma execução por estado):")
+        w(f"{tot_cf['bate']} campos batem com uma relação independente do perfil, {tot_cf['lido']} foram lidos sem relação")
+        w(f"independente, {tot_cf['diverge']} divergem e {tot_cf['não conferível']} não eram conferíveis nesses estados.")
+        w("'Bate' significa que o valor lido satisfez uma relação que não vem do próprio perfil (outro campo, outra estrutura,")
+        w("a ISO, aritmética); 'lido' é só o valor, sem relação disponível. Os resultados valem para esses estados e essa")
+        w(f"sala, não para o jogo inteiro. O critério de aceite do card (três campos por estrutura conferidos ao vivo pelo")
+        w(f"cliente) continua pendente em {pend} de {len(com_cf)} estruturas: os três campos sorteados por estrutura estão")
+        w("listados na seção de cada uma, com o valor lido, para o cliente olhar.")
+    else:
+        w("Nenhuma conferência ao vivo registrada ainda.")
+    w("")
+    w("| estrutura | raiz | campos | com prova no PS2 | com escreve e lê | conferência ao vivo | estado |")
+    w("|---|---|---|---|---|---|---|")
     tot = [0, 0, 0]
     for s in e["lista"]:
         n, prova, fluxo = cobertura(s)
         tot[0] += n
         tot[1] += prova
         tot[2] += fluxo
-        w(f"| [{celula(s['nome'])}](#{s['id'].lower()}) | {celula(s['raiz'])} | {n} | {prova} | {fluxo} | {STATUS[s['status']]} |")
-    w(f"| **total** | | **{tot[0]}** | **{tot[1]}** | **{tot[2]}** | {sum(1 for s in e['lista'] if s['status'] == 'lida')} lidas, "
+        w(f"| [{celula(s['nome'])}](#{s['id'].lower()}) | {celula(s['raiz'])} | {n} | {prova} | {fluxo} | {celula_conferencia(s)} | {STATUS[s['status']]} |")
+    w(f"| **total** | | **{tot[0]}** | **{tot[1]}** | **{tot[2]}** | | {sum(1 for s in e['lista'] if s['status'] == 'lida')} lidas, "
       f"{sum(1 for s in e['lista'] if s['status'] == 'parcial')} parciais, {sum(1 for s in e['lista'] if s['status'] == 'nao_lida')} não lidas |")
     w("")
     w("Legenda das provas: " + "; ".join(f"**{k}** = {v}" for k, v in e["provas"].items()) + ".")
@@ -100,6 +142,25 @@ def gerar(perfil):
             w("")
             for p in s["pendencias"]:
                 w(f"- {p}")
+            w("")
+        cf = s.get("conferencia")
+        if cf:
+            w(f"Conferência ao vivo ({cf['data']}; estados {', '.join(map(str, cf['estados']))}; sala {cf['sala']}; "
+              f"semente {cf['semente']}; aceite do cliente: {cf['aceite_cliente']}):")
+            w("")
+            if not s["campos"]:
+                w("- sem campos no perfil: nada a conferir")
+            for d in cf["sorteados"]:
+                r = cf["campos"].get(d)
+                if r:
+                    w(f"- sorteado `{celula(d)}` (estado {r['estado']}): **{r['resultado']}** — lido {celula(r['lido'])}; relação: {celula(r['relacao'])}")
+                else:
+                    w(f"- sorteado `{celula(d)}`: sem leitura")
+            for d, r in cf["campos"].items():
+                if r["resultado"] == "diverge" and d not in cf["sorteados"]:
+                    w(f"- divergência em `{celula(d)}` (estado {r['estado']}): lido {celula(r['lido'])}; relação: {celula(r['relacao'])}")
+            for o in cf["observacoes"]:
+                w(f"- observação: {celula(o)}")
             w("")
     return "\n".join(linhas) + "\n"
 

@@ -13,6 +13,17 @@ DOCUMENTO = RAIZ / "docs" / "Estruturas-SLUS-21134.md"
 GERADOR = RAIZ / "docs" / "fonte" / "gerar_estruturas.py"
 CHAVES_ESTRUTURA = {"id", "nome", "status", "raiz", "tamanho", "resumo", "campos", "funcoes", "pendencias"}
 CHAVES_CAMPO = {"d", "t", "n", "s", "e", "l", "p"}
+CHAVES_CONFERENCIA = {
+    "data",
+    "estados",
+    "sala",
+    "semente",
+    "sorteados",
+    "aceite_cliente",
+    "campos",
+    "observacoes",
+}
+RESULTADOS = {"bate", "lido", "diverge", "não conferível"}
 
 
 def _perfil() -> dict:
@@ -33,8 +44,10 @@ def test_perfil_tem_a_forma_esperada() -> None:
     ids = [s["id"] for s in e["lista"]]
     assert len(ids) == len(set(ids)), "id de estrutura repetido"
     for s in e["lista"]:
-        assert set(s) == CHAVES_ESTRUTURA, s["id"]
+        assert set(s) - {"conferencia"} == CHAVES_ESTRUTURA, s["id"]
         assert s["status"] in {"lida", "parcial", "nao_lida"}, s["id"]
+        deslocamentos = [c["d"] for c in s["campos"]]
+        assert len(deslocamentos) == len(set(deslocamentos)), (s["id"], "deslocamento repetido")
         for c in s["campos"]:
             assert set(c) == CHAVES_CAMPO, (s["id"], c)
             assert c["d"] and c["n"], (s["id"], c)
@@ -42,6 +55,17 @@ def test_perfil_tem_a_forma_esperada() -> None:
             assert usadas and usadas <= provas, (s["id"], c["d"], c["p"])
         for f in s["funcoes"]:
             assert set(f) == {"nome", "endereco", "papel"}, (s["id"], f)
+        cf = s.get("conferencia")
+        if cf:
+            assert set(cf) == CHAVES_CONFERENCIA, s["id"]
+            assert cf["aceite_cliente"] in {"pendente", "aceito"}, s["id"]
+            assert set(cf["sorteados"]) <= set(deslocamentos) and len(cf["sorteados"]) == min(
+                3, len(deslocamentos)
+            ), s["id"]
+            assert set(cf["campos"]) <= set(deslocamentos), (s["id"], "conferência de campo que não existe")
+            for d, r in cf["campos"].items():
+                assert set(r) == {"resultado", "estado", "lido", "relacao"}, (s["id"], d)
+                assert r["resultado"] in RESULTADOS and r["estado"] in cf["estados"], (s["id"], d)
 
 
 def test_documento_esta_atualizado() -> None:
