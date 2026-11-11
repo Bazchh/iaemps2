@@ -10,6 +10,8 @@ from __future__ import annotations
 import struct
 from pathlib import Path
 
+import pytest
+
 from iaemps2.bancada import personagens as pz
 from iaemps2.ponte.cliente import AREA_DO_MESTRE, Cliente
 from iaemps2.simulador.servidor import Simulador
@@ -35,9 +37,32 @@ def test_ponto_a_frente_segue_a_camera() -> None:
     assert ponto == (500.0, 0.0, 1000.0)
 
 
+def test_vetor_lido_do_emmgr_com_os_dois_passos(tmp_path: Path) -> None:
+    """O passo não é fixo: sete salas usam 0x1470. O vetor e o passo vêm do EmMgr ao vivo (S9-02, 11/11)."""
+    with Simulador("proprio", pasta_estados=tmp_path) as sim:
+        mem = sim.jogo.memoria
+        c = Cliente(porta=sim.porta or 0)
+        c.conectar()
+        for passo in (0xED0, 0x1470):
+            struct.pack_into("<III", mem, pz.EM_MGR, pz.VETOR, 60, passo)
+            assert pz.vetor_personagens(c) == (pz.VETOR, passo, 60)
+            base = pz.VETOR + 3 * passo
+            struct.pack_into("<I", mem, base, 0x02002077)
+            mem[base + 0x11C] = 0x15
+            struct.pack_into("<fff", mem, base + 0xC0, 1.0, 2.0, 3.0)
+            q = pz.listar_personagens(c)[3]
+            assert (q.tipo, q.posicao) == (0x15, (1.0, 2.0, 3.0))
+            struct.pack_into("<I", mem, base, 0)
+        struct.pack_into("<III", mem, pz.EM_MGR, pz.VETOR, 60, 0x1000)
+        with pytest.raises(RuntimeError):
+            pz.vetor_personagens(c)
+        c.fechar()
+
+
 def test_criar_contra_o_simulador(tmp_path: Path) -> None:
     with Simulador("proprio", pasta_estados=tmp_path) as sim:
         mem = sim.jogo.memoria
+        struct.pack_into("<III", mem, pz.EM_MGR, pz.VETOR, 60, pz.PASSO)
         struct.pack_into("<fff", mem, pz.VETOR + 0xC0, 100.0, 0.0, 200.0)
         struct.pack_into("<fff", mem, pz.CAMERA_OLHO, 100.0, 1000.0, -1000.0)
         struct.pack_into("<fff", mem, pz.CAMERA_ALVO, 100.0, 800.0, 200.0)
