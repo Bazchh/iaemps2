@@ -58,7 +58,7 @@ def test_perfil_tem_a_forma_esperada() -> None:
         cf = s.get("conferencia")
         if cf:
             assert set(cf) == CHAVES_CONFERENCIA, s["id"]
-            assert cf["aceite_cliente"] in {"pendente", "aceito"}, s["id"]
+            assert cf["aceite_cliente"] == "pendente" or cf["aceite_cliente"].startswith("aceito"), s["id"]
             assert set(cf["sorteados"]) <= set(deslocamentos) and len(cf["sorteados"]) == min(
                 3, len(deslocamentos)
             ), s["id"]

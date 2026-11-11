@@ -98,7 +98,7 @@
           "sala": "0x0100",
           "semente": 2026,
           "sorteados": ["0x70", "0x7ED6", "0x7EDC"],
-          "aceite_cliente": "pendente",
+          "aceite_cliente": "aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)",
           "campos": {
             "0x5C": {"resultado": "lido", "estado": 96, "lido": "0x010008C0", "relacao": "sem relação independente (só o bit 0x40000000 é lido no C)"},
             "0x70": {"resultado": "bate", "estado": 96, "lido": "0", "relacao": "negativo só quando a lista precisa ser recarregada"},
@@ -148,7 +148,7 @@
           "sala": "0x0100",
           "semente": 2026,
           "sorteados": ["0x10", "0x00", "0x04"],
-          "aceite_cliente": "pendente",
+          "aceite_cliente": "aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)",
           "campos": {
             "0x00": {"resultado": "bate", "estado": 96, "lido": "0x01789F40", "relacao": "no heap; pPL 0x01789F40 = pArray (vaga 0 = jogador)"},
             "0x04": {"resultado": "bate", "estado": 96, "lido": "60", "relacao": "60 vagas"},
@@ -208,7 +208,7 @@
           "sala": "0x0100",
           "semente": 2026,
           "sorteados": ["0x4A4", "0x498", "0x290"],
-          "aceite_cliente": "pendente",
+          "aceite_cliente": "aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)",
           "campos": {
             "0x000": {"resultado": "bate", "estado": 96, "lido": "0x0B002077", "relacao": "jogador vivo"},
             "0x004": {"resultado": "bate", "estado": 96, "lido": "0x017C0930", "relacao": "próximo da cadeia de vivos"},
@@ -272,7 +272,7 @@
           "sala": "0x0100",
           "semente": 2026,
           "sorteados": ["0x50", "0x40", "0x28"],
-          "aceite_cliente": "pendente",
+          "aceite_cliente": "aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)",
           "campos": {
             "0x00": {"resultado": "lido", "estado": 96, "lido": "[0, -200, 0]", "relacao": "sem relação independente"},
             "0x10": {"resultado": "bate", "estado": 96, "lido": "400", "relacao": "400 no jogador"},
@@ -319,7 +319,7 @@
           "sala": "0x0100",
           "semente": 2026,
           "sorteados": ["0x18", "0x0C", "0x03"],
-          "aceite_cliente": "pendente",
+          "aceite_cliente": "aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)",
           "campos": {
             "0x00": {"resultado": "lido", "estado": 96, "lido": "['00', '01', '06']", "relacao": "contagens: {'00': 134, '01': 116, '06': 5}; nenhum cEm vivo veio da lista, logo bit 0 e bit 1 não significam 'cEm vivo agora'"},
             "0x01": {"resultado": "bate", "estado": 96, "lido": "['0F', '12', '13', '15', '17', '18', '21', '23', '24', '26', '27', '28', '2A', '2F']", "relacao": "tipos válidos (1..0x7F; 0x0F é o aliado com modelo de jogador)"},
@@ -374,7 +374,7 @@
           "sala": "0x0100",
           "semente": 2026,
           "sorteados": ["0x0C", "item+0x6", "0x10"],
-          "aceite_cliente": "pendente",
+          "aceite_cliente": "aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)",
           "campos": {
             "0x0C": {"resultado": "bate", "estado": 96, "lido": "0x010F654E", "relacao": "vaga 1 do vetor tem id 0x00000023"},
             "0x10": {"resultado": "bate", "estado": 96, "lido": "0x00000023", "relacao": "igual ao id da vaga apontada por +0xC"},
@@ -422,7 +422,7 @@
           "sala": "0x0100",
           "semente": 2026,
           "sorteados": ["peça+0x4", "peça+0x10", "arma+0x8"],
-          "aceite_cliente": "pendente",
+          "aceite_cliente": "aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)",
           "campos": {
             "peça+0x0": {"resultado": "bate", "estado": 96, "lido": "64 peças até 0xFFFF", "relacao": "64 entradas"},
             "peça+0x4": {"resultado": "bate", "estado": 96, "lido": "3", "relacao": "pistola 3"},
@@ -472,7 +472,7 @@
           "sala": "0x0100",
           "semente": 2026,
           "sorteados": ["arq+0x0", "0x80", "arq+0x6"],
-          "aceite_cliente": "pendente",
+          "aceite_cliente": "aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)",
           "campos": {
             "0x80": {"resultado": "bate", "estado": 96, "lido": "['0012', '002A', '0021', '000E']", "relacao": "tipos vivos no vetor: ['0000', '000E', '0012', '0051', '0052', '0053', '0056']; ao menos um módulo residente tem personagem vivo"},
             "0x82": {"resultado": "bate", "estado": 96, "lido": "['0007', '0007', '0007', '0002']", "relacao": "bit 2 (ligado) em toda entrada usada; bits 1/4 dizem se o carregador alocou .rel/.dat por esta tabela"},
@@ -513,7 +513,7 @@
           "sala": "0x0100",
           "semente": 2026,
           "sorteados": ["0x08", "0x00", "0x04"],
-          "aceite_cliente": "pendente",
+          "aceite_cliente": "aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)",
           "campos": {
             "0x00": {"resultado": "bate", "estado": 96, "lido": "b'AFS\\x00'", "relacao": "lido na ISO"},
             "0x04": {"resultado": "bate", "estado": 96, "lido": "2628", "relacao": "2628"},
@@ -553,7 +553,7 @@
           "sala": "0x0100",
           "semente": 2026,
           "sorteados": ["0x14", "0x0C", "0x340"],
-          "aceite_cliente": "pendente",
+          "aceite_cliente": "aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)",
           "campos": {
             "0x04": {"resultado": "lido", "estado": 96, "lido": "[2, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2]", "relacao": "estado (TaskExec grava 1; TaskSleep liga 0x80)"},
             "0x05": {"resultado": "diverge", "estado": 96, "lido": "['17', '17', '17', '17', '17', '17', '14', '16', '00', '00', '00', '00', '00', '00', '00', '00', '16', '16', '16', '16']", "relacao": "11 vagas com 0x16/0x17; outros valores vistos: [(6, '14', '0x001B59C8')]"},
@@ -606,7 +606,7 @@
           "sala": "0x0100",
           "semente": 2026,
           "sorteados": ["0x45", "0x39", "0x44"],
-          "aceite_cliente": "pendente",
+          "aceite_cliente": "aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)",
           "campos": {
             "0x00": {"resultado": "bate", "estado": 96, "lido": "68 elos", "relacao": "lista termina em 0xFFFFFFFF; nós acima da raiz são áreas"},
             "0x04": {"resultado": "lido", "estado": 96, "lido": "—", "relacao": "volume não decodificado"},
@@ -668,7 +668,7 @@
           "sala": "0x0100",
           "semente": 2026,
           "sorteados": ["sat+0x70", "mgr+0x08", "sat+0x1C"],
-          "aceite_cliente": "pendente",
+          "aceite_cliente": "aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)",
           "campos": {
             "mgr+0x00": {"resultado": "bate", "estado": 96, "lido": "0x018779F0", "relacao": "no heap"},
             "mgr+0x04": {"resultado": "bate", "estado": 96, "lido": "20", "relacao": "20"},
@@ -715,7 +715,7 @@
           "sala": "0x0100",
           "semente": 2026,
           "sorteados": ["0x003CA220", "0x004327C0", "0x003CA230"],
-          "aceite_cliente": "pendente",
+          "aceite_cliente": "aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)",
           "campos": {
             "0x003CA220": {"resultado": "bate", "estado": 96, "lido": "[-97478, 1470, 356]", "relacao": "a 2749 mm do alvo"},
             "0x003CA230": {"resultado": "bate", "estado": 96, "lido": "[-95389, 1045, -1382]", "relacao": "a 1997 mm do jogador"},
@@ -748,7 +748,7 @@
           "sala": "0x0100",
           "semente": 2026,
           "sorteados": ["segmento", "nó", "bin+0x00"],
-          "aceite_cliente": "pendente",
+          "aceite_cliente": "aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)",
           "campos": {
             "bin+0x00": {"resultado": "bate", "estado": 96, "lido": "modelo do jogador 0x00710C40: 7 materiais", "relacao": "cabeçalho do .bin do jogador"},
             "nó": {"resultado": "lido", "estado": 96, "lido": "0x20030818", "relacao": "ponteiro do nó"},
@@ -779,7 +779,7 @@
           "sala": "0x0100",
           "semente": 2026,
           "sorteados": ["est+0x0"],
-          "aceite_cliente": "pendente",
+          "aceite_cliente": "aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)",
           "campos": {
             "est+0x0": {"resultado": "bate", "estado": 96, "lido": "gerente 0x0183ACC0: 13 de 215 entradas usadas", "relacao": "EspGetEstAddr: 3ª palavra 0xD6 = vazia"}
           },
@@ -805,7 +805,7 @@
           "sala": "0x0100",
           "semente": 2026,
           "sorteados": ["0x00"],
-          "aceite_cliente": "pendente",
+          "aceite_cliente": "aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)",
           "campos": {
             "0x00": {"resultado": "lido", "estado": 96, "lido": "0x00000000", "relacao": "ninguém aperta botão nesta conferência"}
           },
@@ -906,7 +906,7 @@
           "sala": "0x0100",
           "semente": 2026,
           "sorteados": ["0x00"],
-          "aceite_cliente": "pendente",
+          "aceite_cliente": "aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)",
           "campos": {
             "0x00": {"resultado": "bate", "estado": 96, "lido": "['SNR2', 'SNR2', 'SNR2', 'SNR2']", "relacao": "início de cada um dos 4 .rel residentes (tabela de módulos +0x88)"}
           },

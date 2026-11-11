@@ -18,7 +18,7 @@ independente, 2 divergem e 1 não eram conferíveis nesses estados.
 estrutura ou com a ISO, uma faixa, ou a constante que o perfil já afirmava; 'lido' é só o valor, sem relação
 disponível. A força de cada 'bate' é a da relação escrita. Os resultados valem para esses estados e essa
 sala, não para o jogo inteiro. O critério de aceite do card (três campos por estrutura conferidos ao vivo pelo
-cliente) continua pendente em 21 de 21 estruturas: os três campos sorteados por estrutura estão
+cliente) continua pendente em 4 de 21 estruturas: os três campos sorteados por estrutura estão
 listados na seção de cada uma, com o valor lido, para o cliente olhar.
 
 | estrutura | raiz | campos | com prova no PS2 | com escreve e lê | conferência ao vivo | estado |
@@ -88,7 +88,7 @@ Pendências:
 - conferir ao vivo três campos sorteados (critério de aceite do S9-02)
 - Em_flg (+0x7F60): a relação 'um bit por entrada criada' não bateu ao vivo; ler quem escreve no C
 
-Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)):
 
 - sorteado `0x70` (estado 96): **bate** — lido 0; relação: negativo só quando a lista precisa ser recarregada
 - sorteado `0x7ED6` (estado 96): **bate** — lido 1200; relação: cEm do jogador +0x4B0 = 1200; faixa 0..2400
@@ -125,7 +125,7 @@ Pendências:
 
 - pSUB (parceira) e o restante do gerente (+0x14..+0x30) só com nome do GameCube
 
-Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)):
 
 - sorteado `0x10` (estado 96): **bate** — lido 0x01795100; relação: cadeia por +0x4 tem 15 nós; vagas com be_flag vivo = 15
 - sorteado `0x00` (estado 96): **bate** — lido 0x01789F40; relação: no heap; pPL 0x01789F40 = pArray (vaga 0 = jogador)
@@ -183,7 +183,7 @@ Pendências:
 - área livre do tipo (trabalho do em10 etc.) não delimitada
 - vetor de anexos 0x017BCDF0 (5 vagas): formato dado como igual, não lido
 
-Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)):
 
 - sorteado `0x4A4` (estado 95): **bate** — lido 0; relação: EM_LIST[10]+0x1A × 1000 = 0
 - sorteado `0x498` (estado 95): **bate** — lido 2.084e+10; relação: distância² xz ao jogador calculada 2.084e+10 (5 %; o jogo atualiza por quadro)
@@ -221,7 +221,7 @@ Pendências:
 
 - +0x2A stat, +0x2C pMod, +0x30 radius3 só por nome; quem escreve m_Pos/m_oldPos no PS2
 
-Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)):
 
 - sorteado `0x50` (estado 96): **bate** — lido [-96682, 578, -661]; relação: igual a m_Pos parado
 - sorteado `0x40` (estado 96): **bate** — lido [-96682, 578, -661]; relação: pos + (0, 874, 0)
@@ -251,7 +251,7 @@ O roteiro da sala cria a entrada i por EmSetFromList2(i); o mestre grava uma str
 | `0x1A` | s16 | Guard_r | × 1000 → cEm+0x4A4 | arquivo | EmSetEvent | decompilado |
 | `0x1C` | u8[4] | reserva | — | — | — | gc |
 
-Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)):
 
 - sorteado `0x18` (estado 96): **bate** — lido ['0x00000100', '0x00000101', '0x00000102', '0x00000103', '0x00000104', '0x00000105', '0x00000106', '0x00000107', '0x00000108', '0x00000109', '0x0000010A', '0x0000010B', '0x0000010E']; relação: todas no estágio de pG+0x7EB8 (1)
 - sorteado `0x0C` (estado 96): **bate** — lido 255 posições; x -8958..14235 cm; relação: dentro de ±300 m
@@ -299,7 +299,7 @@ Pendências:
 - tipos de item 9 e 10 em +0x6/+0x8
 - centro da peça girada (orientação 1)
 
-Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)):
 
 - sorteado `0x0C` (estado 96): **bate** — lido 0x010F654E; relação: vaga 1 do vetor tem id 0x00000023
 - sorteado `item+0x6` (estado 96): **lido** — lido 0x00000000; relação: níveis da pistola
@@ -327,7 +327,7 @@ Dados fixos do executável: forma de cada item na maleta e capacidade do pente p
 | `arma+0x6` | u8 | id do item de munição | 0xFF = nenhum; pistola → 0x04 | executável | reload | decompilado |
 | `arma+0x8` | u16[] | capacidade do pente por nível | pistola 10/13/16/19/22/25 | executável | construct, arm | decompilado, ao_vivo |
 
-Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)):
 
 - sorteado `peça+0x4` (estado 96): **bate** — lido 3; relação: pistola 3
 - sorteado `peça+0x10` (estado 96): **bate** — lido 111111; relação: largura × altura de '1'
@@ -369,7 +369,7 @@ Pendências:
 - criação do tipo 2 (cSubLeon) deixa a thread perdida: ligação não termina
 - cSubAda (pl12) não tem .dat próprio; o sistema de cenas prepara colisão e animação de outro modo (LC-18)
 
-Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)):
 
 - sorteado `arq+0x0` (estado 96): **bate** — lido [('0012', 440), ('002A', 560), ('0021', 524), ('000E', 428)]; relação: índice < 2628 e nome .dat no AFS: ['em12.dat', 'em2a.dat', 'em21.dat', 'pl0e.dat']
 - sorteado `0x80` (estado 96): **bate** — lido ['0012', '002A', '0021', '000E']; relação: tipos vivos no vetor: ['0000', '000E', '0012', '0051', '0052', '0053', '0056']; ao menos um módulo residente tem personagem vivo
@@ -405,7 +405,7 @@ Pendências:
 - mapa dos blocos do arquivo de sala no PS2 (SAR = colisão, SMD = objetos de cenário, ESL, EVS/AEV/ITA de roteiro)
 - formato .tpl (texturas) para o conversor de modelos (LC-17)
 
-Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)):
 
 - sorteado `0x08` (estado 96): **bate** — lido última entrada (1537718272, 126144); relação: todas dentro da ISO; nomes = 48 × 2628 = 126144
 - sorteado `0x00` (estado 96): **bate** — lido b'AFS\x00'; relação: lido na ISO
@@ -444,7 +444,7 @@ Pendências:
 - conferir a tabela ao vivo
 - tipo 0x14 da vaga 6 (tarefa do disco): quem grava e o que muda no escalonador
 
-Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)):
 
 - sorteado `0x14` (estado 96): **lido** — lido [1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1]; relação: quadros a dormir
 - sorteado `0x0C` (estado 96): **bate** — lido [19, 20, 21, 22, 23, 24, 26, 35, 36, 37, 38]; relação: id de semáforo do kernel (pequeno)
@@ -496,7 +496,7 @@ Pendências:
 - eventos (Event, EventMgr, blocos EVS) e como preparam colisão e animação dos personagens de cena (LC-18)
 - sinalizadores de roteiro em pG (Scenario_flg, Room_flg, Key_flg) no PS2
 
-Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)):
 
 - sorteado `0x45` (estado 96): **lido** — lido [0, 1, 2]; relação: kind
 - sorteado `0x39` (estado 96): **bate** — lido [0, 1, 3]; relação: combinação de 1/2/8
@@ -546,7 +546,7 @@ Pendências:
 
 - lacunas da LC-17: travessias de parede (1,4 % dos passos) e salto nativo (10 de 30 muros)
 
-Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)):
 
 - sorteado `sat+0x70` (estado 96): **bate** — lido translação [0, 0, 0]; relação: matriz × inversa = identidade
 - sorteado `mgr+0x08` (estado 96): **bate** — lido 0x000000F0; relação: 0xF0
@@ -576,7 +576,7 @@ Pendências:
 
 - cortes de câmera por sala e como forçar um corte (SceCamMove, CutCall)
 
-Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)):
 
 - sorteado `0x003CA220` (estado 96): **bate** — lido [-97478, 1470, 356]; relação: a 2749 mm do alvo
 - sorteado `0x004327C0` (estado 96): **bate** — lido w = 2749; relação: w ≈ distância olho-alvo 2749
@@ -606,7 +606,7 @@ Pendências:
 
 - texturas (.tpl) e conversor de modelo novo (LC-17)
 
-Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)):
 
 - sorteado `segmento` (estado 95): **não conferível** — lido —; relação: não decodificado nesta conferência
 - sorteado `nó` (estado 96): **lido** — lido 0x20030818; relação: ponteiro do nó
@@ -635,7 +635,7 @@ Pendências:
 
 - catálogo por dados dos kinds (a varredura visual foi abandonada)
 
-Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)):
 
 - sorteado `est+0x0` (estado 96): **bate** — lido gerente 0x0183ACC0: 13 de 215 entradas usadas; relação: EspGetEstAddr: 3ª palavra 0xD6 = vazia
 
@@ -655,7 +655,7 @@ Pendências:
 
 - mapear os botões (base do botão de salto da LC-17)
 
-Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)):
 
 - sorteado `0x00` (estado 96): **lido** — lido 0x00000000; relação: ninguém aperta botão nesta conferência
 
@@ -737,7 +737,7 @@ Pendências:
 
 - tabelar os 16 campos com quem lê cada um no ligador
 
-Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: pendente):
+Conferência ao vivo (2026-11-11; estados 96, 95; sala 0x0100; semente 2026; aceite do cliente: aceito em 2026-11-11 (tela: vida, pente, maleta, sala; demais pelo documento)):
 
 - sorteado `0x00` (estado 96): **bate** — lido ['SNR2', 'SNR2', 'SNR2', 'SNR2']; relação: início de cada um dos 4 .rel residentes (tabela de módulos +0x88)
 - observação: .rel do tipo 0012: SNR2 palavras ['0x01C054DC', '0x00001719', '0x01C16A08', '0x0000021A', '0x01C054BF', '0x01BF8E80', '0x01BF8E28']
