@@ -52,6 +52,9 @@ public class MontarMemoriaEDecompilar extends GhidraScript {
             if (a.equals("--")) { depoisDoSeparador = true; continue; }
             if (!depoisDoSeparador && a.startsWith("simbolos:")) {  // simbolos:<csv> endereco,nome,... aplica nomes
                 aplicarSimbolos(new File(a.substring(9)));
+            } else if (!depoisDoSeparador && a.startsWith("refrescar:")) {  // refrescar:inicio-fim recarrega os bytes da faixa a partir da foto
+                String[] par = a.substring(10).split("-", 2);
+                refrescar(foto, endereco(par[0]), endereco(par[1]));
             } else if (!depoisDoSeparador && a.startsWith("codigo:")) {  // codigo:inicio-fim marca a faixa como código
                 String[] par = a.substring(7).split("-", 2);
                 marcarCodigo(endereco(par[0]), endereco(par[1]));
@@ -74,6 +77,11 @@ public class MontarMemoriaEDecompilar extends GhidraScript {
         try {
             List<Function> fila = new ArrayList<>();
             for (String e : decompilar) {
+                if (e.equals("todas")) {  // todas as funções do programa (mapa completo)
+                    FunctionIterator todas = currentProgram.getFunctionManager().getFunctions(true);
+                    while (todas.hasNext()) fila.add(todas.next());
+                    continue;
+                }
                 boolean comChamadores = e.startsWith("+");  // +endereco: a função e quem a chama ('^' é escape do cmd)
                 Address addr = endereco(comChamadores ? e.substring(1) : e);
                 Function f = getFunctionContaining(addr);
@@ -82,10 +90,13 @@ public class MontarMemoriaEDecompilar extends GhidraScript {
                 fila.add(f);
                 if (comChamadores) fila.addAll(f.getCallingFunctions(monitor));
             }
+            int feitas = 0;
             for (Function f : fila) {
-                DecompileResults r = dec.decompileFunction(f, 120, monitor);
                 String nomeSeguro = f.getName().replaceAll("[^A-Za-z0-9_]+", "_");  // "::" não vale em nome de arquivo
                 File arq = new File(saida, String.format("%08x_%s.c", f.getEntryPoint().getOffset(), nomeSeguro));
+                if (fila.size() > 100 && arq.exists() && arq.length() > 0) continue;  // mapa completo: não refaz o que já existe
+                DecompileResults r = dec.decompileFunction(f, 120, monitor);
+                if (++feitas % 500 == 0) println("decompiladas " + feitas + " de " + fila.size());
                 try (PrintWriter w = new PrintWriter(new FileWriter(arq))) {
                     if (r.decompileCompleted()) {
                         w.print(r.getDecompiledFunction().getC());
@@ -138,6 +149,21 @@ public class MontarMemoriaEDecompilar extends GhidraScript {
     }
 
     private boolean houveCodigoNovo = false;
+
+    // Sobrescreve os bytes de [inicio, fim) com os da foto: serve para módulos carregados depois da foto que criou
+    // os blocos (o projeto guarda a foto antiga). Apaga as instruções da faixa para a análise refazê-las.
+    private void refrescar(File foto, Address inicio, Address fim) throws Exception {
+        long tamanho = fim.getOffset() - inicio.getOffset();
+        byte[] dados = new byte[(int) tamanho];
+        try (java.io.RandomAccessFile f = new java.io.RandomAccessFile(foto, "r")) {
+            f.seek(inicio.getOffset());
+            f.readFully(dados);
+        }
+        currentProgram.getListing().clearCodeUnits(inicio, fim.subtract(1), false);
+        currentProgram.getMemory().setBytes(inicio, dados);
+        houveCodigoNovo = true;
+        println("bytes refrescados: " + inicio + ".." + fim);
+    }
 
     // Recorta a faixa [inicio, fim) do bloco que a contém e a marca como executável, para a análise achar funções nela.
     private void marcarCodigo(Address inicio, Address fim) throws Exception {

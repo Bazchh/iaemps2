@@ -64,7 +64,7 @@ def test_capacidades_falham_no_original_e_respondem_no_proprio() -> None:
     assert r == p.Resultado.OK
     versao, mascara = struct.unpack("<HI", corpo)
     assert versao == p.VERSAO_EXTENSAO and mascara == (
-        p.CAP_PAUSA | p.CAP_VELOCIDADE | p.CAP_CENA | p.CAP_VIGIA
+        p.CAP_PAUSA | p.CAP_VELOCIDADE | p.CAP_CENA | p.CAP_VIGIA | p.CAP_CHAMADA
     )
 
 
