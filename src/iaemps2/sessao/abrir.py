@@ -11,7 +11,9 @@ import json
 from collections.abc import Callable
 from pathlib import Path
 
+from iaemps2 import log
 from iaemps2.catalogo import catalogo as cat
+from iaemps2.catalogo import mundo
 from iaemps2.config import Config
 from iaemps2.olho.captura import Captura, Capturador, Retangulo
 from iaemps2.ponte import emulador
@@ -95,7 +97,22 @@ def abrir(
             },
         )
 
-    catalogo = cat.montar(jogo.capacidades, tom, intensidade)
+    acoes: tuple[mundo.AcaoDeMundo, ...] = ()
+    pasta_perfis = config.perfil.caminho()
+    if pasta_perfis is not None:
+        carga = mundo.carregar_perfil(
+            mundo.localizar(pasta_perfis, jogo.identificacao.serial),
+            jogo.identificacao.serial,
+            jogo.identificacao.crc,
+        )
+        acoes = carga.acoes
+        log.evento(
+            "perfil.acoes",
+            origem=carga.origem,
+            aceitas=[a.id for a in carga.acoes],
+            recusadas=[f"{i}: {m}" for i, m in carga.recusadas],
+        )
+    catalogo = cat.montar(jogo.capacidades, tom, intensidade, acoes_de_mundo=acoes)
     if capturar is None:
         capturador = Capturador(config.captura.largura_px, config.captura.qualidade_jpeg)
 

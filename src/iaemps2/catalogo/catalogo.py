@@ -10,9 +10,12 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass, field, replace
 from enum import StrEnum
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from iaemps2.ponte.emulador import Capacidades
+
+if TYPE_CHECKING:
+    from iaemps2.catalogo.mundo import AcaoDeMundo
 
 NADA = "nada"
 FALHAS_PARA_INDISPONIBILIZAR = 3
@@ -81,6 +84,7 @@ class Alavanca:
     reversao: str
     disponivel: bool = True
     falhas_seguidas: int = 0
+    mundo: AcaoDeMundo | None = None  # ação de mundo (H07): a declaração do perfil que a executa
 
     def como_json(self) -> dict[str, Any]:
         return {
@@ -162,6 +166,9 @@ class Catalogo:
     alavancas: tuple[Alavanca, ...]
     motivo_da_versao: str
     slots_com_contexto: tuple[int, ...] = field(default_factory=tuple)
+    acoes_de_mundo: tuple[AcaoDeMundo, ...] = field(
+        default_factory=tuple
+    )  # as declaradas, para refazer versões
 
     @property
     def regras(self) -> Regras:
@@ -205,8 +212,10 @@ def montar(
     slots_com_contexto: tuple[int, ...] = (),
     versao: int = 1,
     motivo: str = "abertura",
+    acoes_de_mundo: tuple[AcaoDeMundo, ...] = (),
 ) -> Catalogo:
-    """D01: lista universal, disponibilidade pelas capacidades do emulador (A07), faixas pela intensidade."""
+    """D01: lista universal, disponibilidade pelas capacidades do emulador (A07), faixas pela intensidade.
+    As ações de mundo do perfil (H05) entram como linhas iguais, só no modo completo (escrevem pelo canal)."""
     regras = REGRAS[intensidade]
     alavancas = []
     for a in universais(regras):
@@ -216,7 +225,22 @@ def montar(
         if a.precisa == "velocidade":
             disponivel = disponivel and capacidades.velocidade
         alavancas.append(replace(a, disponivel=disponivel))
-    return Catalogo(versao, tom, intensidade, capacidades.modo, tuple(alavancas), motivo, slots_com_contexto)
+    nada = alavancas.pop()  # 'nada' fecha a lista
+    for acao in acoes_de_mundo:
+        alavancas.append(
+            replace(acao.alavanca(regras, intensidade), disponivel=capacidades.modo == "completo")
+        )
+    alavancas.append(nada)
+    return Catalogo(
+        versao,
+        tom,
+        intensidade,
+        capacidades.modo,
+        tuple(alavancas),
+        motivo,
+        slots_com_contexto,
+        acoes_de_mundo,
+    )
 
 
 def registrar_falha(catalogo: Catalogo, nome: str) -> tuple[Catalogo, bool]:
@@ -263,4 +287,5 @@ def nova_versao(catalogo: Catalogo, capacidades: Capacidades, motivo: str) -> Ca
         catalogo.slots_com_contexto,
         catalogo.versao + 1,
         motivo,
+        catalogo.acoes_de_mundo,
     )

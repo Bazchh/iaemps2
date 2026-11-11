@@ -8,6 +8,8 @@ Comandos:
   lista-viva <i>                 EmListIsAlive(i): a entrada i da lista da sala está viva?
   contar-item <id>               cItemMgr::num(id): quantos do item no inventário.
   vida <valor>                   escreve a vida do jogador (0..máxima) e relê.
+  municao <balas>                escreve as balas no pente da arma equipada e relê.
+  vida-inimigo <vaga> <valor>    escreve a vida (1..máxima) de uma vaga viva do vetor de personagens e relê.
   teleporte <x> <y> <z> [--relativo]
                                  escreve a posição do jogador (mm) na entidade, na posição anterior e nas partes do
                                  modelo; relê. Só para pontos do chão (um ponto dentro de objeto é rejeitado pelo jogo).
@@ -100,6 +102,58 @@ def teleportar(c: Cliente, x: float, y: float, z: float) -> tuple[float, float, 
         time.sleep(0.02)
     time.sleep(0.25)
     return pz.ler_vec3(c, vetor + POS)
+
+
+def escrever_municao(c: Cliente, balas: int) -> tuple[int, int]:
+    """Balas no pente da arma equipada (item+0x8 = balas << 3). Devolve (antes, depois)."""
+    item = _u32(c, ITEM_MGR + 0xC)
+    if not 0x00100000 < item < 0x02000000:
+        raise RuntimeError(f"ponteiro do item equipado fora da memória: {item:#x}")
+    antes = _u16(c, item + 8) >> 3
+    c.pedir(p.comando(p.Codigo.WRITE16, struct.pack("<IH", item + 8, max(0, balas) << 3)))
+    return antes, _u16(c, item + 8) >> 3
+
+
+def escrever_vida_de_personagem(c: Cliente, vaga: int, valor: int) -> tuple[int, int, int]:
+    """Vida (cEm+0x4B0) de uma vaga viva do vetor de personagens. Devolve (antes, máxima, depois)."""
+    vetor, passo, vagas = pz.vetor_personagens(c)
+    if not 0 < vaga < vagas:
+        raise RuntimeError(f"vaga {vaga} fora de 1..{vagas - 1}")
+    base = vetor + vaga * passo
+    if _u32(c, base) & 0x201 != 1:
+        raise RuntimeError(f"vaga {vaga} não está viva")
+    antes = struct.unpack_from("<h", c.pedir(p.comando(p.Codigo.READ16, struct.pack("<I", base + 0x4B0))), 0)[
+        0
+    ]
+    maxima = struct.unpack_from(
+        "<h", c.pedir(p.comando(p.Codigo.READ16, struct.pack("<I", base + 0x4B2))), 0
+    )[0]
+    novo = max(1, min(valor, maxima)) if maxima > 0 else max(1, valor)
+    c.pedir(p.comando(p.Codigo.WRITE16, struct.pack("<Ih", base + 0x4B0, novo)))
+    depois = struct.unpack_from(
+        "<h", c.pedir(p.comando(p.Codigo.READ16, struct.pack("<I", base + 0x4B0))), 0
+    )[0]
+    return int(antes), int(maxima), int(depois)
+
+
+def cmd_municao(args: argparse.Namespace) -> int:
+    c = _cliente()
+    try:
+        antes, depois = escrever_municao(c, args.balas)
+    finally:
+        c.fechar()
+    print(f"pente: {antes} -> {depois} balas")
+    return 0 if depois == max(0, args.balas) else 1
+
+
+def cmd_vida_inimigo(args: argparse.Namespace) -> int:
+    c = _cliente()
+    try:
+        antes, maxima, depois = escrever_vida_de_personagem(c, args.vaga, args.valor)
+    finally:
+        c.fechar()
+    print(f"vaga {args.vaga}: vida {antes} -> {depois} (máxima {maxima})")
+    return 0
 
 
 def cmd_lista_viva(args: argparse.Namespace) -> int:
@@ -203,6 +257,13 @@ def main(argv: list[str] | None = None) -> int:
     s = sub.add_parser("vida")
     s.add_argument("valor", type=int)
     s.set_defaults(func=cmd_vida)
+    s = sub.add_parser("municao")
+    s.add_argument("balas", type=int)
+    s.set_defaults(func=cmd_municao)
+    s = sub.add_parser("vida-inimigo")
+    s.add_argument("vaga", type=int)
+    s.add_argument("valor", type=int)
+    s.set_defaults(func=cmd_vida_inimigo)
     s = sub.add_parser("teleporte")
     s.add_argument("x", type=float)
     s.add_argument("y", type=float)

@@ -11,12 +11,12 @@ Catálogo de capacidades (S9-03): o que o mestre pode acionar no jogo de abertur
 
 | estado | quantas | o que significa |
 |---|---|---|
-| provada | 11 | provada (registro datado e ferramenta em src/) |
+| provada | 13 | provada (registro datado e ferramenta em src/) |
 | provada_sem_ferramenta | 2 | provada, sem ferramenta em src/ |
 | provada_em_script | 4 | provada só em script de reversa (uma execução) |
 | candidata | 7 | candidata (lida no C, nunca acionada) |
 | trava | 6 | trava (nunca acionar) |
-| **total** | **30** | 11 entram no sorteio do aceite |
+| **total** | **32** | 13 entram no sorteio do aceite |
 
 Critério de aceite do card (o cliente escolhe três capacidades ao acaso, sem semente, e cada uma funciona ao vivo
 como descrita, com o jogo seguindo): **aceito em 2026-11-11: vida, esconder cenário e criar personagem vistos na tela pelo cliente (escolha delegada ao autor); a vida caiu de novo depois por golpe do aldeão criado, não pela escrita**. As escolhíveis são as de estado 'provada'. O que
@@ -33,6 +33,8 @@ está marcado 'trava' não entra no catálogo de ações do S8-03.
 | [Saber se o módulo de um tipo está residente](#consultar_modulo) | SearchEmModule | 0x00262D68 | chamada remota | 1 | não | python -m iaemps2.bancada.modulos listar (lê a tabela; a chamada é usada por carregar) | provada | 29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md) | 11/11/2026 |
 | [Saber se a entrada i da lista da sala está viva](#lista_viva) | EmListIsAlive | 0x001BDB38 | chamada remota | 1 | não | python -m iaemps2.bancada.capacidades lista-viva <i> | provada | 29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md) | 11/11/2026 |
 | [Quantidade de um item no inventário](#contar_item) | cItemMgr::num | 0x0011F0E0 | chamada remota | 2 | não | python -m iaemps2.bancada.capacidades contar-item <id> | provada | 29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md) | 11/11/2026 |
+| [Mudar a vida de um personagem vivo](#vida_de_inimigo) | escrita em cEm+0x4B0 (vida) de uma vaga do vetor de personagens | 0x004203B0 | escrita de memória | 0 | não | python -m iaemps2.bancada.capacidades vida-inimigo <vaga> <valor> | provada | 11/11/2026, estado 96, sala 0x0100, pelo autor (ensaio antes do aceite) | 11/11/2026 |
+| [Mudar as balas no pente da arma equipada](#municao_no_pente) | escrita no item equipado (cItemMgr+0xC → item+0x8, balas × 8) | 0x003CE154 | escrita de memória | 0 | não | python -m iaemps2.bancada.capacidades municao <balas> | provada | 11/11/2026, estado 96, sala 0x0100, pelo autor (ensaio antes do aceite) | 11/11/2026 |
 | [Dar um item pela função do próprio jogo (encaixa na maleta)](#dar_item_pela_funcao) | dar_item_se_couber | 0x00261898 | chamada remota | 3 | não | nenhuma: bancada/inventario.py dar escreve a vaga direto (ver dar_item_por_escrita) | provada_sem_ferramenta | 29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md) | — |
 | [Somar pesetas](#somar_dinheiro) | somar_dinheiro | 0x0011E610 | chamada remota | 1 | não | nenhuma | provada_sem_ferramenta | 29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md) | — |
 | [Mudar a vida do jogador](#vida) | escrita em pG+0x7ED6 | 0x0042DA76 | escrita de memória | 0 | não | python -m iaemps2.bancada.capacidades vida <valor> | provada | 29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md) | 11/11/2026 |
@@ -168,6 +170,38 @@ está marcado 'trava' não entra no catálogo de ações do S8-03.
 - **Risco / causa da trava:** nenhum conhecido
 - **Prova:** 29/10/2026, com o cliente no controle (docs/medicoes/S8-02-chamada-remota.md); cItemMgr::num(pistola) = 1
 - **Ensaio:** 11/11/2026, estado 96, sala 0x0100, pelo autor (ensaio antes do aceite); cItemMgr::num(0x23) = 1, (0x04) = 15: bate com o inventário lido
+
+<a id="vida_de_inimigo"></a>
+### Mudar a vida de um personagem vivo
+
+- **Função:** escrita em cEm+0x4B0 (vida) de uma vaga do vetor de personagens (0x004203B0); símbolo: `EmMgr lido ao vivo; vaga escolhida por regra (inimigo vivo mais próximo); cEm+0x4B0 s16`
+- **Via:** escrita de memória; 0 argumentos; trampolim desnecessário
+- **Argumentos:** vaga, vida (1..máxima +0x4B2)
+- **Ferramenta:** python -m iaemps2.bancada.capacidades vida-inimigo <vaga> <valor>
+- **Pré-condições:**
+  - vaga viva (be_flag & 0x201 == 1) com vida > 0
+  - tipo 0x10..0x4F para contar como inimigo na função de dano
+- **Efeito visível:** o personagem morre com menos tiros; nada muda na tela na hora
+- **Como desfazer:** escrever o valor anterior
+- **Risco / causa da trava:** zero deve matar sem animação de morte (não medido); escrita numa vaga que o jogo destrói no meio: sem efeito
+- **Prova:** 11/11/2026, estado 96, sala 0x0100, pelo autor (ensaio antes do aceite); vaga 59 (tipo 0x51): 1000 → 500, relido 500, estável 3 s, devolvido 1000
+- **Ensaio:** 11/11/2026, estado 96, sala 0x0100, pelo autor (ensaio antes do aceite); igual à prova (mesma rodada)
+
+<a id="municao_no_pente"></a>
+### Mudar as balas no pente da arma equipada
+
+- **Função:** escrita no item equipado (cItemMgr+0xC → item+0x8, balas × 8) (0x003CE154); símbolo: `cItemMgr +0xC ponteiro do item equipado; item+0x8 u16 = balas << 3`
+- **Via:** escrita de memória; 0 argumentos; trampolim desnecessário
+- **Argumentos:** balas (0..capacidade do pente)
+- **Ferramenta:** python -m iaemps2.bancada.capacidades municao <balas>
+- **Pré-condições:**
+  - arma equipada (ponteiro em cItemMgr+0xC dentro do vetor de itens)
+  - armas de carga (0x34, 0x37, 0x53) guardam o pente em +0x6, não em +0x8: não tratadas
+- **Efeito visível:** o contador de balas na tela muda
+- **Como desfazer:** escrever o valor anterior
+- **Risco / causa da trava:** valor acima da capacidade do pente não medido
+- **Prova:** 11/11/2026, estado 96, sala 0x0100, pelo autor (ensaio antes do aceite); pistola: 10 → 3 balas, relido 3, estável 3 s, devolvido 10
+- **Ensaio:** 11/11/2026, estado 96, sala 0x0100, pelo autor (ensaio antes do aceite); igual à prova (mesma rodada)
 
 <a id="vida"></a>
 ### Mudar a vida do jogador

@@ -131,6 +131,17 @@ def conferir(
                 decisao,
                 f"fora da faixa: {alavanca.nome}.{nome}={decisao.parametros[nome]:g} não está em [{faixa.minimo:g}, {faixa.maximo:g}]",
             )
+    if alavanca.mundo is not None:
+        proibicoes = alavanca.mundo.proibicoes
+        if proibicoes.so_em_jogo and not situacao.em_jogo:
+            return descartar(
+                decisao, f"regra de mesa (RN-03): {alavanca.nome} fora de jogo ({situacao.fase})"
+            )
+        if proibicoes.fases and situacao.fase.value not in proibicoes.fases:
+            return descartar(
+                decisao,
+                f"regra de mesa: {alavanca.nome} só em {', '.join(proibicoes.fases)}, agora {situacao.fase}",
+            )
     if alavanca.nome == "recarregar":
         slot = int(decisao.parametros["slot"])
         if slot not in aperto_dos_slots:

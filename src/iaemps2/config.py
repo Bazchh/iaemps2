@@ -86,6 +86,15 @@ class Servico(Secao):
     )  # acima disso o mestre se pausa; > 3 pelo critério G02
 
 
+class Perfil(Secao):
+    """Perfis de memória por jogo (<serial>.json): as ações de mundo saem daqui (H05). Pasta vazia = nenhum."""
+
+    pasta: str = "perfis/memoria"
+
+    def caminho(self) -> Path | None:
+        return Path(self.pasta).expanduser() if self.pasta else None
+
+
 class Config(Secao):
     canal: Canal = Field(default_factory=Canal)
     sessoes: Sessoes = Field(default_factory=Sessoes)
@@ -93,6 +102,7 @@ class Config(Secao):
     emulador: Emulador = Field(default_factory=Emulador)
     captura: Captura = Field(default_factory=Captura)
     servico: Servico = Field(default_factory=Servico)
+    perfil: Perfil = Field(default_factory=Perfil)
 
     @staticmethod
     def chave_servico() -> str | None:
