@@ -33,6 +33,8 @@ SAIDA = Path(ARGS[2]) if len(ARGS) > 2 else Path(__file__).with_name("conferenci
 # rodando e registra 96 (o estado limpo do jogador, carregado ao lançar)
 ESTADO = next((int(a.split("=", 1)[1]) for a in sys.argv[1:] if a.startswith("--estado=")), 96)
 CARREGAR = any(a.startswith("--estado=") for a in sys.argv[1:])
+# --so=a,b: só estas estruturas entram na saída e no sorteio (rodada separada, sem mexer no sorteio das outras)
+SO = next((set(a.split("=", 1)[1].split(",")) for a in sys.argv[1:] if a.startswith("--so=")), set())
 
 PG = 0x00425BA0
 EM_MGR = 0x004203B0
@@ -1397,9 +1399,301 @@ def conferir(m_: Leitor, cf: Conferencia, iso: Path) -> dict:
             BATE if assin and all(a == "SNR2" for a in assin) else DIVERGE,
             f"início de cada um dos {len(assin)} .rel residentes (tabela de módulos +0x88)",
         )
-    # ---- tipos_inimigo ---------------------------------------------------------------------------------------
-    tab = m_.bloco(0x003C8F40, 64 * 4)
-    cf.obs("tipos_inimigo", f"primeiras 8 palavras: {[h(x) for x in struct.unpack('<8I', tab[:32])]}")
+    # ---- tipos_inimigo (tabela de salto da função de dano) ------------------------------------------------------
+    tab = struct.unpack("<64I", m_.bloco(0x003B8F40, 64 * 4))
+    alvos: dict[int, list[int]] = {}
+    for i, t in enumerate(tab):
+        alvos.setdefault(t, []).append(0x10 + i)
+    crus = sorted(alvos.get(0x001C2A8C, []))
+    if "0x00" in cf.campos["tipos_inimigo"]:
+        cf.anota(
+            "tipos_inimigo",
+            "0x00",
+            f"{len(alvos)} alvos: " + ", ".join(f"{h(t)} ×{len(v)}" for t, v in sorted(alvos.items())),
+            BATE
+            if all(0x001C2618 <= t < 0x001C2B00 for t in tab) and crus == [0x27, 0x2E, 0x33, 0x3B, 0x3D, 0x3E]
+            else DIVERGE,
+            "64 alvos dentro de LifeDownSet2; os seis tipos sem escala são 0x27, 0x2E, 0x33, 0x3B, 0x3D, 0x3E",
+        )
+    # ---- blocos_sala (arquivo da sala em pG+0x48) ------------------------------------------------------------
+    room = m_.u32(PG + 0x48)
+    blocos: dict[str, list[int]] = {}
+    num = m_.u32(room) if heap(room) else 0
+    if heap(room) and 0 < num < 200:
+        offs = struct.unpack(f"<{num}I", m_.bloco(room + 0x10, 4 * num))
+        tags = m_.bloco(room + 0x10 + 4 * num, 4 * num)
+        for i in range(num):
+            blocos.setdefault(tags[4 * i : 4 * i + 3].decode("latin-1"), []).append(room + offs[i])
+    ctx["blocos"] = blocos
+    campos_b = cf.campos["blocos_sala"]
+
+    def bl(d: str, lido: str, resultado: str, relacao: str) -> None:
+        if d in campos_b:
+            cf.anota("blocos_sala", d, lido, resultado, relacao)
+
+    bl(
+        "0x00",
+        str(num),
+        BATE if 0 < num < 200 and heap(room) else DIVERGE,
+        f"pG+0x48 = {h(room)} no heap; contagem plausível",
+    )
+    bl(
+        "0x04",
+        m_.bloco(room + 4, 12).hex() if heap(room) else "—",
+        BATE if heap(room) and m_.bloco(room + 4, 12) == bytes(12) else DIVERGE,
+        "zeros",
+    )
+    bl(
+        "0x10",
+        f"{num} deslocamentos crescentes" if blocos else "—",
+        BATE
+        if blocos and all(offs[i] < offs[i + 1] for i in range(num - 1)) and offs[0] >= 0x10 + 8 * num
+        else DIVERGE,
+        "crescentes e depois das duas tabelas",
+    )
+    bl(
+        "0x10+4n",
+        str(sorted(blocos)),
+        BATE if blocos and all(t.isalpha() for t in blocos) else DIVERGE,
+        "etiquetas de três letras",
+    )
+    cns = m_.u32(0x00457730)
+    cns_ok = heap(cns) and blocos.get("CNS", [0])[0] == cns
+    cns_n = m_.u32(cns) if heap(cns) else 0
+    bl(
+        "CNS",
+        f"0x457730 = {h(cns)}; contagem {cns_n}; máscara {h(m_.u32(cns + 4)) if heap(cns) else '—'}",
+        BATE if cns_ok and cns_n == 16 else DIVERGE,
+        "0x457730 aponta para o bloco CNS do arquivo",
+    )
+    bl(
+        "SMD / SMX",
+        h(m_.u32(SMD)),
+        BATE if "SMD" in blocos and m_.u32(SMD) == blocos["SMD"][0] else DIVERGE,
+        "0x4568A0 = primeiro bloco SMD",
+    )
+    sat_b, eat_b = blocos.get("SAT", [0])[0], blocos.get("EAT", [0])[0]
+    sat_arq = m_.u32(m_.u32(SAT_MGR) + 0x60)
+    eat_arq = m_.u32(m_.u32(EAT_MGR) + 0x60)
+    bl(
+        "SAT / EAT",
+        f"SatMgr peça 0 arquivo {h(sat_arq)}; EatMgr {h(eat_arq)}",
+        BATE
+        if sat_b and sat_arq == sat_b + m_.u32(sat_b + 4) and eat_arq == eat_b + m_.u32(eat_b + 4)
+        else DIVERGE,
+        "cSat+0x60 da primeira peça = bloco + *(bloco+4) (cabeçalho do bloco: +4 deslocamento do cSatFile)",
+    )
+    aev = blocos.get("AEV", [0])[0]
+    bl(
+        "AEV / ITA",
+        f"AEV {h(aev)} {m_.bloco(aev, 4)!r}; ITA {m_.bloco(blocos.get('ITA', [0])[0], 4)!r}" if aev else "—",
+        BATE
+        if aev and m_.bloco(aev, 3) == b"AEV" and m_.bloco(blocos.get("ITA", [0])[0], 3) == b"ITA"
+        else DIVERGE,
+        "cabeçalhos 'AEV' e 'ITA'",
+    )
+    bl(
+        "CAM",
+        h(m_.u32(PG + 0x7E10)),
+        BATE if blocos.get("CAM", [0])[0] == m_.u32(PG + 0x7E10) else DIVERGE,
+        "pG+0x7E10 = bloco CAM",
+    )
+    bl(
+        "RTP / MDT / OSD / EMI",
+        f"pG+0x7E14 {h(m_.u32(PG + 0x7E14))}, +0x7E08 {h(m_.u32(PG + 0x7E08))}, +0x7E1C {h(m_.u32(PG + 0x7E1C))}, +0x7E18 {h(m_.u32(PG + 0x7E18))}",
+        BATE
+        if all(
+            blocos.get(t, [0])[0] == m_.u32(PG + o)
+            for t, o in (("RTP", 0x7E14), ("MDT", 0x7E08), ("OSD", 0x7E1C), ("EMI", 0x7E18))
+        )
+        else DIVERGE,
+        "os quatro ponteiros de pG apontam para os blocos de mesma etiqueta",
+    )
+    fse = blocos.get("FSE", [0])[0]
+    bl(
+        "FSE",
+        f"{m_.bloco(fse, 4)!r} versão {h(m_.u16(fse + 4))}" if fse else "—",
+        BATE if fse and m_.bloco(fse, 3) == b"FSE" and m_.u16(fse + 4) == 0x103 else DIVERGE,
+        "'FSE' versão 0x103",
+    )
+    ev_n, ev_pw = m_.u32(0x004243D0 + 0x140), m_.u32(0x004243D0 + 0x144)
+    bins = []
+    for i in range(min(ev_n, 320)):
+        ent = m_.bloco(ev_pw + 0x3C * i, 0x3C)
+        if ent[0x30] & 1:
+            bins.append(struct.unpack_from("<I", ent, 0x34)[0])
+    bt = set(blocos.get("BIN", []) + blocos.get("TPL", []))
+    bl(
+        "BIN / TPL / FCV",
+        f"{len(bins)} bins registrados",
+        BATE if bins and all(b in bt for b in bins) else DIVERGE,
+        "todo bin do EvtMgr é um bloco BIN ou TPL do arquivo",
+    )
+    for d in (
+        "LIT",
+        "EFF",
+        "EAR / SAR",
+        "ITM / ETM / ETS",
+        "STB / DSE / ESE",
+        "EVS",
+        "SHD / TEX / BLK / DRA / SEQ / UWF / PTH",
+    ):
+        presentes = [t for t in d.replace(" ", "").split("/") if t in blocos]
+        bl(
+            d,
+            f"presentes: {presentes}",
+            LIDO if presentes else NAO,
+            "consumidor não conferido nesta rodada; só a presença do bloco",
+        )
+    # ---- eventos (EvtMgr) ---------------------------------------------------------------------------------------
+    mg = 0x004243D0
+    campos_e = cf.campos["eventos"]
+
+    def evn(d: str, lido: str, resultado: str, relacao: str) -> None:
+        if d in campos_e:
+            cf.anota("eventos", d, lido, resultado, relacao)
+
+    tabelas = {o: (m_.u32(mg + o), m_.u32(mg + o + 4)) for o in (0x138, 0x140, 0x148, 0x150)}
+    esperado = {0x138: 32, 0x140: 320, 0x148: 16, 0x150: 8}
+    nome_corrente = m_.bloco(0x004243EC, 0x30).split(b"\0", 1)[0].decode("latin-1")
+    vivos_ev = [
+        m_.u32(mg) + v * 0x140 for v in range(m_.u32(mg + 4)) if m_.u32(m_.u32(mg) + v * 0x140) & 0x201 == 1
+    ]
+    evn(
+        "mgr+0x1C",
+        repr(nome_corrente),
+        BATE if bool(nome_corrente) == bool(vivos_ev) else DIVERGE,
+        f"vazio sem Event vivo ({len(vivos_ev)} vivos)",
+    )
+    evn(
+        "mgr+0x4C",
+        m_.bloco(mg + 0x4C, 0x20).hex(),
+        BATE if not vivos_ev and m_.bloco(mg + 0x4C, 0x20) == bytes(0x20) else LIDO,
+        "zerado sem evento",
+    )
+    for o, d in ((0x138, "mgr+0x138"), (0x140, "mgr+0x140"), (0x148, "mgr+0x148"), (0x150, "mgr+0x150")):
+        n, pw = tabelas[o]
+        usadas = sum(1 for i in range(min(n, 400)) if m_.u8(pw + 0x3C * i + 0x30) & 1) if heap(pw) else -1
+        evn(
+            d,
+            f"n={n} vetor {h(pw)} ({usadas} em uso)",
+            BATE if n == esperado[o] and heap(pw) else DIVERGE,
+            f"{esperado[o]} entradas alocadas por FUN_00205AD8; vetor no heap",
+        )
+    evn(
+        "tbl+0x00",
+        str([tabelas[o][0] for o in sorted(tabelas)]),
+        BATE if [tabelas[o][0] for o in sorted(tabelas)] == [32, 320, 16, 8] else DIVERGE,
+        "32, 320, 16, 8",
+    )
+    evn(
+        "tbl+0x04",
+        str([h(tabelas[o][1]) for o in sorted(tabelas)]),
+        BATE if all(heap(tabelas[o][1]) for o in tabelas) else DIVERGE,
+        "no heap",
+    )
+    n, pw = tabelas[0x140]
+    ents = [m_.bloco(pw + 0x3C * i, 0x3C) for i in range(min(n, 320))]
+    usadas_b = [x for x in ents if x[0x30] & 1]
+    nomes_b = [x[:0x30].split(b"\0", 1)[0].decode("latin-1") for x in usadas_b]
+    evn(
+        "ent+0x00",
+        str(nomes_b),
+        BATE if nomes_b and all(nm.endswith((".bin", ".tpl")) for nm in nomes_b) else DIVERGE,
+        "nomes de .bin/.tpl nos bins",
+    )
+    evn(
+        "ent+0x30",
+        str(sorted({h(x[0x30])[-2:] for x in usadas_b})),
+        BATE if usadas_b and all(x[0x30] & 1 for x in usadas_b) else DIVERGE,
+        "bit 0 nas usadas",
+    )
+    evn(
+        "ent+0x31",
+        str(sorted({x[0x31] for x in usadas_b})),
+        BATE if usadas_b and all(x[0x31] == 7 for x in usadas_b) else DIVERGE,
+        "7 = bin (SetBin)",
+    )
+    evn(
+        "ent+0x32",
+        str(sorted({struct.unpack_from("<H", x, 0x32)[0] for x in usadas_b})),
+        BATE if usadas_b and all(struct.unpack_from("<H", x, 0x32)[0] >= 1 for x in usadas_b) else DIVERGE,
+        "≥ 1 nas usadas",
+    )
+    dados_b = [struct.unpack_from("<I", x, 0x34)[0] for x in usadas_b]
+    evn(
+        "ent+0x34",
+        str([h(x) for x in dados_b]),
+        BATE if dados_b and all(x in bt for x in dados_b) else DIVERGE,
+        "blocos BIN/TPL do arquivo da sala",
+    )
+    evn(
+        "ent+0x38",
+        str(sorted({h(struct.unpack_from("<I", x, 0x38)[0]) for x in usadas_b})),
+        LIDO,
+        "zero nas vistas",
+    )
+    for d in campos_e:
+        if d.startswith("ev+"):
+            evn(d, "—", NAO, "nenhum Event vivo neste estado (as duas vagas estão vazias)")
+        elif d.startswith(("evd+", "pac+")):
+            evn(d, "—", NAO, "campo de arquivo: conferido na ISO (prova 'iso'), não na memória")
+    # ---- pzl (maleta) ------------------------------------------------------------------------------------------
+    for d in cf.campos["pzl"]:
+        cf.anota("pzl", d, "—", NAO, "a maleta só existe com a tela aberta")
+    # ---- campos acrescentados em pG e afs ------------------------------------------------------------------------
+    campos_pg = cf.campos["pG"]
+
+    def pgn(d: str, lido: str, resultado: str, relacao: str) -> None:
+        if d in campos_pg and d not in cf.resultados["pG"]:
+            cf.anota("pG", d, lido, resultado, relacao)
+
+    pgn(
+        "0x48",
+        h(room),
+        BATE if heap(room) and 0 < num < 200 else DIVERGE,
+        f"arquivo com {num} blocos etiquetados",
+    )
+    pgn("0x50", h(m_.u32(PG + 0x50)), LIDO, "ponteiro; uso só pelo C")
+    pgn("0x54", h(m_.u32(PG + 0x54)), LIDO, "ponteiro; uso só pelo C")
+    cns8 = m_.u32(cns + 4 * ((cns_n >> 5) + 2 + 8)) if heap(cns) else 0
+    bit8 = (m_.u32(cns + 4) >> 8) & 1 if heap(cns) else 0
+    esperado_heap = (cns8 if bit8 else m_.u32(0x0032ABC8 + 4 * 8)) + 0x8000
+    pgn(
+        "0x7E04",
+        str(m_.u32(PG + 0x7E04)),
+        BATE if m_.u32(PG + 0x7E04) == esperado_heap else DIVERGE,
+        f"CNS[8] ({cns8 if bit8 else 'padrão'}) + 0x8000 = {esperado_heap}",
+    )
+    for d, t in (
+        ("0x7E08", "MDT"),
+        ("0x7E10", "CAM"),
+        ("0x7E14", "RTP"),
+        ("0x7E18", "EMI"),
+        ("0x7E1C", "OSD"),
+    ):
+        pgn(
+            d,
+            h(m_.u32(PG + int(d, 16))),
+            BATE if blocos.get(t, [0])[0] == m_.u32(PG + int(d, 16)) else DIVERGE,
+            f"= bloco {t} do arquivo da sala",
+        )
+    for d in ("0x7F50", "0x7F54", "0x7F58", "0x7F5C"):
+        pgn(d, h(m_.u32(PG + int(d, 16))), LIDO, "sinalizadores; sem evento em curso")
+    campos_a = cf.campos["afs"]
+    if "lista" in campos_a:
+        conts = [m_.u32(0x003AEA00 + 4 * k) for k in range(3)]
+        ptrs = [m_.u32(0x003D7D60 + 4 * k) for k in range(3)]
+        afs_n = [afs.n, md.Afs(iso, 1197174).n, md.Afs(iso, 2081).n]
+        cf.anota(
+            "afs",
+            "lista",
+            f"contagens {conts}; ponteiros {[h(p_) for p_ in ptrs]}",
+            BATE if conts == afs_n and all(heap(p_) for p_ in ptrs) else DIVERGE,
+            f"iguais às contagens dos três AFS da ISO {afs_n}",
+        )
+    if "índice" in campos_a:
+        cf.anota("afs", "índice", "—", LIDO, "composição lista << 12 | posição só pelo C")
     return ctx
 
 
@@ -1437,6 +1731,8 @@ def main() -> int:
         "estruturas": {},
     }
     for est, campos in cf.campos.items():
+        if SO and est not in SO:
+            continue
         res = cf.resultados[est]
         faltam = [d for d in campos if d not in res]
         sorteio = rnd.sample(campos, min(3, len(campos))) if campos else []

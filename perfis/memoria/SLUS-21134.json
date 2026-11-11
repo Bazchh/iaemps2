@@ -59,8 +59,8 @@
   "estruturas": {
     "versao": 2,
     "data": "2026-11-11",
-    "nota": "Fonte única do documento de estruturas (S9-02): docs/fonte/gerar_estruturas.py gera docs/Estruturas-SLUS-21134.md daqui. Deslocamentos em hexadecimal; endereços estáticos são do executável SLUS-21134 1.01; o que é dinâmico (heap, módulo realocado) vem com a raiz estática e o caminho. Provas: decompilado = lido no C decompilado do PS2 (S9-01); vigia = vigia de escrita do fork (S8-01); foto = diferença entre fotos da memória (S8-00); ao_vivo = lido ou escrito pelo canal com efeito conferido; publica = fonte pública conferida ao vivo; gc = só o nome ou o papel vem da decompilação do GameCube, sem prova no PS2. Conferência ao vivo (11/11/2026): reversa/estruturas/conferir.py lê cada campo pelo canal e confere por relação independente do perfil (EM_LIST × cEm, soma das classes de polígonos, matriz × inversa, projeção da câmera, AFS lido na ISO, lista de áreas pela raiz do código); só leitura, estados 96 (jogo do cliente) e 95 (gravado pelos scripts de 30/10), sala 0x0100, uma execução de cada; três campos por estrutura sorteados com semente registrada. O aceite do card é do cliente e continua pendente: a conferência automática só prepara a lista do que ele olha.",
-    "provas": {"decompilado": "lido no C decompilado do PS2", "vigia": "vigia de escrita do fork", "foto": "diferença entre fotos da memória", "ao_vivo": "lido ou escrito pelo canal com efeito conferido", "publica": "fonte pública conferida ao vivo", "gc": "nome ou papel vindo da decompilação do GameCube, sem prova no PS2"},
+    "nota": "Fonte única do documento de estruturas (S9-02): docs/fonte/gerar_estruturas.py gera docs/Estruturas-SLUS-21134.md daqui. Deslocamentos em hexadecimal; endereços estáticos são do executável SLUS-21134 1.01; o que é dinâmico (heap, módulo realocado) vem com a raiz estática e o caminho. Provas: decompilado = lido no C decompilado do PS2 (S9-01); vigia = vigia de escrita do fork (S8-01); foto = diferença entre fotos da memória (S8-00); ao_vivo = lido ou escrito pelo canal com efeito conferido; publica = fonte pública conferida ao vivo; gc = só o nome ou o papel vem da decompilação do GameCube, sem prova no PS2. Conferência ao vivo (11/11/2026): reversa/estruturas/conferir.py lê cada campo pelo canal e confere por relação independente do perfil (EM_LIST × cEm, soma das classes de polígonos, matriz × inversa, projeção da câmera, AFS lido na ISO, lista de áreas pela raiz do código); só leitura, estados 96 (jogo do cliente) e 95 (gravado pelos scripts de 30/10), sala 0x0100, uma execução de cada; três campos por estrutura sorteados com semente registrada. O aceite do card é do cliente e continua pendente: a conferência automática só prepara a lista do que ele olha. Continuação de 11/11 (branch card/s9-02-eventos): eventos, arquivo de sala, maleta e tabela de tipos lidos pelo C decompilado, pela memória viva (estado 96) e pelos AFS da ISO (prova 'iso'); campos acrescentados a estruturas já aceitas estão marcados como posteriores ao aceite.",
+    "provas": {"decompilado": "lido no C decompilado do PS2", "vigia": "vigia de escrita do fork", "foto": "diferença entre fotos da memória", "ao_vivo": "lido ou escrito pelo canal com efeito conferido", "publica": "fonte pública conferida ao vivo", "gc": "nome ou papel vindo da decompilação do GameCube, sem prova no PS2", "iso": "lido no arquivo da ISO (AFS) fora do emulador, com o mesmo formato conferido na memória"},
     "lista": [
       {
         "id": "pG",
@@ -70,8 +70,17 @@
         "tamanho": "≥ 0xB3B4 (o C decompilado lê até +0xB3B0)",
         "resumo": "Estado global da partida: sala, vida, dificuldade, personagem, lista de inimigos da sala e sinalizadores. A decompilação do GameCube nomeia o equivalente (GLOBAL_WK), mas os deslocamentos do PS2 são outros; os nomes abaixo entre parênteses são os do GameCube quando o papel bate.",
         "campos": [
+          {"d": "0x48", "t": "ptr", "n": "arquivo da sala (pRoom)", "s": "endereço do st%x/r%03x.dat no heap (0x0119A140 na sala 0x0100); escrito pelo cDvd ao fim da leitura (campo acrescentado em 11/11, depois do aceite)", "e": "carregador 0x002620E8 (cDvd::ReadCheck)", "l": "0x00263710 e todos os consumidores de bloco", "p": "decompilado, ao_vivo"},
+          {"d": "0x50", "t": "ptr", "n": "arquivo do jogador", "s": "+0x2C luz, +0x30 câmera (inicialização da sala) (campo acrescentado em 11/11, depois do aceite)", "e": "não lido", "l": "0x00217EE0", "p": "decompilado"},
+          {"d": "0x54", "t": "ptr", "n": "arquivo central", "s": "+0x10 texturas de id (IdTexDataLoad), +0x3C IDSystem::set (campo acrescentado em 11/11, depois do aceite)", "e": "não lido", "l": "0x00217EE0", "p": "decompilado"},
           {"d": "0x5C", "t": "u32", "n": "sinalizadores de sistema", "s": "a função de dano testa o bit 0x40000000 (com pSys+8 == 0) e readEmList o bit 0x2000; nome não determinado", "e": "não lido", "l": "LifeDownSet2, readEmList", "p": "decompilado"},
           {"d": "0x70", "t": "s32", "n": "não nomeado", "s": "readEmList recarrega a lista quando este valor é negativo e a lista mudou; papel não determinado", "e": "não lido", "l": "readEmList", "p": "decompilado"},
+          {"d": "0x7E04", "t": "u32", "n": "tamanho do heap da sala", "s": "CNS índice 8 + 0x8000 (0x8000 sem CNS) (campo acrescentado em 11/11, depois do aceite)", "e": "0x00217EE0", "l": "não lido", "p": "decompilado"},
+          {"d": "0x7E08", "t": "ptr", "n": "bloco MDT da sala (mensagens)", "s": "0x0157E220 na sala 0x0100 (campo acrescentado em 11/11, depois do aceite)", "e": "carregador 0x002620E8", "l": "não lido", "p": "decompilado, ao_vivo"},
+          {"d": "0x7E10", "t": "ptr", "n": "bloco CAM da sala", "s": "0 quando a sala não tem; 0x0119A2E0 na sala 0x0100 (campo acrescentado em 11/11, depois do aceite)", "e": "0x00217EE0", "l": "CameraControl", "p": "decompilado, ao_vivo"},
+          {"d": "0x7E14", "t": "ptr", "n": "bloco RTP da sala", "s": "'PTR2' (campo acrescentado em 11/11, depois do aceite)", "e": "carregador 0x002620E8", "l": "não lido", "p": "decompilado, ao_vivo"},
+          {"d": "0x7E18", "t": "ptr", "n": "bloco EMI da sala", "s": "dados de inimigo por sala (58 salas têm) (campo acrescentado em 11/11, depois do aceite)", "e": "carregador 0x002620E8", "l": "não lido", "p": "decompilado, ao_vivo"},
+          {"d": "0x7E1C", "t": "ptr", "n": "bloco OSD da sala", "s": " (campo acrescentado em 11/11, depois do aceite)", "e": "carregador 0x002620E8", "l": "não lido", "p": "decompilado, ao_vivo"},
           {"d": "0x7EB8", "t": "u16", "n": "sala (room_id)", "s": "byte baixo = sala, byte alto = estágio; chave de cRoomData::checkPassed e das tabelas por sala", "e": "troca de sala (não lida)", "l": "EmSetFromList2, readEmList, MercSysInitRoom, cRoomData::checkPassed e dezenas de funções", "p": "decompilado, ao_vivo"},
           {"d": "0x7EC4", "t": "u8", "n": "dificuldade adaptativa (Game_level)", "s": "0 a 10; fator do jogador 0,1·dif + 0,5; do inimigo 2,0 − 0,2·dif abaixo de 6, senão 1,0 − 0,03·(dif − 5)", "e": "não lido (GameAddPoint no GameCube)", "l": "LifeDownSet2", "p": "decompilado, ao_vivo"},
           {"d": "0x7ED5", "t": "s8", "n": "lista de inimigos carregada (em_list_no)", "s": "número do arquivo .esl em memória; −1 = nenhuma", "e": "readEmList", "l": "EmSetFromList2, readEmList", "p": "decompilado"},
@@ -82,6 +91,10 @@
           {"d": "0x7EE8", "t": "u8", "n": "traje (pl_costume)", "s": "0 a 5", "e": "não lido", "l": "escolha da tabela de arquivos por tipo", "p": "publica"},
           {"d": "0x7EEA", "t": "u8", "n": "personagem (pl_type)", "s": "0 Leon, 1 Ashley, 2 Ada, 3 HUNK, 4 Krauser, 5 Wesker (nomes do GameCube); escolhe a tabela de arquivos de módulo", "e": "não lido", "l": "LifeDownSet2 (== 1), bancada/modulos.py", "p": "decompilado, ao_vivo"},
           {"d": "0x7EED", "t": "u8", "n": "não nomeado", "s": "LifeDownSet2: com valor 2, o jogador de tipo 1 e a parceira de tipo 3 não perdem vida (reposta ao máximo). Era descrito como 'flags de invencibilidade de 64 bits em +0x7EE8'; o C mostra uma leitura de 8 bytes que testa só +0x7EEA e +0x7EED", "e": "não lido", "l": "LifeDownSet2", "p": "decompilado"},
+          {"d": "0x7F50", "t": "u32", "n": "sinalizadores de evento 1", "s": "SceEventStart liga 0x1000 e limpa no fim; bit 0x400 binóculo; 0x10 ligado na inicialização da sala (campo acrescentado em 11/11, depois do aceite)", "e": "SceEventStart / SceEventEnd", "l": "não listado", "p": "decompilado"},
+          {"d": "0x7F54", "t": "u32", "n": "sinalizadores de evento 2", "s": "SceEventStart liga 0x10000000; RunEvtCancel testa (campo acrescentado em 11/11, depois do aceite)", "e": "SceEventStart / SceEventEnd", "l": "RunEvtCancel", "p": "decompilado"},
+          {"d": "0x7F58", "t": "u32", "n": "sinalizadores de evento 3", "s": "EvtReadExec liga 0x80000 e 0x10000 e limpa no fim; MovieBrowserExec liga 0x200 (campo acrescentado em 11/11, depois do aceite)", "e": "EvtReadExec", "l": "não listado", "p": "decompilado"},
+          {"d": "0x7F5C", "t": "u32", "n": "sinalizadores de evento 4", "s": "EvtReadExec: 0x1000 (vídeo tocado), 0x4000/0x8000 (fonte de mensagens, DivEvent), 0x1000000 (cancelado); 0x2000 ligado na inicialização da sala (campo acrescentado em 11/11, depois do aceite)", "e": "EvtReadExec / DivEvent / RunEvtCancel", "l": "EvtReadExec", "p": "decompilado"},
           {"d": "0x7F60", "t": "u32[12][8]", "n": "entradas da lista já usadas (Em_flg)", "s": "32 bytes por lista de inimigos; um bit por entrada (bit 31 − índice da palavra); EmSetFromList2 recusa a entrada com o bit ligado. NÃO confirmado ao vivo: no estado 95, com as entradas 3..14, 18, 19, 29, 38 e 39 criadas, a lista 0 tinha só os bits 3, 4, 5, 16, 17 e 255 ligados (decodificação bit 31 − índice) — nem 'entradas criadas' nem 'entradas mortas' (3..8) nem a ordem de bits inversa explicam; relação não confirmada", "e": "não lido (morte do inimigo no GameCube)", "l": "EmSetFromList2", "p": "decompilado"},
           {"d": "0x8344", "t": "EM_LIST[256]", "n": "lista de inimigos da sala (Em_list)", "s": "= 0x0042DEE4; 0x2000 bytes lidos do arquivo .esl pelo readEmList (cDvd, dorme pelo escalonador); zerada se a leitura falha", "e": "readEmList", "l": "EmSetFromList2, GetEmPtrFromList, GetEmIdFromList, EmListIsAlive", "p": "decompilado, ao_vivo"},
           {"d": "0xB3B0", "t": "s32", "n": "não nomeado", "s": "readEmList recarrega a lista quando vale 3", "e": "não lido", "l": "readEmList", "p": "decompilado"}
@@ -91,7 +104,7 @@
           {"nome": "readEmList", "endereco": "0x00276D60", "papel": "lê o .esl da sala para pG+0x8344 (dorme; não chamar pelo canal)"},
           {"nome": "cRoomData::checkPassed", "endereco": "não indexado (objeto 0x004561F8)", "papel": "sala já visitada; chamada por sala"}
         ],
-        "pendencias": ["nomear +0x5C, +0x70, +0x7EED e +0xB3B0 pelo C (quem escreve)", "dinheiro (peseta), capítulo, tempo de jogo e sinalizadores de roteiro (Scenario_flg, Key_flg, Room_flg) no PS2: só os nomes do GameCube", "conferir ao vivo três campos sorteados (critério de aceite do S9-02)", "Em_flg (+0x7F60): a relação 'um bit por entrada criada' não bateu ao vivo; ler quem escreve no C"],
+        "pendencias": ["nomear +0x5C, +0x70, +0x7EED e +0xB3B0 pelo C (quem escreve)", "dinheiro (peseta), capítulo, tempo de jogo e sinalizadores de roteiro (Scenario_flg, Key_flg, Room_flg) no PS2: só os nomes do GameCube", "conferir ao vivo três campos sorteados (critério de aceite do S9-02)", "Em_flg (+0x7F60): a relação 'um bit por entrada criada' não bateu ao vivo; ler quem escreve no C", "quem lê pG+0x7E08..+0x7E1C (MDT, RTP, EMI, OSD) e pG+0x50/+0x54 (arquivos do jogador e central): só o carregador e a inicialização foram lidos"],
         "conferencia": {
           "data": "2026-11-11",
           "estados": [96, 95],
@@ -114,9 +127,22 @@
             "0x7EED": {"resultado": "lido", "estado": 96, "lido": "0", "relacao": "sem relação independente"},
             "0x7F60": {"resultado": "diverge", "estado": 95, "lido": "lista 0: 6 bits", "relacao": "entradas criadas [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 18, 19, 29, 38, 39] ⊆ bits ligados [3, 4, 5, 16, 17, 255]"},
             "0x8344": {"resultado": "bate", "estado": 96, "lido": "0x0042DEE4", "relacao": "aritmética = 0x0042DEE4; 255 entradas ocupadas"},
-            "0xB3B0": {"resultado": "lido", "estado": 96, "lido": "0", "relacao": "sem relação independente"}
+            "0xB3B0": {"resultado": "lido", "estado": 96, "lido": "0", "relacao": "sem relação independente"},
+            "0x48": {"resultado": "bate", "estado": 96, "lido": "0x0119A140", "relacao": "arquivo com 49 blocos etiquetados"},
+            "0x50": {"resultado": "lido", "estado": 96, "lido": "0x00550800", "relacao": "ponteiro; uso só pelo C"},
+            "0x54": {"resultado": "lido", "estado": 96, "lido": "0x006CC800", "relacao": "ponteiro; uso só pelo C"},
+            "0x7E04": {"resultado": "bate", "estado": 96, "lido": "352256", "relacao": "CNS[8] (319488) + 0x8000 = 352256"},
+            "0x7E08": {"resultado": "bate", "estado": 96, "lido": "0x0157E220", "relacao": "= bloco MDT do arquivo da sala"},
+            "0x7E10": {"resultado": "bate", "estado": 96, "lido": "0x0119A2E0", "relacao": "= bloco CAM do arquivo da sala"},
+            "0x7E14": {"resultado": "bate", "estado": 96, "lido": "0x0157C620", "relacao": "= bloco RTP do arquivo da sala"},
+            "0x7E18": {"resultado": "bate", "estado": 96, "lido": "0x0163C620", "relacao": "= bloco EMI do arquivo da sala"},
+            "0x7E1C": {"resultado": "bate", "estado": 96, "lido": "0x01585F40", "relacao": "= bloco OSD do arquivo da sala"},
+            "0x7F50": {"resultado": "lido", "estado": 96, "lido": "0x03080110", "relacao": "sinalizadores; sem evento em curso"},
+            "0x7F54": {"resultado": "lido", "estado": 96, "lido": "0x08000200", "relacao": "sinalizadores; sem evento em curso"},
+            "0x7F58": {"resultado": "lido", "estado": 96, "lido": "0x00000000", "relacao": "sinalizadores; sem evento em curso"},
+            "0x7F5C": {"resultado": "lido", "estado": 96, "lido": "0x00000000", "relacao": "sinalizadores; sem evento em curso"}
           },
-          "observacoes": []
+          "observacoes": ["rodada 2 (11/11, depois do aceite): campos acrescentados ['0x48', '0x50', '0x54', '0x7E04', '0x7E08', '0x7E10', '0x7E14', '0x7E18', '0x7E1C', '0x7F50', '0x7F54', '0x7F58', '0x7F5C'] conferidos; sorteio e aceite da rodada 1 mantidos"]
         }
       },
       {
@@ -128,8 +154,8 @@
         "resumo": "Pool fixo de 60 personagens de 0xED0 bytes; o vetor é alocado no heap (0x01789F40 no estado 91) e deve ser lido por +0 a cada sessão. Lista de vivos encadeada por cEm+0x4.",
         "campos": [
           {"d": "0x00", "t": "ptr", "n": "pArray", "s": "vetor de personagens (heap)", "e": "arrayAlloc (gc)", "l": "EmSetEvent, EmSetFromList2, tudo que percorre personagens", "p": "decompilado, ao_vivo"},
-          {"d": "0x04", "t": "u32", "n": "nArray", "s": "60", "e": "arrayAlloc (gc)", "l": "at() (gc)", "p": "decompilado, ao_vivo"},
-          {"d": "0x08", "t": "u32", "n": "size", "s": "0xED0 (passo do vetor)", "e": "construtor (gc)", "l": "at() (gc)", "p": "decompilado, ao_vivo"},
+          {"d": "0x04", "t": "u32", "n": "nArray", "s": "60; vem do bloco CNS índice 0 (60 na sala 0x0100 e no padrão 0x0032ABC8) — lido em 11/11, depois do aceite", "e": "arrayAlloc (gc)", "l": "at() (gc)", "p": "decompilado, ao_vivo"},
+          {"d": "0x08", "t": "u32", "n": "size", "s": "0xED0 (passo do vetor); a inicialização da sala 0x00217EE0 grava 0x1470 nas salas 0x11F, 0x332, 0x31C, 0x31B, 0x228, 0x221 e 0x51C (0xED0 nas outras) — lido em 11/11, depois do aceite", "e": "0x00217EE0 (inicialização da sala)", "l": "at() (gc)", "p": "decompilado, ao_vivo"},
           {"d": "0x0C", "t": "u8", "n": "flag", "s": "", "e": "construtor", "l": "", "p": "gc"},
           {"d": "0x10", "t": "ptr", "n": "pAlive", "s": "cabeça da lista de vivos (cEm+0x4 = próximo)", "e": "create/destroy", "l": "move, getEmPtr", "p": "gc, ao_vivo"},
           {"d": "0x34", "t": "u32", "n": "Guid", "s": "próximo serial de modelo", "e": "construct", "l": "", "p": "gc"}
@@ -141,7 +167,7 @@
           {"nome": "GetEmPtrFromList / GetEmIdFromList / EmListIsAlive", "endereco": "0x001BD9E8 / 0x001BDAA8 / 0x001BDB38", "papel": "consultas por índice da lista"},
           {"nome": "SceDestroyEm(tipo_ini, tipo_fim)", "endereco": "0x002710C8", "papel": "destrói os personagens de uma faixa de tipos"}
         ],
-        "pendencias": ["pSUB (parceira) e o restante do gerente (+0x14..+0x30) só com nome do GameCube"],
+        "pendencias": ["pSUB (parceira) e o restante do gerente (+0x14..+0x30) só com nome do GameCube", "bancada/personagens.py usa PASSO = 0xED0 fixo e VETOR fixo: ler EmMgr+0x8 e +0x0 ao vivo (falha nas sete salas de passo 0x1470 e se o vetor mudar de endereço)"],
         "conferencia": {
           "data": "2026-11-11",
           "estados": [96, 95],
@@ -491,22 +517,24 @@
       },
       {
         "id": "afs",
-        "nome": "Arquivos da ISO (BIO4DAT.AFS)",
-        "status": "parcial",
-        "raiz": "ISO, setor 446273 (2048 bytes por setor)",
+        "nome": "Arquivos da ISO (BIO4DAT.AFS, BIO4MOV.AFS, BIO4MOV2.AFS) e as listas de nomes do jogo",
+        "status": "lida",
+        "raiz": "ISO: BIO4DAT.AFS no setor 446273 (2628 arquivos), BIO4MOV.AFS no setor 1197174 (515: vídeos .sfd, eventos .evd, fontes), BIO4MOV2.AFS no setor 2081 (153); 2048 bytes por setor. Na memória, três listas de nomes com caminho (ponteiros em 0x003D7D60, contagens em 0x003AEA00: 2628, 515, 153) no mesmo índice de cada AFS",
         "tamanho": "2628 arquivos",
         "resumo": "Cabeçalho 'AFS', contagem, pares (deslocamento, tamanho), nomes de 48 bytes no fim. Só os .dat/.rel de personagem e os .esl foram usados; os blocos da sala (SMD/SMX, LIT, SAR, EFF, TEX, ITM/ETM/ETS, CAM, BLK, EVS/FSE/AEV/ITA no GameCube) ainda não foram mapeados no PS2.",
         "campos": [
           {"d": "0x00", "t": "char[4]", "n": "assinatura", "s": "'AFS\\0'", "e": "disco", "l": "cDvd (inferido)", "p": "ao_vivo"},
           {"d": "0x04", "t": "u32", "n": "quantidade", "s": "2628", "e": "disco", "l": "", "p": "ao_vivo"},
           {"d": "0x08", "t": "u32[2][n+1]", "n": "(deslocamento, tamanho)", "s": "última entrada aponta para os nomes", "e": "disco", "l": "bancada/modulos.py", "p": "ao_vivo"},
-          {"d": "nomes", "t": "char[48][n]", "n": "nomes", "s": "32 bytes de nome mais atributos", "e": "disco", "l": "bancada/modulos.py", "p": "ao_vivo"}
+          {"d": "nomes", "t": "char[48][n]", "n": "nomes", "s": "32 bytes de nome mais atributos", "e": "disco", "l": "bancada/modulos.py", "p": "ao_vivo"},
+          {"d": "lista", "t": "char[]", "n": "listas de nomes do jogo", "s": "nomes com caminho em maiúsculas e barra invertida (ST1\\R100.DAT, EVD\\R100S20.EVD), separados por zero e um byte; índice da lista = índice no AFS (lista 1 e 2: 515 e 153 iguais; lista 0: 1875 iguais e 753 marcadores '_') (campo acrescentado em 11/11, depois do aceite)", "e": "DATINFO.DAT / MOVINFO.DAT / MOV2INFO.DAT (entrada 0 de cada AFS)", "l": "0x0016C220 (nome → índice) / 0x0016C700 (índice → nome)", "p": "decompilado, ao_vivo, iso"},
+          {"d": "índice", "t": "u16", "n": "índice composto de arquivo", "s": "lista << 12 | posição; o carregador da sala pede o anterior (.snd) e o próprio .dat (campo acrescentado em 11/11, depois do aceite)", "e": "0x0016C220", "l": "cDvd 0x001B3330 (leitura)", "p": "decompilado"}
         ],
         "funcoes": [
           {"nome": "cDvd::ReadCheck / FileExistCheck / ReadCancel", "endereco": "0x001B63F0 / 0x001B5C98 / 0x001B6060", "papel": "fila de leitura do disco (objeto 0x0041C138)"},
           {"nome": "DvdReadN; DVDOpenDir/ReadDir/CloseDir", "endereco": "0x001B33E0; 0x0016BF18 / 0x0016BF20 / 0x0016BF28", "papel": "leitura do disco"}
         ],
-        "pendencias": ["mapa dos blocos do arquivo de sala no PS2 (SAR = colisão, SMD = objetos de cenário, ESL, EVS/AEV/ITA de roteiro)", "formato .tpl (texturas) para o conversor de modelos (LC-17)"],
+        "pendencias": ["formato .tpl (texturas) para o conversor de modelos (LC-17)"],
         "conferencia": {
           "data": "2026-11-11",
           "estados": [96, 95],
@@ -518,9 +546,11 @@
             "0x00": {"resultado": "bate", "estado": 96, "lido": "b'AFS\\x00'", "relacao": "lido na ISO"},
             "0x04": {"resultado": "bate", "estado": 96, "lido": "2628", "relacao": "2628"},
             "0x08": {"resultado": "bate", "estado": 96, "lido": "última entrada (1537718272, 126144)", "relacao": "todas dentro da ISO; nomes = 48 × 2628 = 126144"},
-            "nomes": {"resultado": "bate", "estado": 96, "lido": "datinfo.dat … r534.dat", "relacao": "nenhum nome vazio"}
+            "nomes": {"resultado": "bate", "estado": 96, "lido": "datinfo.dat … r534.dat", "relacao": "nenhum nome vazio"},
+            "lista": {"resultado": "bate", "estado": 96, "lido": "contagens [2628, 515, 153]; ponteiros ['0x00F9AB00', '0x00FA6080', '0x00FA9340']", "relacao": "iguais às contagens dos três AFS da ISO [2628, 515, 153]"},
+            "índice": {"resultado": "lido", "estado": 96, "lido": "—", "relacao": "composição lista << 12 | posição só pelo C"}
           },
-          "observacoes": []
+          "observacoes": ["rodada 2 (11/11, depois do aceite): campos acrescentados ['lista', 'índice'] conferidos; sorteio e aceite da rodada 1 mantidos"]
         }
       },
       {
@@ -599,7 +629,7 @@
           {"nome": "SceEventStart / SceEventEnd / SceSetEventCancel; EventMgr::EvtReadExec / EvtFree / SetFunc", "endereco": "0x00270328 / 0x00270570 / 0x00274F10; 0x00206280 / 0x00206740 / 0x00206EA0", "papel": "cutscenes: não lidas"},
           {"nome": "SceSetItemEvent / SceCheckEmAlive / SceSetChapterEnd / SceCamMove", "endereco": "0x002713C8 / 0x00270F00 / 0x00271F68 / 0x00272080", "papel": "roteiro de sala: não lidas"}
         ],
-        "pendencias": ["AREA_HIT_DATA (+0x04..+0x34) e os dados por tipo no PS2", "onde a lista das áreas da sala fica em memória (raiz estática de sceAtSetOtStart)", "eventos (Event, EventMgr, blocos EVS) e como preparam colisão e animação dos personagens de cena (LC-18)", "sinalizadores de roteiro em pG (Scenario_flg, Room_flg, Key_flg) no PS2"],
+        "pendencias": ["AREA_HIT_DATA (+0x04..+0x34) e os dados por tipo no PS2", "eventos (Event, EventMgr, blocos EVS) e como preparam colisão e animação dos personagens de cena (LC-18)", "sinalizadores de roteiro em pG (Scenario_flg, Room_flg, Key_flg) no PS2"],
         "conferencia": {
           "data": "2026-11-11",
           "estados": [96, 95],
@@ -814,76 +844,246 @@
       },
       {
         "id": "eventos",
-        "nome": "Eventos e cutscenes (Event, EventMgr, blocos EVS)",
-        "status": "nao_lida",
-        "raiz": "EventMgr (0x00205B90..0x00207470 nomeadas no índice); raiz dos dados não localizada",
-        "tamanho": "",
-        "resumo": "Nada lido no PS2. É o que prepara colisão e animação dos personagens de cena (LC-18).",
+        "nome": "Eventos e cutscenes (EvtMgr, Event, arquivo .evd)",
+        "status": "parcial",
+        "raiz": "EvtMgr 0x004243D0 (cManager<Event>: +0 pArray 0x0187A900, +4 2 vagas, +8 passo 0x140, +0x10 pAlive); nome do evento corrente em 0x004243EC; tabelas de nomes (DatTbl) em +0x138, +0x140, +0x148, +0x150; estático. Arquivos .evd nos AFS de filmes (BIO4MOV.AFS 121, BIO4MOV2.AFS 38), nome \"evd/rXXXsYY.evd\"",
+        "tamanho": "Event 0x140; DatTbl entrada 0x3C; .evd r100s20 6 784 bytes",
+        "resumo": "Uma cutscene é um Event criado de um arquivo .evd (cabeçalho com o próprio caminho, sala e número; fluxo de pacotes de 0x10 de cabeçalho com id 0..0x20 e tamanho; tabela de bins com os nomes dos modelos, câmeras .fcv e mensagens .mdt). EvtReadExec lê o arquivo pelo cDataCtrl 0x41B6B0 (cDvd resolve o nome na lista do AFS de filmes), toca o vídeo .sfd correspondente pelo cSofdec 0x455940 quando pedido, cria o Event, espera o fim e libera. SceEventStart/SceEventEnd cercam o evento: guardam o estado de dano do jogador (+0x420..+0x43C), ligam pG+0x7F50 bit 0x1000, pG+0x7F54 bit 0x10000000 e pG+0x5C bit 0x800, escondem a vida e os ícones. No estado 96 as duas vagas estão vazias; os campos do Event vêm só do C e os nomes de pacote e de sinalizador do GameCube.",
         "campos": [
+          {"d": "mgr+0x1C", "t": "char[0x30]", "n": "nome do evento corrente", "s": "strcpy em 0x004243EC ao criar (FUN_00206998); vazio sem evento", "e": "FUN_00206998", "l": "", "p": "decompilado, ao_vivo"},
+          {"d": "mgr+0x4C", "t": "u8[8][4]", "n": "módulo de inimigo por arquivo .evd", "s": "+0 tipo do módulo lido para o evento (EmReadSearch), +1 = 1 se o módulo foi realocado; EvtFree libera", "e": "FUN_00205FD8", "l": "EvtFree 0x00206740", "p": "decompilado"},
+          {"d": "mgr+0x138", "t": "DatTbl", "n": "tabela de modelos (32)", "s": "nome → dado; consultada por FUN_00206DA0 ao criar o Event", "e": "FUN_00205AD8 (init por sala)", "l": "FUN_00206DA0", "p": "decompilado, ao_vivo"},
+          {"d": "mgr+0x140", "t": "DatTbl", "n": "tabela de bins (320)", "s": "nome do .bin/.tpl → endereço no arquivo da sala (tipo 7); na sala 0x0100: em/pl07/pl0700a.bin, pl0700.bin, pl0700.tpl, obj/objmodel/obm2a00.bin, obm2a00.tpl", "e": "SetBin 0x00206BE8", "l": "FUN_00206C20", "p": "decompilado, ao_vivo"},
+          {"d": "mgr+0x148", "t": "DatTbl", "n": "tabela de funções (16)", "s": "nome evt_rXXXsYY_func → função de roteiro do módulo da sala (0x011897A0.. na sala 0x0100: s03, s20, s40)", "e": "SetFunc 0x00206EA0", "l": "FUN_00206ED0 (ao preparar o Event, vai para Event+0x9C)", "p": "decompilado, ao_vivo"},
+          {"d": "mgr+0x150", "t": "DatTbl", "n": "tabela de arquivos .evd (8)", "s": "nome → cDataUnit (+0x10 endereço, +0x24 tamanho) do arquivo lido; EvtFree remove", "e": "FUN_00206F28", "l": "FUN_00206F88", "p": "decompilado, ao_vivo"},
+          {"d": "tbl+0x00", "t": "s32", "n": "DatTbl: quantidade de entradas", "s": "32 / 320 / 16 / 8 (FUN_00207570 aloca)", "e": "FUN_00207570", "l": "FUN_00207650 / FUN_00207820", "p": "decompilado, ao_vivo"},
+          {"d": "tbl+0x04", "t": "ptr", "n": "DatTbl: vetor de entradas", "s": "entradas de 0x3C", "e": "FUN_00207570", "l": "FUN_00207650 / FUN_00207820", "p": "decompilado, ao_vivo"},
+          {"d": "ent+0x00", "t": "char[0x30]", "n": "entrada: nome", "s": "até 0x2F caracteres", "e": "FUN_00207650 (SetDat)", "l": "FUN_00207820 (GetDat, strcmp)", "p": "decompilado, ao_vivo"},
+          {"d": "ent+0x30", "t": "u8", "n": "entrada: sinalizadores", "s": "bit 0 em uso; bit 1 dado 2 liberável", "e": "FUN_00207650", "l": "FUN_00207820", "p": "decompilado, ao_vivo"},
+          {"d": "ent+0x31", "t": "u8", "n": "entrada: tipo", "s": "7 nos bins; 0 nas funções", "e": "FUN_00207650", "l": "FUN_00207820", "p": "decompilado, ao_vivo"},
+          {"d": "ent+0x32", "t": "u16", "n": "entrada: contagem de referências", "s": "SetDat de nome já existente incrementa", "e": "FUN_00207650", "l": "", "p": "decompilado, ao_vivo"},
+          {"d": "ent+0x34", "t": "ptr", "n": "entrada: dado", "s": "endereço do bin, da função ou do cDataUnit", "e": "FUN_00207650", "l": "FUN_00207820", "p": "decompilado, ao_vivo"},
+          {"d": "ent+0x38", "t": "ptr", "n": "entrada: dado 2", "s": "zero nas vistas", "e": "FUN_00207650", "l": "", "p": "decompilado, ao_vivo"},
+          {"d": "ev+0x000", "t": "u32", "n": "Event: be_flag", "s": "bit 0 vivo (cManager)", "e": "cManager", "l": "DelAll 0x00205B90", "p": "decompilado"},
+          {"d": "ev+0x018", "t": "char[0x20]", "n": "Event: nome", "s": "strcpy do nome do arquivo ao preparar (FUN_002029E8)", "e": "FUN_002029E8", "l": "", "p": "decompilado"},
+          {"d": "ev+0x038", "t": "ptr", "n": "Event: arquivo .evd", "s": "cabeçalho 'event' (FUN_002068D8 exige 'even' + 't')", "e": "FUN_002029E8", "l": "FUN_00205080 / FUN_002050F8 (pacotes)", "p": "decompilado"},
+          {"d": "ev+0x03C", "t": "ptr", "n": "Event: primeiro pacote", "s": "= arquivo + *(arquivo+0x40)", "e": "FUN_002029E8", "l": "", "p": "decompilado"},
+          {"d": "ev+0x044", "t": "u32", "n": "Event: sinalizadores de estado", "s": "EvtReadExec liga 0x100000 e 0x200 (vídeo), 8, 0x800, 0x400, 0x80, 0x40 conforme o argumento; RunEvtCancel liga 0x4000000 e 0x8000000, testa 0x10000000 e 0x800000; nomes dos bits (EvtStatusFlag, bit 31 − n) só do GameCube", "e": "EvtReadExec / RunEvtCancel", "l": "RunEvtCancel / FUN_00202B50", "p": "decompilado"},
+          {"d": "ev+0x048", "t": "DatTbl", "n": "Event: tabela de modelos do evento", "s": "0x60 vagas (FUN_00207570)", "e": "FUN_002029E8", "l": "", "p": "decompilado"},
+          {"d": "ev+0x09C", "t": "ptr", "n": "Event: tabela de funções da sala", "s": "entrada da tabela +0x148 pelo nome", "e": "FUN_00206ED0", "l": "", "p": "decompilado"},
+          {"d": "ev+0x0A4", "t": "s32", "n": "Event: total de quadros", "s": "soma das durações dos cortes (FUN_002051E8)", "e": "FUN_002051E8", "l": "FUN_00202B50", "p": "decompilado"},
+          {"d": "ev+0x0AC", "t": "s32", "n": "Event: quadros do corte corrente", "s": "FUN_002050F8 (pacote 6 = câmera .fcv: quadros da curva + 1; pacote 8 = câmera fixa: valor do pacote)", "e": "FUN_002050F8", "l": "", "p": "decompilado"},
+          {"d": "ev+0x0B0", "t": "s32", "n": "Event: corte corrente", "s": "RunEvtCancel compara com +0xB4 − 1 e com +0xE0", "e": "", "l": "RunEvtCancel", "p": "decompilado"},
+          {"d": "ev+0x0B4", "t": "s32", "n": "Event: quantidade de cortes", "s": "pacotes de id 6 e 8 (FUN_00205080)", "e": "FUN_002051E8", "l": "RunEvtCancel", "p": "decompilado"},
+          {"d": "ev+0x0D0", "t": "s32[2]", "n": "Event: vagas de stream", "s": "−1 ao preparar; +0xD8[2] idem", "e": "FUN_002029E8", "l": "", "p": "decompilado"},
+          {"d": "ev+0x0E0", "t": "s32", "n": "Event: corte limite do cancelamento", "s": "RunEvtCancel só cancela se +0xB0 < +0xE0 (com o bit 0x10000000)", "e": "", "l": "RunEvtCancel", "p": "decompilado"},
+          {"d": "evd+0x00", "t": "char[0x20]", "n": ".evd: caminho do próprio arquivo", "s": "\"event/evd/r100s20.evd\"; FUN_002068D8 exige começar por \"event\"", "e": "arquivo", "l": "FUN_002068D8", "p": "decompilado, iso"},
+          {"d": "evd+0x20", "t": "char[8]", "n": ".evd: sala", "s": "\"r100\"", "e": "arquivo", "l": "", "p": "iso"},
+          {"d": "evd+0x28", "t": "char[0xC]", "n": ".evd: número", "s": "\"s20\"; EvtReadExec usa o caractere +0xB (dígito) para a fonte de mensagens e monta \"movie/\" + nome até o ponto + \".sfd\"", "e": "arquivo", "l": "EvtReadExec", "p": "decompilado, iso"},
+          {"d": "evd+0x40", "t": "u32", "n": ".evd: deslocamento do primeiro pacote", "s": "0x50", "e": "arquivo", "l": "FUN_002029E8", "p": "decompilado, iso"},
+          {"d": "evd+0x44", "t": "u32", "n": ".evd: tamanho do fluxo de pacotes", "s": "528 em r100s20", "e": "arquivo", "l": "", "p": "iso"},
+          {"d": "evd+0x48", "t": "s32", "n": ".evd: quantidade de bins", "s": "6 em r100s20", "e": "arquivo", "l": "", "p": "iso"},
+          {"d": "evd+0x4C", "t": "u32", "n": ".evd: deslocamento da tabela de bins", "s": "0x260; entradas de 0x40: nome[0x30] (event/r100/s20/cam/cam_s20_000.fcv, …/etc/r100s20.mdt), +0x30 deslocamento", "e": "arquivo", "l": "", "p": "iso"},
+          {"d": "pac+0x00", "t": "s32", "n": "pacote: id", "s": "0..0x20; 0x1B encerra o fluxo; 6 e 8 contam como corte; em r100s20: 0, 32, 6, 15, 6, 6, 17, 6, 17, 6, 26, 27 (nomes do GameCube: 0 início, 6 câmera, 8 câmera fixa, 15 stream, 17 mensagem, 26 fim do evento, 27 fim dos pacotes, 32 mensagens)", "e": "arquivo", "l": "FUN_00205080 / FUN_002050F8", "p": "decompilado, iso"},
+          {"d": "pac+0x04", "t": "u32", "n": "pacote: sinalizadores", "s": "nomes só do GameCube", "e": "arquivo", "l": "", "p": "iso"},
+          {"d": "pac+0x08", "t": "s16", "n": "pacote: corte", "s": "", "e": "arquivo", "l": "", "p": "iso"},
+          {"d": "pac+0x0A", "t": "s16", "n": "pacote: quadro", "s": "", "e": "arquivo", "l": "", "p": "iso"},
+          {"d": "pac+0x0C", "t": "s16", "n": "pacote: tamanho", "s": "deslocamento do próximo pacote", "e": "arquivo", "l": "FUN_00205080 / FUN_002050F8", "p": "decompilado, iso"},
+          {"d": "pac+0x10", "t": "char[0x30]", "n": "pacote 6: nome da curva de câmera", "s": "FUN_002050F8 procura o nome na tabela de bins (+0x140) e lê a quantidade de quadros u16 no início do .fcv", "e": "arquivo", "l": "FUN_002050F8", "p": "decompilado"}
         ],
         "funcoes": [
-          {"nome": "EventMgr::EvtReadExec / EvtFree / SetFunc / SetBin; Event::RunEvtCancel", "endereco": "0x00206280 / 0x00206740 / 0x00206EA0 / 0x00206BE8; 0x00202DD8", "papel": "pontos de entrada pelo nome"}
+          {"nome": "EventMgr::EvtReadExec(mgr, nome, espera, bits)", "endereco": "0x00206280", "papel": "toca um evento do início ao fim: bits 0x200 espera SceCheckEventStart, 0x80 SceEventStart(1), 2 vídeo (cSofdec 0x455940, movie/<nome>.sfd), 4 fade, 8 não libera; dorme por SceSleep: nunca pelo canal"},
+          {"nome": "EventMgr::EvtReadMram / FUN_00205FD8", "endereco": "0x00205F40 / 0x00205FD8", "papel": "lê o .evd pelo cDataCtrl 0x41B6B0 (cDataCtrl::setData 0x001B21C8 → cDvd::FileExistCheck) e o módulo de inimigo do evento (EmReadSearch)"},
+          {"nome": "criar e preparar o Event", "endereco": "0x002068D8 / 0x00206998 / 0x002029E8", "papel": "exige o cabeçalho 'event', pega uma vaga (FUN_00208038), guarda o arquivo, conta cortes e quadros"},
+          {"nome": "Event::RunEvtCancel", "endereco": "0x00202DD8", "papel": "cancelamento pelo jogador: fade, limpa mensagens, avança até o fim"},
+          {"nome": "EventMgr::EvtFree / DelAll", "endereco": "0x00206740 / 0x00205B90", "papel": "libera o arquivo e o módulo do evento; destrói todos"},
+          {"nome": "DatTbl::SetDat / GetDat", "endereco": "0x00207650 / 0x00207820", "papel": "tabelas de nomes (0x3C por entrada); SetBin 0x00206BE8 e SetFunc 0x00206EA0 são atalhos"},
+          {"nome": "EventMgr::SetEvs / init por sala", "endereco": "0x00207048 / 0x00205AD8", "papel": "registra os .evd embutidos no bloco EVS; aloca as quatro tabelas (32, 320, 16, 8)"},
+          {"nome": "SceEventStart / SceEventEnd", "endereco": "0x00270328 / 0x00270570", "papel": "cercam o evento: contador 0x004567BE, estado de dano do jogador, sinalizadores em pG, vida e ícones escondidos"},
+          {"nome": "MovieBrowserExec", "endereco": "0x0012E878", "papel": "toca os eventos de um índice da tabela 0x002F1398 (8 nomes por índice: event/evd/r120s99.evd, r100s40, r100s03, r100s20, …)"}
         ],
-        "pendencias": ["ler EvtReadExec e o formato dos blocos EVS"],
+        "pendencias": ["formato dos pacotes por id (parâmetros após +0x10) e o executor (ExePacket) no PS2", "quem lê pG+0x7F50..+0x7F5C e pG+0x1C4 (sinalizadores de evento) fora do sistema de eventos", "conferir ao vivo um Event preenchido (precisa de uma cutscene em andamento)"],
         "conferencia": {
           "data": "2026-11-11",
-          "estados": [96, 95],
+          "estados": [96],
           "sala": "0x0100",
           "semente": 2026,
-          "sorteados": [],
+          "sorteados": ["pac+0x0C", "pac+0x10", "pac+0x04"],
           "aceite_cliente": "pendente",
           "campos": {
+            "mgr+0x1C": {"resultado": "bate", "estado": 96, "lido": "''", "relacao": "vazio sem Event vivo (0 vivos)"},
+            "mgr+0x4C": {"resultado": "bate", "estado": 96, "lido": "0000000000000000000000000000000000000000000000000000000000000000", "relacao": "zerado sem evento"},
+            "mgr+0x138": {"resultado": "bate", "estado": 96, "lido": "n=32 vetor 0x0187AB90 (0 em uso)", "relacao": "32 entradas alocadas por FUN_00205AD8; vetor no heap"},
+            "mgr+0x140": {"resultado": "bate", "estado": 96, "lido": "n=320 vetor 0x0187B330 (5 em uso)", "relacao": "320 entradas alocadas por FUN_00205AD8; vetor no heap"},
+            "mgr+0x148": {"resultado": "bate", "estado": 96, "lido": "n=16 vetor 0x0187FE40 (3 em uso)", "relacao": "16 entradas alocadas por FUN_00205AD8; vetor no heap"},
+            "mgr+0x150": {"resultado": "bate", "estado": 96, "lido": "n=8 vetor 0x01880220 (0 em uso)", "relacao": "8 entradas alocadas por FUN_00205AD8; vetor no heap"},
+            "tbl+0x00": {"resultado": "bate", "estado": 96, "lido": "[32, 320, 16, 8]", "relacao": "32, 320, 16, 8"},
+            "tbl+0x04": {"resultado": "bate", "estado": 96, "lido": "['0x0187AB90', '0x0187B330', '0x0187FE40', '0x01880220']", "relacao": "no heap"},
+            "ent+0x00": {"resultado": "bate", "estado": 96, "lido": "['em/pl07/pl0700a.bin', 'em/pl07/pl0700.bin', 'em/pl07/pl0700.tpl', 'obj/objmodel/obm2a00.bin', 'obj/objmodel/obm2a00.tpl']", "relacao": "nomes de .bin/.tpl nos bins"},
+            "ent+0x30": {"resultado": "bate", "estado": 96, "lido": "['03']", "relacao": "bit 0 nas usadas"},
+            "ent+0x31": {"resultado": "bate", "estado": 96, "lido": "[7]", "relacao": "7 = bin (SetBin)"},
+            "ent+0x32": {"resultado": "bate", "estado": 96, "lido": "[1]", "relacao": "≥ 1 nas usadas"},
+            "ent+0x34": {"resultado": "bate", "estado": 96, "lido": "['0x015FB060', '0x015DC000', '0x015EDE40', '0x01586660', '0x015A73E0']", "relacao": "blocos BIN/TPL do arquivo da sala"},
+            "ent+0x38": {"resultado": "lido", "estado": 96, "lido": "['0x00000000']", "relacao": "zero nas vistas"},
+            "ev+0x000": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "nenhum Event vivo neste estado (as duas vagas estão vazias)"},
+            "ev+0x018": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "nenhum Event vivo neste estado (as duas vagas estão vazias)"},
+            "ev+0x038": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "nenhum Event vivo neste estado (as duas vagas estão vazias)"},
+            "ev+0x03C": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "nenhum Event vivo neste estado (as duas vagas estão vazias)"},
+            "ev+0x044": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "nenhum Event vivo neste estado (as duas vagas estão vazias)"},
+            "ev+0x048": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "nenhum Event vivo neste estado (as duas vagas estão vazias)"},
+            "ev+0x09C": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "nenhum Event vivo neste estado (as duas vagas estão vazias)"},
+            "ev+0x0A4": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "nenhum Event vivo neste estado (as duas vagas estão vazias)"},
+            "ev+0x0AC": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "nenhum Event vivo neste estado (as duas vagas estão vazias)"},
+            "ev+0x0B0": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "nenhum Event vivo neste estado (as duas vagas estão vazias)"},
+            "ev+0x0B4": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "nenhum Event vivo neste estado (as duas vagas estão vazias)"},
+            "ev+0x0D0": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "nenhum Event vivo neste estado (as duas vagas estão vazias)"},
+            "ev+0x0E0": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "nenhum Event vivo neste estado (as duas vagas estão vazias)"},
+            "evd+0x00": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "campo de arquivo: conferido na ISO (prova 'iso'), não na memória"},
+            "evd+0x20": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "campo de arquivo: conferido na ISO (prova 'iso'), não na memória"},
+            "evd+0x28": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "campo de arquivo: conferido na ISO (prova 'iso'), não na memória"},
+            "evd+0x40": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "campo de arquivo: conferido na ISO (prova 'iso'), não na memória"},
+            "evd+0x44": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "campo de arquivo: conferido na ISO (prova 'iso'), não na memória"},
+            "evd+0x48": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "campo de arquivo: conferido na ISO (prova 'iso'), não na memória"},
+            "evd+0x4C": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "campo de arquivo: conferido na ISO (prova 'iso'), não na memória"},
+            "pac+0x00": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "campo de arquivo: conferido na ISO (prova 'iso'), não na memória"},
+            "pac+0x04": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "campo de arquivo: conferido na ISO (prova 'iso'), não na memória"},
+            "pac+0x08": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "campo de arquivo: conferido na ISO (prova 'iso'), não na memória"},
+            "pac+0x0A": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "campo de arquivo: conferido na ISO (prova 'iso'), não na memória"},
+            "pac+0x0C": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "campo de arquivo: conferido na ISO (prova 'iso'), não na memória"},
+            "pac+0x10": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "campo de arquivo: conferido na ISO (prova 'iso'), não na memória"}
           },
-          "observacoes": []
+          "observacoes": ["rodada 2 (só estas estruturas, sorteio próprio com a mesma semente)"]
         }
       },
       {
         "id": "blocos_sala",
-        "nome": "Arquivo de sala (blocos SMD/SMX, LIT, SAR, EFF, TEX, ITM/ETM/ETS, CAM, BLK, EVS/FSE/AEV/ITA)",
-        "status": "nao_lida",
-        "raiz": "não localizada no PS2 (no GameCube, pG->pRoom e pCore)",
-        "tamanho": "",
-        "resumo": "Só os nomes dos blocos vêm do GameCube. No PS2 só se leu o que já está em memória (colisão SAR, objetos SMD, lista ESL).",
+        "nome": "Arquivo de sala (st<estágio>/r<sala>.dat: cabeçalho por etiqueta e blocos)",
+        "status": "lida",
+        "raiz": "pG+0x48 aponta para o arquivo da sala no heap (0x0119A140 na sala 0x0100); o carregador 0x002620E8 monta o nome \"st%x/r%03x.dat\" (estágio, sala), acha o índice no BIO4DAT.AFS (0x0016C220), lê antes o arquivo anterior (.snd) e depois o .dat com cDvd (0x001B3330, ReadCheck grava o endereço em pG+0x48). Blocos lidos por etiqueta pela função 0x00263710 (arquivo, etiqueta de 3 letras, n-ésima ocorrência)",
+        "tamanho": "r100.dat tem 5 214 368 bytes e 49 blocos; 165 arquivos de sala no AFS",
+        "resumo": "Mesmo formato do GameCube (GetDataExt): contagem, três palavras zeradas, tabela de deslocamentos e tabela de etiquetas de 4 bytes; cada bloco é um arquivo próprio (colisão SAT/EAT, modelos SMD/SMX, luzes LIT, áreas de roteiro AEV/ITA, câmera CAM, efeitos EFF, itens ITM, mensagens MDT, limites CNS, chão de roteiro FSE, som STB/DSE/ESE, modelos e texturas de evento BIN/TPL, curvas de câmera FCV). A inicialização da sala 0x00217EE0 pede 17 etiquetas na ordem CNS, SMD, SMX, LIT, SAT, EAT, AEV, ITA, SHD, EFF, EAR, SAR, ITM, ETM, ETS, CAM, EVS (tabela de nomes 0x003BDA10); o carregador guarda RTP, MDT, OSD e EMI em pG. Varredura dos 165 arquivos na ISO: toda sala tem CAM, SMX, EAT, RTP, MDT, CNS e FSE; EVS existe em 5 (r101, r111, r400, r500, r504); EMI em 58; SEQ, UWF e PTH não têm consumidor localizado.",
         "campos": [
+          {"d": "0x00", "t": "u32", "n": "quantidade de blocos", "s": "49 na sala 0x0100", "e": "arquivo", "l": "0x00263710 (leitor por etiqueta)", "p": "decompilado, ao_vivo, iso"},
+          {"d": "0x04", "t": "u32[3]", "n": "reserva", "s": "zeros", "e": "arquivo", "l": "", "p": "ao_vivo"},
+          {"d": "0x10", "t": "u32[n]", "n": "deslocamentos", "s": "relativos ao início do arquivo; bloco i em arquivo + deslocamento[i]", "e": "arquivo", "l": "0x00263710", "p": "decompilado, ao_vivo, iso"},
+          {"d": "0x10+4n", "t": "char[4][n]", "n": "etiquetas", "s": "três letras e zero; o leitor compara os 3 bytes e conta as ocorrências (n-ésima)", "e": "arquivo", "l": "0x00263710", "p": "decompilado, ao_vivo, iso"},
+          {"d": "CNS", "t": "bloco", "n": "limites por sala", "s": "+0 contagem (16), +4 máscara de bits (um por índice), depois um u32 por índice; 0x002834E0(i) devolve o valor da sala se o bit está ligado, senão o padrão da tabela 0x0032ABC8 (60, 160, 350, 256, 10, 50, 1200, 260, 655360, 10, 20, 30). Índices: 0 vagas do EmMgr, 1 cObjMgr 0x431D20, 2, 3, 4 (0x41B690), 5 cLightMgr, 8 heap da sala (pG+0x7E04 = valor + 0x8000), 10 SatMgr, 11 EatMgr. r100: bits 0, 1, 3, 6, 7, 8 = 60, 60, 64, 1000, 150, 319488", "e": "arquivo", "l": "0x002834D0 guarda em 0x00457730; 0x002834E0 consulta", "p": "decompilado, ao_vivo"},
+          {"d": "SMD / SMX", "t": "bloco", "n": "objetos de cenário", "s": "SMD 0 e 1 e SMX vão para 0x00275150 (SmdInit); SMD em 0x004568A0 (ver modelo visual)", "e": "arquivo", "l": "0x00275150", "p": "decompilado, ao_vivo"},
+          {"d": "LIT", "t": "bloco", "n": "luzes", "s": "duas ocorrências (0 e 1) para cLightMgr 0x425A88 (0x00223048), junto com a luz do arquivo do jogador (pG+0x50 + 0x2C)", "e": "arquivo", "l": "0x00223048", "p": "decompilado"},
+          {"d": "SAT / EAT", "t": "bloco", "n": "colisão de cenário", "s": "cabeçalho do bloco: +0 u16, +4 u32 deslocamento do cSatFile dentro do bloco (0xC no SAT, 8 no EAT da sala 0x0100); cSatMgr::create(SatMgr 0x41AF10, SAT) e create(EatMgr 0x41AF30, EAT) com posição e rotação zero; a primeira peça de cada gerente aponta (cSat+0x60) para bloco + deslocamento (ver colisão)", "e": "arquivo", "l": "cSatMgr::create 0x001A32D0", "p": "decompilado, ao_vivo"},
+          {"d": "AEV / ITA", "t": "bloco", "n": "áreas de roteiro e itens", "s": "0x00265FE0 (SceAtInit) recebe os dois; cabeçalho 'AEV\\0' versão 0x104, 'ITA\\0' 0x105 (ver cenas)", "e": "arquivo", "l": "0x00265FE0", "p": "decompilado, ao_vivo"},
+          {"d": "CAM", "t": "bloco", "n": "cortes de câmera", "s": "0x00100A10 (CameraControl) e pG+0x7E10 (0 se a sala não tem); cabeçalho 'B404'", "e": "arquivo", "l": "0x00100A10", "p": "decompilado, ao_vivo"},
+          {"d": "EFF", "t": "bloco", "n": "efeitos da sala", "s": "EspDataLoad(bloco, 1, 0); o EFF do módulo de inimigo (tabela de módulos +0x84) vai por EspDataLoad(bloco, id, 0) em 0x00253121 (linha da junção)", "e": "arquivo", "l": "EspDataLoad", "p": "decompilado"},
+          {"d": "EAR / SAR", "t": "bloco", "n": "áreas de som e de luz", "s": "EAR → 0x001B7B88; SAR → 0x001211D0 (no GameCube, áreas de luz)", "e": "arquivo", "l": "0x001B7B88 / 0x001211D0", "p": "decompilado"},
+          {"d": "ITM / ETM / ETS", "t": "bloco", "n": "itens e modelos extra", "s": "ITM → 0x00221458; ETM → 0x001FC1B8; ETS → 0x001FC1D0", "e": "arquivo", "l": "0x00221458 / 0x001FC1B8 / 0x001FC1D0", "p": "decompilado"},
+          {"d": "RTP / MDT / OSD / EMI", "t": "bloco", "n": "guardados em pG pelo carregador", "s": "RTP → pG+0x7E14 ('PTR2'), MDT → pG+0x7E08 (mensagens da sala), OSD → pG+0x7E1C, EMI → pG+0x7E18 (dados de inimigo por sala, 58 salas têm)", "e": "0x002620E8", "l": "quem lê pG+0x7E08..+0x7E1C não foi listado", "p": "decompilado, ao_vivo"},
+          {"d": "STB / DSE / ESE", "t": "bloco", "n": "som da sala", "s": "STB → objeto de som 0x003D8C54+0x9C (0x00268299 na junção); DSE → mesma área; ESE → 0x00276020 (0x003D7E54, exige versão 0x100)", "e": "arquivo", "l": "som", "p": "decompilado"},
+          {"d": "FSE", "t": "bloco", "n": "chão de roteiro", "s": "0x00424C20; exige 'FSE' e versão 0x103 (FlrAtSetOnOff / FlrAtSetDefVal)", "e": "arquivo", "l": "0x00180488 (linha da junção)", "p": "decompilado, ao_vivo"},
+          {"d": "EVS", "t": "bloco", "n": "tabela de eventos da sala", "s": "+0 contagem, +4 deslocamento da tabela de pares (deslocamento do .evd embutido, reserva) de 8 bytes; 0x00207048 registra cada um no EvtMgr (0x00206C98). Só 5 das 165 salas têm; a sala 0x0100 não tem (caminho nunca visto ao vivo)", "e": "arquivo", "l": "0x00207048", "p": "decompilado, iso"},
+          {"d": "BIN / TPL / FCV", "t": "bloco", "n": "modelos, texturas e curvas de câmera dos eventos", "s": "na sala 0x0100 os cinco bins registrados no EvtMgr (+0x140) apontam para os blocos BIN [23, 30, 32] e TPL [24, 31] do arquivo; FCV = curva de câmera (cam_s20_000.fcv nos bins do .evd); quem registra não foi localizado", "e": "arquivo", "l": "EvtMgr (tabela de bins)", "p": "ao_vivo"},
+          {"d": "SHD / TEX / BLK / DRA / SEQ / UWF / PTH", "t": "bloco", "n": "sem consumidor localizado", "s": "SHD é pedido pela inicialização e descartado; BLK tem o formato do GameCube ('BLK' 0x100, blocos de carga por área) mas a inicialização do PS2 não o pede", "e": "arquivo", "l": "não localizado", "p": "decompilado, iso"}
         ],
         "funcoes": [
+          {"nome": "carregador da sala", "endereco": "0x002620E8", "papel": "nome st%x/r%03x.dat, índice no AFS, leitura do .snd e do .dat, guarda RTP/MDT/OSD/EMI em pG"},
+          {"nome": "leitor por etiqueta (GetDataExt)", "endereco": "0x00263710", "papel": "devolve o n-ésimo bloco com a etiqueta de 3 letras ou 0"},
+          {"nome": "inicialização da sala", "endereco": "0x00217EE0", "papel": "pede os 17 blocos e inicializa os gerentes com os limites do CNS; EmMgr com passo 0x1470 nas salas 0x11F, 0x332, 0x31C, 0x31B, 0x228, 0x221 e 0x51C, 0xED0 nas outras"},
+          {"nome": "limites por sala", "endereco": "0x002834D0 / 0x002834E0", "papel": "guarda o CNS e consulta por índice (valor da sala ou padrão 0x0032ABC8)"},
+          {"nome": "índice de arquivo por nome", "endereco": "0x0016C220 / 0x0016C700", "papel": "maiúsculas e barra invertida; três listas de nomes (ver AFS); índice = lista << 12 | posição"}
         ],
-        "pendencias": ["achar o arquivo da sala no AFS e o índice de blocos em memória"],
+        "pendencias": ["consumidores de TEX, BLK, DRA, SEQ, UWF e PTH", "quem registra BIN/TPL nos bins do EvtMgr (sem EVS na sala)", "formato de cada bloco além do cabeçalho (ITM, ETM, ETS, EAR, SAR, MDT, RTP, OSD, EMI, STB, DSE, ESE)"],
         "conferencia": {
           "data": "2026-11-11",
-          "estados": [96, 95],
+          "estados": [96],
           "sala": "0x0100",
           "semente": 2026,
-          "sorteados": [],
+          "sorteados": ["RTP / MDT / OSD / EMI", "BIN / TPL / FCV", "FSE"],
           "aceite_cliente": "pendente",
           "campos": {
+            "0x00": {"resultado": "bate", "estado": 96, "lido": "49", "relacao": "pG+0x48 = 0x0119A140 no heap; contagem plausível"},
+            "0x04": {"resultado": "bate", "estado": 96, "lido": "000000000000000000000000", "relacao": "zeros"},
+            "0x10": {"resultado": "bate", "estado": 96, "lido": "49 deslocamentos crescentes", "relacao": "crescentes e depois das duas tabelas"},
+            "0x10+4n": {"resultado": "bate", "estado": 96, "lido": "['AEV', 'BIN', 'BLK', 'CAM', 'CNS', 'DRA', 'DSE', 'EAR', 'EAT', 'EFF', 'EMI', 'ESE', 'ETM', 'ETS', 'FCV', 'FSE', 'ITA', 'ITM', 'LIT', 'MDT', 'OSD', 'RTP', 'SAR', 'SAT', 'SMD', 'SMX', 'STB', 'TEX', 'TPL']", "relacao": "etiquetas de três letras"},
+            "CNS": {"resultado": "bate", "estado": 96, "lido": "0x457730 = 0x01581F00; contagem 16; máscara 0x000001CB", "relacao": "0x457730 aponta para o bloco CNS do arquivo"},
+            "SMD / SMX": {"resultado": "bate", "estado": 96, "lido": "0x011C90A0", "relacao": "0x4568A0 = primeiro bloco SMD"},
+            "LIT": {"resultado": "lido", "estado": 96, "lido": "presentes: ['LIT']", "relacao": "consumidor não conferido nesta rodada; só a presença do bloco"},
+            "SAT / EAT": {"resultado": "bate", "estado": 96, "lido": "SatMgr peça 0 arquivo 0x0119C62C; EatMgr 0x01547068", "relacao": "cSat+0x60 da primeira peça = bloco + *(bloco+4) (cabeçalho do bloco: +4 deslocamento do cSatFile)"},
+            "AEV / ITA": {"resultado": "bate", "estado": 96, "lido": "AEV 0x0157AD00 b'AEV\\x00'; ITA b'ITA\\x00'", "relacao": "cabeçalhos 'AEV' e 'ITA'"},
+            "CAM": {"resultado": "bate", "estado": 96, "lido": "0x0119A2E0", "relacao": "pG+0x7E10 = bloco CAM"},
+            "EFF": {"resultado": "lido", "estado": 96, "lido": "presentes: ['EFF']", "relacao": "consumidor não conferido nesta rodada; só a presença do bloco"},
+            "EAR / SAR": {"resultado": "lido", "estado": 96, "lido": "presentes: ['EAR', 'SAR']", "relacao": "consumidor não conferido nesta rodada; só a presença do bloco"},
+            "ITM / ETM / ETS": {"resultado": "lido", "estado": 96, "lido": "presentes: ['ITM', 'ETM', 'ETS']", "relacao": "consumidor não conferido nesta rodada; só a presença do bloco"},
+            "RTP / MDT / OSD / EMI": {"resultado": "bate", "estado": 96, "lido": "pG+0x7E14 0x0157C620, +0x7E08 0x0157E220, +0x7E1C 0x01585F40, +0x7E18 0x0163C620", "relacao": "os quatro ponteiros de pG apontam para os blocos de mesma etiqueta"},
+            "STB / DSE / ESE": {"resultado": "lido", "estado": 96, "lido": "presentes: ['STB', 'DSE', 'ESE']", "relacao": "consumidor não conferido nesta rodada; só a presença do bloco"},
+            "FSE": {"resultado": "bate", "estado": 96, "lido": "b'FSE\\x00' versão 0x00000103", "relacao": "'FSE' versão 0x103"},
+            "EVS": {"resultado": "não conferível", "estado": 96, "lido": "presentes: []", "relacao": "consumidor não conferido nesta rodada; só a presença do bloco"},
+            "BIN / TPL / FCV": {"resultado": "bate", "estado": 96, "lido": "5 bins registrados", "relacao": "todo bin do EvtMgr é um bloco BIN ou TPL do arquivo"},
+            "SHD / TEX / BLK / DRA / SEQ / UWF / PTH": {"resultado": "lido", "estado": 96, "lido": "presentes: ['TEX', 'BLK', 'DRA']", "relacao": "consumidor não conferido nesta rodada; só a presença do bloco"}
           },
-          "observacoes": []
+          "observacoes": ["rodada 2 (só estas estruturas, sorteio próprio com a mesma semente)"]
         }
       },
       {
         "id": "pzl",
         "nome": "Tabuleiro da maleta (pzlPlayer, pzlBoard, pzlPiece)",
-        "status": "nao_lida",
-        "raiz": "criado pela tela da maleta 0x0111F4E0 (módulo do menu); vive só com a tela aberta",
-        "tamanho": "pzlPiece 0x2C; até 121 peças",
-        "resumo": "Lido só o suficiente para dar um item (peça: +0x14/+0x18 posição, +0x20 orientação, +0x24 item; tamanhos 10x6, 11x7, 12x8, 15x8, extra 6x12). Campos não tabelados.",
+        "status": "parcial",
+        "raiz": "objeto pzlPlayer criado pela tela da maleta (módulo do menu 0x0111F4E0) e desfeito ao fechar; os tabuleiros e as peças vêm do mem_alloc; só existe com a tela aberta",
+        "tamanho": "pzlBoard 0x60 (alocação FUN_00122128); pzlPiece 0x2C; até DAT_00328440 peças",
+        "resumo": "pzlPlayer::init monta a maleta (largura × altura por nível: 0 → 10×6, 1 → 11×7, 2 → 12×8, 3 → 15×8) e o tabuleiro extra (DAT_00328441 × DAT_00328442), cria uma pzlPiece por item ocupado do inventário cujo dono bate com o personagem (pG+0x7EEA == 1), lendo a peça na tabela 0x00326DE8, e coloca cada uma no tabuleiro indicado por item+0xD. pzlPlayer::save escreve de volta no item: +0xA/+0xB = 2 × centro, +0xC = orientação, +0xD = 1 se está na maleta. Não conferível ao vivo com a tela fechada.",
         "campos": [
+          {"d": "pl+0x00", "t": "ptr", "n": "pzlPlayer: tabuleiro da maleta", "s": "pzlBoard", "e": "pzlPlayer::init", "l": "putPiece, save, search", "p": "decompilado"},
+          {"d": "pl+0x04", "t": "ptr", "n": "pzlPlayer: tabuleiro extra", "s": "pzlBoard (DAT_00328441 × DAT_00328442)", "e": "pzlPlayer::init", "l": "save", "p": "decompilado"},
+          {"d": "pl+0x08", "t": "ptr", "n": "pzlPlayer: vetor de peças", "s": "pzlPiece × n, 0x2C cada", "e": "pzlPlayer::init", "l": "save, piecePtr", "p": "decompilado"},
+          {"d": "pl+0x0C", "t": "u8", "n": "pzlPlayer: quantidade de peças", "s": "DAT_00328440", "e": "pzlPlayer::init", "l": "save", "p": "decompilado"},
+          {"d": "pl+0x10", "t": "ptr", "n": "pzlPlayer: peça na mão", "s": "putPiece coloca (0x0025F438) e grava o centro no alvo (+0x50/+0x51) e zera", "e": "selPiece / putPiece", "l": "putPiece", "p": "decompilado"},
+          {"d": "bd+0x00", "t": "ptr", "n": "pzlBoard: células", "s": "largura × altura bytes; 0xFF vazia (clearState); cellState devolve 3 fora e 0x43 na borda", "e": "0x0025EE68 (init)", "l": "cellState 0x0025FB88", "p": "decompilado"},
+          {"d": "bd+0x04", "t": "u8", "n": "pzlBoard: largura", "s": "10 na maleta inicial", "e": "0x0025EE68", "l": "cellState", "p": "decompilado"},
+          {"d": "bd+0x05", "t": "u8", "n": "pzlBoard: altura", "s": "6 na maleta inicial", "e": "0x0025EE68", "l": "cellState", "p": "decompilado"},
+          {"d": "bd+0x06", "t": "u8", "n": "pzlBoard: máximo de peças", "s": "", "e": "0x0025EE68", "l": "", "p": "decompilado"},
+          {"d": "bd+0x08", "t": "ptr", "n": "pzlBoard: vetor de ponteiros de peças", "s": "4 bytes por vaga, zerado", "e": "0x0025EE68", "l": "search / getPiece", "p": "decompilado"},
+          {"d": "pc+0x00", "t": "u8", "n": "pzlPiece: sinalizadores", "s": "bit 0 em uso", "e": "0x0025EA50", "l": "save", "p": "decompilado"},
+          {"d": "pc+0x04", "t": "ptr", "n": "pzlPiece: dado da peça", "s": "entrada ITEM_PIECE_INFO (0x00326DE8)", "e": "0x0025EA50", "l": "", "p": "decompilado"},
+          {"d": "pc+0x0C", "t": "u32", "n": "pzlPiece: largura e altura", "s": "cópia de peça+0x4", "e": "0x0025EA50", "l": "", "p": "decompilado"},
+          {"d": "pc+0x10", "t": "u32", "n": "pzlPiece: centro da peça", "s": "cópia de peça+0x8", "e": "0x0025EA50", "l": "", "p": "decompilado"},
+          {"d": "pc+0x14", "t": "f32", "n": "pzlPiece: centro x", "s": "item+0xA × 0,5", "e": "pzlPlayer::init", "l": "save (× 2 → item+0xA)", "p": "decompilado"},
+          {"d": "pc+0x18", "t": "f32", "n": "pzlPiece: centro y", "s": "item+0xB × 0,5", "e": "pzlPlayer::init", "l": "save (× 2 → item+0xB)", "p": "decompilado"},
+          {"d": "pc+0x20", "t": "u8", "n": "pzlPiece: orientação", "s": "item+0xC (pzlPiece::orientation)", "e": "pzlPiece::orientation 0x0025E7A0", "l": "save → item+0xC", "p": "decompilado"},
+          {"d": "pc+0x24", "t": "ptr", "n": "pzlPiece: item do inventário", "s": "vaga de 14 bytes do cItemMgr", "e": "pzlPlayer::init", "l": "save", "p": "decompilado"}
         ],
         "funcoes": [
-          {"nome": "pzlPlayer::init / save / appendExtraPiece / putPiece; pzlBoard::cellState", "endereco": "0x0025FD10 / 0x002601B0 / 0x002602A0 / 0x002607D8; 0x0025FB88", "papel": "lidas em 28/10 para a regra de encaixe"}
+          {"nome": "pzlPlayer::init / quit / save", "endereco": "0x0025FD10 / 0x00260058 / 0x002601B0", "papel": "montar do inventário, desfazer, gravar de volta nos itens"},
+          {"nome": "pzlPlayer::putPiece / selPiece / movePiece / chgPiece / cmbPiece", "endereco": "0x002607D8 / 0x00260450 / 0x00260AD0 / 0x002608D8 / 0x00260978", "papel": "mexer na peça em mão"},
+          {"nome": "pzlBoard::init / cellState / search / getPiece / rmPiece", "endereco": "0x0025EE68 / 0x0025FB88 / 0x0025EFD8 / 0x0025F838 / 0x0025F978", "papel": "tabuleiro e células"},
+          {"nome": "colocar peça", "endereco": "0x0025F438", "papel": "encaixa a peça no tabuleiro (usada por dar_item_se_couber 0x00261898)"}
         ],
-        "pendencias": ["tabelar pzlBoard e pzlPiece"],
+        "pendencias": ["conferir ao vivo com a maleta aberta (localizar o pzlPlayer pelo módulo do menu)", "estados das células além de 0xFF, 3 e 0x43"],
         "conferencia": {
           "data": "2026-11-11",
-          "estados": [96, 95],
+          "estados": [96],
           "sala": "0x0100",
           "semente": 2026,
-          "sorteados": [],
+          "sorteados": ["pc+0x14", "bd+0x05", "pl+0x00"],
           "aceite_cliente": "pendente",
           "campos": {
+            "pl+0x00": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "a maleta só existe com a tela aberta"},
+            "pl+0x04": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "a maleta só existe com a tela aberta"},
+            "pl+0x08": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "a maleta só existe com a tela aberta"},
+            "pl+0x0C": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "a maleta só existe com a tela aberta"},
+            "pl+0x10": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "a maleta só existe com a tela aberta"},
+            "bd+0x00": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "a maleta só existe com a tela aberta"},
+            "bd+0x04": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "a maleta só existe com a tela aberta"},
+            "bd+0x05": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "a maleta só existe com a tela aberta"},
+            "bd+0x06": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "a maleta só existe com a tela aberta"},
+            "bd+0x08": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "a maleta só existe com a tela aberta"},
+            "pc+0x00": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "a maleta só existe com a tela aberta"},
+            "pc+0x04": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "a maleta só existe com a tela aberta"},
+            "pc+0x0C": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "a maleta só existe com a tela aberta"},
+            "pc+0x10": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "a maleta só existe com a tela aberta"},
+            "pc+0x14": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "a maleta só existe com a tela aberta"},
+            "pc+0x18": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "a maleta só existe com a tela aberta"},
+            "pc+0x20": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "a maleta só existe com a tela aberta"},
+            "pc+0x24": {"resultado": "não conferível", "estado": 96, "lido": "—", "relacao": "a maleta só existe com a tela aberta"}
           },
-          "observacoes": []
+          "observacoes": ["rodada 2 (só estas estruturas, sorteio próprio com a mesma semente)"]
         }
       },
       {
@@ -915,26 +1115,30 @@
       },
       {
         "id": "tipos_inimigo",
-        "nome": "Tabela de tipos de inimigo (0x003C8F40)",
-        "status": "nao_lida",
-        "raiz": "0x003C8F40; estática",
-        "tamanho": "64 entradas",
-        "resumo": "Tabela de salto por tipo usada pela função de dano; os 64 casos não foram nomeados.",
+        "nome": "Tabela de salto por tipo da função de dano (0x003B8F40)",
+        "status": "lida",
+        "raiz": "0x003B8F40; estática (lui 0x3C / addiu −0x70C0 em 0x001C29C8..0x001C29D0). O endereço 0x003C8F40 do perfil anterior era texto da biblioteca CRI (versão do CFT), não uma tabela",
+        "tamanho": "64 × u32 (tipos 0x10 a 0x4F)",
+        "resumo": "LifeDownSet2 0x001C2618 subtrai (tipo − 0x10), testa < 0x40 e salta pelo endereço da tabela. 58 tipos vão para 0x001C29E4: dano escalado pela dificuldade (× (2 − 0,2·dif) até 5; × (1 − 0,03·(dif − 5)) acima), pontos GameAddPoint(0xC) a partir de 101 de dano e GameAddPoint(0xD) na morte. Seis tipos (0x27, 0x2E, 0x33, 0x3B, 0x3D, 0x3E) vão para 0x001C2A8C: dano cru, sem escala. Tipos fora de 0x10..0x4F também caem em 0x001C2A8C. A vida nunca cai abaixo de 1 com o bit 0 do 4º argumento.",
         "campos": [
+          {"d": "0x00", "t": "u32[64]", "n": "alvo do salto por tipo (tipo − 0x10)", "s": "58 entradas = 0x001C29E4 (dano escalado); 6 entradas (0x27, 0x2E, 0x33, 0x3B, 0x3D, 0x3E) = 0x001C2A8C (dano cru); todas dentro de 0x001C2618..0x001C2B00", "e": "executável", "l": "LifeDownSet2 0x001C2618 (jr em 0x001C29DC)", "p": "decompilado, ao_vivo"}
         ],
         "funcoes": [
+          {"nome": "LifeDownSet2 (dano)", "endereco": "0x001C2618", "papel": "única função que desconta vida; o ramo por tipo decide a escala pela dificuldade pG+0x7EC4"},
+          {"nome": "GameAddPoint", "endereco": "chamada em 0x001C2A5C / 0x001C2AD0 (linhas do C)", "papel": "pontos 0xC (acerto forte) e 0xD (morte) para os tipos de inimigo"}
         ],
-        "pendencias": ["nomear os 64 casos pelo C decompilado (LifeDownSet2)"],
+        "pendencias": ["nomear os seis tipos sem escala (0x27, 0x2E, 0x33, 0x3B, 0x3D, 0x3E) pelos módulos em<tipo>.rel"],
         "conferencia": {
           "data": "2026-11-11",
-          "estados": [96, 95],
+          "estados": [96],
           "sala": "0x0100",
           "semente": 2026,
-          "sorteados": [],
+          "sorteados": ["0x00"],
           "aceite_cliente": "pendente",
           "campos": {
+            "0x00": {"resultado": "bate", "estado": 96, "lido": "2 alvos: 0x001C29E4 ×58, 0x001C2A8C ×6", "relacao": "64 alvos dentro de LifeDownSet2; os seis tipos sem escala são 0x27, 0x2E, 0x33, 0x3B, 0x3D, 0x3E"}
           },
-          "observacoes": ["primeiras 8 palavras: ['0x5F524D54', '0x00004843', '0x5F524D54', '0x004B4C43', '0x73696854', '0x54464320', '0x6E756620', '0x6F697463']"]
+          "observacoes": ["rodada 2 (só estas estruturas, sorteio próprio com a mesma semente)"]
         }
       }
     ]

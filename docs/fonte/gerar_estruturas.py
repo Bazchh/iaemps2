@@ -15,7 +15,7 @@ RAIZ = AQUI.parent.parent
 ENTRADA = Path(sys.argv[1]) if len(sys.argv) > 1 else RAIZ / "perfis" / "memoria" / "SLUS-21134.json"
 SAIDA = Path(sys.argv[2]) if len(sys.argv) > 2 else RAIZ / "docs" / "Estruturas-SLUS-21134.md"
 
-PROVAS_FORTES = {"decompilado", "vigia", "foto", "ao_vivo", "publica"}
+PROVAS_FORTES = {"decompilado", "vigia", "foto", "ao_vivo", "publica", "iso"}
 STATUS = {"lida": "lida", "parcial": "parcial", "nao_lida": "não lida"}
 
 
