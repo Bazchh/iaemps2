@@ -253,3 +253,43 @@ def test_pausa_termina_no_segundo_certo_sem_depender_do_ciclo(tmp_path: Path) ->
         s.encerrada.set()
         relogio_de_fim.join(timeout=2)
         s.con.close()
+
+
+def test_acao_de_mundo_na_sessao_inteira(tmp_path: Path) -> None:
+    """S8-03: o perfil do jogo entra na abertura, o serviço decide uma ação de mundo em combate, a vida cai,
+    o ciclo encerra no prazo e tudo fica no registro (H07)."""
+    import struct
+
+    agora = [1000.0]
+    cenas = Cenas()
+    servico = ServicoFalso(
+        respostas=[COMBATE, COMBATE],
+        decisoes=[DEC % ("vida_do_jogador", '{"fracao": 0.5, "duracao_s": 5}', "O corpo pesa.")],
+    )
+    with Simulador(
+        "proprio", pasta_estados=tmp_path / "sstates", atraso_salvamento_s=0.1, relogio=lambda: agora[0]
+    ) as sim:
+        vida = 0x00425BA0 + 0x7ED6
+        struct.pack_into("<hh", sim.jogo.memoria, vida, 1200, 1200)
+        s = _sessao(tmp_path, sim, servico, cenas, agora)
+        assert s.executor.catalogo.alavanca("vida_do_jogador") is not None
+        s.iniciar()
+        s.passo()  # combate -> decidindo
+        s.passo()  # validada -> executando
+        s.passo()  # executa: vida cai
+        assert s.laco.estado == Estado.OBSERVANDO
+        assert struct.unpack_from("<h", sim.jogo.memoria, vida)[0] == 600
+        assert s.painel.painel.ultima_acao == "vida do jogador"
+        agora[0] += 6
+        s.passo()  # prazo vencido: devolve
+        assert struct.unpack_from("<h", sim.jogo.memoria, vida)[0] == 1200
+        s.gesto("encerrar")
+        s.passo()
+        r = s.resumo()
+        assert r["intervencoes_por_alavanca"] == [{"alavanca": "vida_do_jogador", "n": 1}]
+        linhas = s.con.execute(
+            "select origem, resultado, fim_ms, caminho_volta_json from intervencoes order by id"
+        ).fetchall()
+        assert [(x[0], x[1]) for x in linhas] == [("mestre", "confirmada"), ("encerramento", "confirmada")]
+        assert linhas[0][2] is not None and json.loads(linhas[0][3])["tirado"] == 600
+        s.con.close()

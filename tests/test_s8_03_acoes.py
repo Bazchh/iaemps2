@@ -347,3 +347,91 @@ def test_municao_por_ponteiro_e_inimigo_mais_proximo(bancada: Bancada) -> None:
     bancada.agora[0] += 11
     bancada.executor.encerrar_vencidos()
     assert struct.unpack_from("<h", mem, VETOR + 4 * PASSO + 0x4B0)[0] == 800
+
+
+# ---------- segunda rodada: a volta não se perde, não erra o alvo e não passa do teto ----------
+
+
+def test_canal_caido_no_fim_tenta_de_novo_no_proximo_ciclo(
+    bancada: Bancada, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from iaemps2.ponte import memoria
+    from iaemps2.ponte.cliente import CanalError
+
+    e = bancada.executar("vida_do_jogador", fracao=0.5, duracao_s=10)
+    assert e.resultado == "confirmada" and bancada.vida() == 600
+    original = memoria.escrever
+
+    def cai(*a, **k):
+        raise CanalError("canal_caido", "simulado")
+
+    monkeypatch.setattr(memoria, "escrever", cai)
+    bancada.agora[0] += 11
+    assert bancada.executor.encerrar_vencidos() == [] and len(bancada.executor.pendentes) == 1
+    assert bancada.executor.pendentes[0].tentativas == 1 and bancada.encerramentos("vida_do_jogador") == []
+    monkeypatch.setattr(memoria, "escrever", original)
+    assert bancada.executor.encerrar_vencidos() == [e.intervencao_id] and bancada.vida() == 1200
+    # no fim da sessão a última tentativa registra a falha em vez de ficar pendente
+    e2 = bancada.executar("vida_do_jogador", fracao=0.5, duracao_s=10)
+    assert e2.resultado == "confirmada"
+    monkeypatch.setattr(memoria, "escrever", cai)
+    assert bancada.executor.encerrar_todas() == [e2.intervencao_id] and bancada.executor.pendentes == []
+    assert bancada.encerramentos("vida_do_jogador")[-1]["resultado"] == "falhou"
+
+
+def test_inimigo_trocado_na_vaga_nao_recebe_a_volta(bancada: Bancada) -> None:
+    mem = bancada.mem
+    struct.pack_into("<fff", mem, VETOR + 0xC0, 0.0, 0.0, 0.0)
+    base = VETOR + 4 * PASSO
+    struct.pack_into("<I", mem, base, 0x02002077)
+    mem[base + 0x11C] = 0x15
+    struct.pack_into("<fff", mem, base + 0xC0, 2000.0, 0.0, 0.0)
+    struct.pack_into("<hh", mem, base + 0x4B0, 800, 800)
+    e = bancada.executar("vida_do_inimigo_mais_proximo", fracao=0.5, duracao_s=10)
+    assert e.resultado == "confirmada" and struct.unpack_from("<h", mem, base + 0x4B0)[0] == 400
+    mem[base + 0x11C] = 0x23  # morreu e a vaga virou um corvo com vida própria
+    struct.pack_into("<hh", mem, base + 0x4B0, 10, 10)
+    bancada.agora[0] += 11
+    bancada.executor.encerrar_vencidos()
+    assert struct.unpack_from("<h", mem, base + 0x4B0)[0] == 10
+    fim = bancada.encerramentos("vida_do_inimigo_mais_proximo")[-1]
+    assert fim["resultado"] == "descartada" and "alvo" in json.loads(fim["parametros_json"])["motivo"]
+
+
+def test_recarga_da_arma_no_meio_nao_passa_do_teto(bancada: Bancada) -> None:
+    mem = bancada.mem
+    item = 0x010F654E
+    struct.pack_into("<I", mem, 0x003CE148 + 0xC, item)
+    struct.pack_into("<H", mem, item + 8, 10 << 3)
+    e = bancada.executar("municao_do_pente", fracao=0.3, duracao_s=10)
+    assert e.resultado == "confirmada" and struct.unpack_from("<H", mem, item + 8)[0] == 3 << 3
+    struct.pack_into("<H", mem, item + 8, 10 << 3)  # o jogador recarregou
+    bancada.agora[0] += 11
+    bancada.executor.encerrar_vencidos()
+    assert struct.unpack_from("<H", mem, item + 8)[0] == 10 << 3  # devolve até o valor de antes, não além
+    fim = bancada.encerramentos("municao_do_pente")[-1]
+    assert fim["resultado"] == "confirmada" and json.loads(fim["parametros_json"])["devolvido"] == 0
+    # arma trocada no meio: o ponteiro mudou, a volta não escreve na nova
+    struct.pack_into("<H", mem, item + 8, 10 << 3)
+    e2 = bancada.executar("municao_do_pente", fracao=0.3, duracao_s=10)
+    assert e2.resultado == "confirmada"
+    outro = 0x010F6560
+    struct.pack_into("<I", mem, 0x003CE148 + 0xC, outro)
+    struct.pack_into("<H", mem, outro + 8, 7 << 3)
+    bancada.agora[0] += 11
+    bancada.executor.encerrar_vencidos()
+    assert struct.unpack_from("<H", mem, outro + 8)[0] == 7 << 3
+    assert bancada.encerramentos("municao_do_pente")[-1]["resultado"] == "descartada"
+
+
+def test_carga_recusa_piso_baixo_na_vida_por_qualquer_id_e_acao_que_sobe(tmp_path: Path) -> None:
+    perfil = json.loads(PERFIL.read_text(encoding="utf-8"))
+    vida = next(a for a in perfil["acoes_de_mundo"] if a["id"] == "vida_do_jogador")
+    sangria = dict(vida, id="sangria", proibicoes=dict(vida["proibicoes"], piso=0))
+    sobe = dict(vida, id="cura", proibicoes=dict(vida["proibicoes"], nunca_sobe=False))
+    perfil["acoes_de_mundo"] = [sangria, sobe]
+    arquivo = tmp_path / "SLUS-21134.json"
+    arquivo.write_text(json.dumps(perfil), encoding="utf-8")
+    carga = mundo.carregar_perfil(arquivo, "SLUS-21134", "013e349d")
+    assert carga.acoes == ()
+    assert "RN-01" in carga.recusadas[0][1] and "sobe" in carga.recusadas[1][1]

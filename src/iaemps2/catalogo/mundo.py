@@ -123,8 +123,14 @@ def conferir(acao: AcaoDeMundo, capacidades: dict[str, str]) -> None:
         raise AcaoInvalidaError(f"{acao.id}: fixar_fracao_da_maxima exige onde ler a máxima")
     if acao.alvo.modo == "entidade" and not acao.alvo.regra:
         raise AcaoInvalidaError(f"{acao.id}: alvo por entidade exige a regra de escolha")
-    if acao.id == "vida_do_jogador" and acao.proibicoes.piso < PISO_DE_VIDA:
-        raise AcaoInvalidaError(f"{acao.id}: piso {acao.proibicoes.piso} abaixo de {PISO_DE_VIDA} (RN-01)")
+    if acao.capacidade == "vida" and acao.proibicoes.piso < PISO_DE_VIDA:
+        raise AcaoInvalidaError(
+            f"{acao.id}: ação sobre a vida do jogador com piso {acao.proibicoes.piso}, abaixo de {PISO_DE_VIDA} (RN-01)"
+        )
+    if not acao.proibicoes.nunca_sobe:
+        raise AcaoInvalidaError(
+            f"{acao.id}: ação que sobe o valor não tem volta declarada (a volta só devolve o tirado)"
+        )
 
 
 def carregar_perfil(caminho: Path, serial: str, crc: str) -> Carga:

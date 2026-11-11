@@ -65,6 +65,17 @@ class AcaoDescartadaError(RuntimeError):
     """Proibição batida na hora (H07): a ação não escreve e fica registrada como descartada."""
 
 
+class EscritaNaoConfirmadaError(ComandoFalhouError):
+    """A releitura não bateu com o escrito: a escrita aconteceu, então a volta vai para o registro."""
+
+    def __init__(self, detalhe: str, volta: dict[str, float]) -> None:
+        super().__init__(detalhe)
+        self.volta = volta
+
+
+VOLTA_TENTATIVAS = 10  # ciclos em que a volta de uma ação de mundo é tentada de novo com o canal caído
+
+
 @dataclass
 class Pendente:
     intervencao_id: int
@@ -72,6 +83,7 @@ class Pendente:
     fim_ms: int
     decisao_id: int = 0
     volta: dict[str, float] | None = None  # ação de mundo: o que devolver no prazo
+    tentativas: int = 0
 
 
 def _mundo(catalogo: cat.Catalogo, nome: str) -> AcaoDeMundo | None:
@@ -165,12 +177,13 @@ class Executor:
             memoria.AlvoNaoResolvidoError,
         ) as erro:
             depois = self._estado_seguro(situacao)
-            banco.preencher_uma_vez(
-                self.con,
-                "intervencoes",
-                intervencao_id,
-                {"resultado": "falhou", "estado_depois_json": json.dumps(depois, ensure_ascii=False)},
-            )
+            falha: dict[str, object] = {
+                "resultado": "falhou",
+                "estado_depois_json": json.dumps(depois, ensure_ascii=False),
+            }
+            if isinstance(erro, EscritaNaoConfirmadaError):
+                falha["caminho_volta_json"] = json.dumps(erro.volta)
+            banco.preencher_uma_vez(self.con, "intervencoes", intervencao_id, falha)
             self.catalogo, _ = cat.registrar_falha(self.catalogo, veredito.alavanca)
             return Execucao(intervencao_id, veredito.alavanca, "falhou", str(erro))
         depois = self._estado_seguro(situacao)
@@ -251,20 +264,13 @@ class Executor:
             raise AcaoDescartadaError(f"{v.alavanca} já em vigor")
         alvo = memoria.resolver(self.cliente, acao.alvo)
         atual = memoria.ler(self.cliente, acao.alvo, alvo.endereco)
-        maxima = -1
-        if acao.operacao == "fixar_fracao_da_maxima":
-            assert acao.maxima is not None
-            maxima = memoria.ler(
-                self.cliente, acao.maxima, memoria.resolver(self.cliente, acao.maxima).endereco
-            )
-            base = maxima
-        else:
-            base = atual
+        maxima = self._ler_maxima(acao, alvo)
+        base = maxima if acao.operacao == "fixar_fracao_da_maxima" else atual
         piso = acao.proibicoes.piso
         if atual <= piso:
             raise AcaoDescartadaError(f"{v.alavanca}: valor atual {atual} já no piso {piso}")
         desejado = max(piso, int(base * v.parametros["fracao"]))
-        if acao.proibicoes.nunca_sobe and desejado >= atual:
+        if desejado >= atual:
             raise AcaoDescartadaError(f"{v.alavanca}: alvo {desejado} não está abaixo do atual {atual}")
         memoria.escrever(self.cliente, acao.alvo, alvo.endereco, desejado)
         relido = memoria.ler(self.cliente, acao.alvo, alvo.endereco)
@@ -274,23 +280,39 @@ class Executor:
             "valor_escrito": float(desejado),
             "tirado": float(atual - relido),
             "maxima": float(maxima),
+            **alvo.chaves(),
         }
         if relido != desejado:
-            # a escrita aconteceu: devolve agora o que tirou e conta como falha
+            # a escrita aconteceu: devolve agora o que tirou, guarda a volta e conta como falha
             self._devolver_valor(acao, volta)
-            raise ComandoFalhouError(f"{v.alavanca}: escrito {desejado}, relido {relido}; devolvido")
+            raise EscritaNaoConfirmadaError(
+                f"{v.alavanca}: escrito {desejado}, relido {relido}; devolvido", volta
+            )
         return self.contador.agora_ms() + int(v.parametros["duracao_s"] * 1000), volta
 
+    def _ler_maxima(self, acao: AcaoDeMundo, alvo: memoria.Resolvido) -> int:
+        """A máxima declarada, lida na hora; numa entidade, na mesma vaga do alvo. −1 quando não há."""
+        if acao.maxima is None:
+            return -1
+        if acao.maxima.modo == "entidade":
+            endereco = alvo.endereco - acao.alvo.deslocamento + acao.maxima.deslocamento
+        else:
+            endereco = memoria.resolver(self.cliente, acao.maxima).endereco
+        return memoria.ler(self.cliente, acao.maxima, endereco)
+
     def _devolver_valor(self, acao: AcaoDeMundo, volta: dict[str, float]) -> dict[str, float]:
-        """Devolve o que tirou, limitado à máxima; sem escrita quando o valor está em zero (morte)."""
-        endereco = int(volta["endereco"])
+        """Devolve o que tirou, sem passar do teto (a máxima lida na ida, ou o valor de antes) e sem baixar o
+        atual; sem escrita quando o valor está em zero (morte) ou quando o alvo já não é o mesmo."""
+        endereco = memoria.conferir_alvo(self.cliente, acao.alvo, volta)
+        if endereco is None:
+            return {"valor_no_fim": -1.0, "devolvido": 0.0, "valor_final": -1.0, "alvo_mudou": 1.0}
         atual = memoria.ler(self.cliente, acao.alvo, endereco)
         if atual <= 0:
             return {"valor_no_fim": float(atual), "devolvido": 0.0, "valor_final": float(atual)}
-        novo = atual + int(volta["tirado"])
-        if volta["maxima"] >= 0:
-            novo = min(novo, int(volta["maxima"]))
-        memoria.escrever(self.cliente, acao.alvo, endereco, novo)
+        teto = int(volta["maxima"]) if volta["maxima"] >= 0 else int(volta["valor_antes"])
+        novo = max(atual, min(atual + int(volta["tirado"]), teto))
+        if novo != atual:
+            memoria.escrever(self.cliente, acao.alvo, endereco, novo)
         relido = memoria.ler(self.cliente, acao.alvo, endereco)
         return {"valor_no_fim": float(atual), "devolvido": float(novo - atual), "valor_final": float(relido)}
 
@@ -388,7 +410,8 @@ class Executor:
             if agora < pendente.fim_ms:
                 continue
             self._encerrar(pendente)
-            encerradas.append(pendente.intervencao_id)
+            if pendente not in self.pendentes:  # a volta de uma ação de mundo pode ficar para o próximo ciclo
+                encerradas.append(pendente.intervencao_id)
         return encerradas
 
     @_sincronizado
@@ -396,12 +419,12 @@ class Executor:
         """D05 e E04: tudo que tem duração volta ao normal agora."""
         encerradas = [pendente.intervencao_id for pendente in self.pendentes]
         for pendente in list(self.pendentes):
-            self._encerrar(pendente)
+            self._encerrar(pendente, ultima_tentativa=True)
         return encerradas
 
-    def _encerrar(self, pendente: Pendente) -> None:
+    def _encerrar(self, pendente: Pendente, ultima_tentativa: bool = False) -> None:
         if pendente.volta is not None:
-            self._encerrar_mundo(pendente)
+            self._encerrar_mundo(pendente, ultima_tentativa)
             return
         try:
             if pendente.alavanca == "pausa":
@@ -415,18 +438,32 @@ class Executor:
         )
         self.pendentes.remove(pendente)
 
-    def _encerrar_mundo(self, pendente: Pendente) -> None:
-        """No prazo: devolve o que tirou e registra o fim como intervenção de encerramento."""
+    def _encerrar_mundo(self, pendente: Pendente, ultima_tentativa: bool = False) -> None:
+        """No prazo: devolve o que tirou e registra o fim como intervenção de encerramento. Canal caído na hora
+        da volta não perde a volta: a pendente fica e o próximo ciclo tenta de novo, até o limite ou o fim da
+        sessão."""
         acao = _mundo(self.catalogo, pendente.alavanca)
         assert acao is not None and pendente.volta is not None
         try:
             feito = self._devolver_valor(acao, pendente.volta)
-            resultado = "confirmada" if feito["devolvido"] > 0 or feito["valor_no_fim"] > 0 else "descartada"
-            parametros: dict[str, object] = dict(feito)
-            if feito["valor_no_fim"] <= 0:
-                parametros["motivo"] = "valor em zero no fim: sem escrita"
-        except (CanalError, ComandoFalhouError) as erro:
-            resultado, parametros = "falhou", {"erro": str(erro)}
+        except (CanalError, ComandoFalhouError, memoria.AlvoNaoResolvidoError) as erro:
+            pendente.tentativas += 1
+            if not ultima_tentativa and pendente.tentativas < VOLTA_TENTATIVAS:
+                return  # tenta de novo no próximo ciclo
+            self._registrar_fim(pendente, "falhou", {"erro": str(erro), "tentativas": pendente.tentativas})
+            self.pendentes.remove(pendente)
+            return
+        parametros: dict[str, object] = dict(feito)
+        if feito.get("alvo_mudou"):
+            resultado = "descartada"
+            parametros["motivo"] = (
+                "o alvo já não é o mesmo (ponteiro, vetor, vaga ou tipo mudou): sem escrita"
+            )
+        elif feito["valor_no_fim"] <= 0:
+            resultado = "descartada"
+            parametros["motivo"] = "valor em zero no fim: sem escrita"
+        else:
+            resultado = "confirmada"
         self._registrar_fim(pendente, resultado, parametros)
         self.pendentes.remove(pendente)
 

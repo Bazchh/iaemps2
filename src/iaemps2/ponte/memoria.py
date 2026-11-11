@@ -33,6 +33,13 @@ class AlvoNaoResolvidoError(RuntimeError):
 class Resolvido:
     endereco: int
     detalhe: str  # como chegou lá (ponteiro lido, vaga escolhida)
+    base: int = 0  # ponteiro lido, ou vetor de personagens
+    vaga: int = -1  # vaga escolhida (entidade)
+    tipo: int = -1  # tipo da entidade na hora
+
+    def chaves(self) -> dict[str, float]:
+        """O que vai no caminho de volta para conferir o alvo no fim do prazo."""
+        return {"base": float(self.base), "vaga": float(self.vaga), "tipo": float(self.tipo)}
 
 
 def _ler_bruto(c: Cliente, codigo: p.Codigo, formato: str, endereco: int) -> int:
@@ -59,8 +66,27 @@ def resolver(c: Cliente, alvo: Alvo) -> Resolvido:
             raise AlvoNaoResolvidoError(
                 f"ponteiro em {alvo.endereco:#010x} aponta para {base:#x}, fora da memória"
             )
-        return Resolvido(base + alvo.deslocamento, f"ponteiro {alvo.endereco:#010x} -> {base:#010x}")
+        return Resolvido(base + alvo.deslocamento, f"ponteiro {alvo.endereco:#010x} -> {base:#010x}", base)
     return _resolver_entidade(c, alvo)
+
+
+def conferir_alvo(c: Cliente, alvo: Alvo, volta: dict[str, float]) -> int | None:
+    """O endereço gravado na ida ainda é o mesmo alvo? Ponteiro trocado, vetor recriado, vaga morta ou de
+    outro tipo: None, e a volta não escreve (escreveria em outro personagem ou em memória alheia)."""
+    endereco = int(volta["endereco"])
+    if alvo.modo == "fixo":
+        return endereco
+    if alvo.modo == "ponteiro":
+        return endereco if _u32(c, alvo.endereco) == int(volta["base"]) else None
+    vetor = _u32(c, alvo.endereco)
+    if vetor != int(volta["base"]):
+        return None
+    base = endereco - alvo.deslocamento
+    if _u32(c, base) & 0x201 != 1:
+        return None
+    if _ler_bruto(c, p.Codigo.READ8, "<B", base + TIPO) != int(volta["tipo"]):
+        return None
+    return endereco
 
 
 def _resolver_entidade(c: Cliente, alvo: Alvo) -> Resolvido:
@@ -87,7 +113,14 @@ def _resolver_entidade(c: Cliente, alvo: Alvo) -> Resolvido:
     if melhor is None:
         raise AlvoNaoResolvidoError("nenhum inimigo vivo no vetor de personagens")
     distancia, vaga = melhor
-    return Resolvido(vetor + vaga * passo + alvo.deslocamento, f"vaga {vaga} a {distancia:.0f} mm do jogador")
+    tipo = _ler_bruto(c, p.Codigo.READ8, "<B", vetor + vaga * passo + TIPO)
+    return Resolvido(
+        vetor + vaga * passo + alvo.deslocamento,
+        f"vaga {vaga} a {distancia:.0f} mm do jogador",
+        vetor,
+        vaga,
+        tipo,
+    )
 
 
 def ler(c: Cliente, alvo: Alvo, endereco: int) -> int:

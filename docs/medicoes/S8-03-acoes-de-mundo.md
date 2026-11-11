@@ -38,9 +38,24 @@ cliente e nunca entram em ensaio). Decisão `vida_do_jogador` com fração 0,5 e
 | 2 s, 4 s, 7 s, 9 s | 4500 | nada vencido |
 | 11 s | 9000 | intervenção 2, origem encerramento, devolvido 4500; `fim_ms` da 1 preenchido |
 
+## Segunda rodada (mesmo dia): a volta não se perde, não erra o alvo e não passa do teto
+
+- Canal caído na hora da volta: a pendente fica e o próximo ciclo tenta de novo, até 10 vezes; no fim da sessão a
+  última tentativa registra a falha em vez de deixar a vida rebaixada em silêncio.
+- O caminho de volta guarda o ponteiro lido (munição), ou o vetor, a vaga e o tipo (inimigo). No fim, ponteiro
+  trocado, vetor recriado, vaga morta ou de outro tipo: a volta não escreve e fica registrada como descartada
+  (escreveria em outro personagem ou em memória alheia).
+- Teto da volta: a máxima lida na ida (vida do jogador, vida do inimigo em +0x4B2) ou o valor de antes (munição).
+  O jogador recarregou a arma no meio do prazo: 3 virou 10, e o fim não passa de 10. A volta nunca baixa o atual.
+- Regra "não derrota" presa à capacidade `vida`, não ao nome da ação: qualquer ação sobre a vida do jogador com
+  piso abaixo de 300 é recusada; ação que sobe o valor é recusada porque a volta só devolve o tirado.
+- A releitura diferente do escrito agora grava a volta no registro antes de contar a falha.
+
 ## Testes (simulador)
 
-`tests/test_s8_03_acoes.py`, 12 testes: o critério de aceite (cai, relido igual, volta sozinho no prazo, registro
+`tests/test_s8_03_acoes.py`, 16 testes, mais um de sessão inteira em `tests/test_s3_06_esqueleto.py` (perfil
+carregado na abertura, serviço decide em combate, a vida cai, o ciclo devolve no prazo, resumo e registro
+batem): o critério de aceite (cai, relido igual, volta sozinho no prazo, registro
 com antes, depois, motivo e volta), piso e "nunca sobe", dano no meio do prazo (devolve o tirado), morte no meio
 (sem escrita), reversão do jogador, salvamento bloqueado e recarga que descarta, releitura diferente (falha com
 volta), fora de jogo na hora, perfil de outro jogo, ação recusada ao carregar, munição por ponteiro e escolha
