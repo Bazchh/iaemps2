@@ -116,7 +116,7 @@
     </div>
   </div>
 
-  <p style="font-size:8.8pt;color:var(--muted);margin-top:12px;border-top:1px solid var(--line);padding-top:8px">Versão 1.1 · outubro de 2026 · emulador PCSX2, versão própria a partir da etiqueta corrente · Resident Evil 4 (SLUS-21134, versão 1.01) · acompanha o Mapa do Projeto (revisão 7) e os Casos de Uso (entrega 7). A 1.1 acrescentou a camada de cena (fase 4) ao capítulo 6 e a etapa S7 ao roadmap; a 1.2 acrescenta o perfil de memória e a descoberta de endereços ao capítulo 6 e a etapa S8 (fase 2 adiantada, DC-22); o resto é a 1.0 aprovada</p>
+  <p style="font-size:8.8pt;color:var(--muted);margin-top:12px;border-top:1px solid var(--line);padding-top:8px">Versão 1.1 · outubro de 2026 · emulador PCSX2, versão própria a partir da etiqueta corrente · Resident Evil 4 (SLUS-21134, versão 1.01) · acompanha o Mapa do Projeto (revisão 7) e os Casos de Uso (entrega 7). A 1.1 acrescentou a camada de cena (fase 4) ao capítulo 6 e a etapa S7 ao roadmap; a 1.2 acrescenta o perfil de memória e a descoberta de endereços ao capítulo 6 e a etapa S8 (fase 2 adiantada, DC-22); a 1.3, de 29 de outubro, registra o que S8-01 e S8-02 viraram na prática (vigia de memória e engenharia reversa do código; chamada remota, personagens e módulos carregados pelo mestre) e acrescenta a etapa S9, o mapa completo do jogo de abertura, que passa na frente das ações de mundo (DC-23); o resto é a 1.0 aprovada</p>
 </section>
 
 <!-- ============ CAP 1 ESCOPO ============ -->
@@ -811,7 +811,7 @@
 
   <div class="seq" style="margin-top:12px">
     <div class="lbl">Quem depende de quem</div>
-    <svg viewBox="0 0 900 250" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Consolas, monospace" font-size="7.5">
+    <svg viewBox="0 0 1000 250" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Consolas, monospace" font-size="7.5">
       <g font-weight="700" font-size="8">
         <rect x="6" y="6" width="90" height="16" rx="3" fill="#5b6577"/><text x="51" y="17" text-anchor="middle" fill="#fff">S0</text>
         <rect x="106" y="6" width="90" height="16" rx="3" fill="#1f4fd1"/><text x="151" y="17" text-anchor="middle" fill="#fff">S1</text>
@@ -822,6 +822,7 @@
         <rect x="606" y="6" width="88" height="16" rx="3" fill="#1f9d55"/><text x="650" y="17" text-anchor="middle" fill="#fff">S6</text>
         <rect x="706" y="6" width="88" height="16" rx="3" fill="#8a3fc9"/><text x="750" y="17" text-anchor="middle" fill="#fff">S7 cena</text>
         <rect x="806" y="6" width="88" height="16" rx="3" fill="#e08a1e"/><text x="850" y="17" text-anchor="middle" fill="#fff">S8 memória</text>
+        <rect x="906" y="6" width="88" height="16" rx="3" fill="#b3261e"/><text x="950" y="17" text-anchor="middle" fill="#fff">S9 mapa</text>
       </g>
       <g fill="#fff" stroke="#9aa4b5" stroke-width="0.8">
         <rect x="6" y="32" width="90" height="18" rx="3"/><rect x="6" y="62" width="90" height="18" rx="3"/><rect x="6" y="92" width="90" height="18" rx="3"/><rect x="6" y="122" width="90" height="18" rx="3"/>
@@ -832,7 +833,8 @@
         <rect x="506" y="32" width="90" height="18" rx="3"/><rect x="506" y="62" width="90" height="18" rx="3"/><rect x="506" y="92" width="90" height="18" rx="3"/><rect x="506" y="122" width="90" height="18" rx="3"/>
         <rect x="606" y="32" width="88" height="18" rx="3"/><rect x="606" y="62" width="88" height="18" rx="3" stroke="#1f9d55" stroke-width="1.6"/>
         <rect x="706" y="32" width="88" height="18" rx="3" stroke="#8a3fc9" stroke-width="1.6"/><rect x="706" y="62" width="88" height="18" rx="3"/><rect x="706" y="92" width="88" height="18" rx="3"/><rect x="706" y="122" width="88" height="18" rx="3" stroke-dasharray="3 2"/>
-        <rect x="806" y="32" width="88" height="18" rx="3" stroke="#e08a1e" stroke-width="1.6"/><rect x="806" y="62" width="88" height="18" rx="3"/><rect x="806" y="92" width="88" height="18" rx="3"/><rect x="806" y="122" width="88" height="18" rx="3"/><rect x="806" y="152" width="88" height="18" rx="3"/>
+        <rect x="806" y="32" width="88" height="18" rx="3" stroke="#e08a1e" stroke-width="1.6"/><rect x="806" y="62" width="88" height="18" rx="3"/><rect x="806" y="92" width="88" height="18" rx="3"/><rect x="806" y="122" width="88" height="18" rx="3" stroke-dasharray="3 2"/><rect x="806" y="152" width="88" height="18" rx="3"/>
+        <rect x="906" y="32" width="88" height="18" rx="3" stroke="#b3261e" stroke-width="1.6"/><rect x="906" y="62" width="88" height="18" rx="3"/><rect x="906" y="92" width="88" height="18" rx="3"/><rect x="906" y="122" width="88" height="18" rx="3"/>
       </g>
       <g fill="#0f1b33" text-anchor="middle">
         <text x="51" y="44">S0-01 repo</text><text x="51" y="74">S0-02 sessão viva</text><text x="51" y="104">S0-03 simulador</text><text x="51" y="134">S0-04 CI e log</text>
@@ -843,7 +845,8 @@
         <text x="551" y="44">S5-01 falhas</text><text x="551" y="74">S5-02 retomar</text><text x="551" y="104">S5-03 custo</text><text x="551" y="134">S5-04 exportar</text>
         <text x="650" y="44">S6-01 bancada</text><text x="650" y="74" font-weight="700">S6-02 aceite</text>
         <text x="750" y="44" font-weight="700">S7-00 prova</text><text x="750" y="74">S7-01 assinaturas</text><text x="750" y="104">S7-02 nível 1</text><text x="750" y="134">S7-03 nível 2</text>
-        <text x="850" y="44" font-weight="700">S8-00 câmera+entid.</text><text x="850" y="74">S8-01 perfil v1 e A08</text><text x="850" y="104">S8-02 validação</text><text x="850" y="134">S8-03 ações de mundo</text><text x="850" y="164">S8-04 ferramenta</text>
+        <text x="850" y="44" font-weight="700">S8-00 câmera+entid.</text><text x="850" y="74">S8-01 vigia e reversa</text><text x="850" y="104">S8-02 chamada+módulos</text><text x="850" y="134">S8-03 ações de mundo</text><text x="850" y="164">S8-04 ferramenta</text>
+        <text x="950" y="44" font-weight="700">S9-01 decompilação</text><text x="950" y="74">S9-02 estruturas</text><text x="950" y="104">S9-03 capacidades</text><text x="950" y="134">S9-04 roteiro por jogo</text>
       </g>
       <g stroke="#9aa4b5" stroke-width="1.1" fill="none" marker-end="url(#a)">
         <defs><marker id="a" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#9aa4b5"/></marker></defs>
@@ -851,8 +854,9 @@
         <path d="M351,200 V214 H451 V146"/><path d="M451,214 H551 V146"/><path d="M551,214 H650 V86"/>
         <path d="M496,131 H506 V131" stroke-dasharray="3 2"/><path d="M596,131 H606 V76" stroke-dasharray="3 2"/>
         <path d="M451,146 V228 H750 V146" stroke-dasharray="3 2"/><path d="M750,146 V228 H850 V176" stroke-dasharray="3 2"/><path d="M806,41 H798 V131" stroke-dasharray="3 2"/>
+        <path d="M894,101 H906 V41" /><path d="M950,146 V236 H870 V146" stroke-dasharray="3 2"/>
       </g>
-      <text x="450" y="236" text-anchor="middle" fill="#5b6577" font-family="Segoe UI, Arial" font-size="8">S0 a S3 são sequenciais; S4, S5 e S6 partem do esqueleto. S7 parte da versão própria. S8 (fase 2, adiantada pela DC-22) parte de S7-01: S8-00 entrega a câmera e as entidades que S7-03 espera; S5-02 a S5-04 e S6-02 ficam para depois de S8.</text>
+      <text x="500" y="244" text-anchor="middle" fill="#5b6577" font-family="Segoe UI, Arial" font-size="8">S0 a S3 são sequenciais; S4, S5 e S6 partem do esqueleto. S7 parte da versão própria. S8 (fase 2, DC-22) parte de S7-01. S9 (mapa completo, DC-23) parte de S8-02 e passa na frente de S8-03: as ações de mundo saem do catálogo de capacidades do S9-03.</text>
     </svg>
   </div>
   <div class="note"><b>Como usar estes cards.</b> Cada card vira um item no quadro, com o identificador no título. O critério de aceite é copiado como está: é a definição de terminado e deve ser executado por outra pessoa, não pelo autor; no caso deste projeto, pelo cliente, que também é o jogador. Trabalho novo entra como card novo, com código próprio.</div>
@@ -1099,20 +1103,20 @@
     </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> o roteiro de movimentos feito pelo cliente, <b>quando</b> a comparação roda, <b>então</b> existe um par câmera e lista de entidades cuja projeção cai na caixa do inimigo que se move em pelo menos 90% dos quadros amostrados, com o passo entre entidades e os campos de posição anotados; ou o registro diz quais candidatos sobraram e por que não bastou.</div></div>
 
     <div class="cardi"><div>
-      <div class="t"><span class="id">S8-01</span><b>Perfil de memória v1 e leitura e escrita pelo canal</b><span class="pill uc">UC-H01 UC-H02 UC-A08</span></div>
-      <p class="why">O esquema do perfil, o primeiro perfil do jogo de abertura e o acesso por nome, com faixa e releitura.</p>
-      <ul><li>Esquema v1 com validação por tipo: variáveis, compostas (câmera, entidades), cadeias de ponteiros, intocável, ações de mundo.</li><li>Perfil do jogo de abertura com o que já está provado: vida do jogador e da parceira (fonte pública conferida), câmera e entidades (S8-00).</li><li>Leitura e escrita por nome pelo canal: faixa conferida, releitura, registro com antes e depois; nome fora do perfil é recusado.</li><li>Importação de lista de códigos em formato bruto, extraindo só endereço, tamanho e descrição, com referência da fonte.</li></ul>
-    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> o perfil do jogo de abertura, <b>quando</b> a plataforma escreve a vida do jogador dentro da faixa e relê, <b>então</b> o valor confere, o registro tem antes e depois, e uma escrita fora da faixa ou num nome desconhecido é recusada antes de qualquer comando.</div></div>
+      <div class="t"><span class="id">S8-01</span><b>Vigia de memória e engenharia reversa do código</b><span class="pill uc">UC-H01 UC-H02 UC-A08</span><span class="pill" style="background:#e6f4ea;color:#1f6b3a">feito em 28/10</span></div>
+      <p class="why">O que o card previa (perfil v1 e acesso por nome) ficou menor que o que a medição exigiu: a vida do inimigo e a munição não apareciam por diferença de fotos, e o cliente decidiu destrinchar o código do jogo.</p>
+      <ul><li>Vigia de memória na versão própria do emulador (códigos 0x89 a 0x8B): por instrução do jogo, cada acesso a uma faixa, sem pausar; achou a função de dano, a vida do inimigo (+0x4B0 da entidade) e a dificuldade adaptativa.</li><li>Executável com os próprios símbolos (3448 nomes, 1275 endereços); projeto do Ghidra sem interface, completado com a foto da memória; roteiro versionado em <code>reversa/</code>.</li><li>Munição fechada pelo gerenciador de itens; maleta lida como tabuleiro de peças; item dado pelo canal (lança-foguetes) na abertura seguinte.</li><li>Perfil v1 do jogo de abertura com variáveis, câmera, entidades, inventário e funções; medições em <code>docs/medicoes/S8-01-vigia.md</code>.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite (como ficou)</div><b>Dado</b> o jogo de abertura na versão própria, <b>quando</b> o cliente atira e abre a maleta, <b>então</b> o vigia aponta a instrução que escreve a vida do inimigo e o item gravado pelo canal aparece na maleta. Cumprido em 28/10, com o cliente no controle.</div></div>
 
     <div class="cardi"><div>
-      <div class="t"><span class="id">S8-02</span><b>Validação automática do perfil, com projeção</b><span class="pill uc">UC-H04</span></div>
-      <p class="why">Nenhum perfil age no lugar errado: toda abertura de sessão com perfil passa por leitura, faixa e, para câmera e entidades, pela projeção na tela.</p>
-      <ul><li>Validação por serial, soma e versão; leitura de cada variável com faixa; variável suspeita bloqueia as ações que dependem dela.</li><li>Projeção das entidades pela câmera contra as caixas da camada de cena por alguns quadros, com limite configurado.</li><li>Resultado gravado no perfil com data; o simulador do canal ganha uma memória de mentira com câmera e entidades para o teste.</li></ul>
-    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> um perfil com a câmera deslocada de propósito, <b>quando</b> a sessão abre, <b>então</b> câmera e entidades ficam suspeitas, as ações de mundo que dependem delas somem do catálogo e o painel avisa; com o perfil certo, tudo entra.</div></div>
+      <div class="t"><span class="id">S8-02</span><b>Chamada remota, personagens e módulos carregados pelo mestre</b><span class="pill uc">UC-H05 UC-I01</span><span class="pill" style="background:#e6f4ea;color:#1f6b3a">feito em 29/10</span></div>
+      <p class="why">"Spawna um mob": criar personagem é uma função do jogo, não um endereço. A versão própria passou a executar funções do jogo; o limite de quatro módulos de personagem carregados foi contornado pelo mestre carregando módulos da ISO por conta própria.</p>
+      <ul><li>Chamada remota (código 0x8C): registradores salvos, argumentos, pilha própria, trampolim, restauração; imediata no vsync ou ancorada num acesso de memória para rodar na thread do jogo. Regra: função que dorme pelo escalonador do jogo trava a thread.</li><li>Provado ao vivo: Ganados, corvos e outros tipos criados onde pedido; itens pela lógica "cabe na maleta"; dinheiro; vida; teleporte; cenário escondido pela camada de cena.</li><li>Módulos: leitor do AFS da ISO, formato SNR2 lido no ligador do jogo, carga pela memória com alocação pelo próprio jogo; identidade dos tipos lida nas tabelas de seções (Ashley, Luis, lanchas, Ada jogável e de cena, Hunk, Krauser, Wesker).</li><li>Fica em aberto a Ada de cena (trava na colisão segundos depois) e o Leon de cena (ligação não termina); medições em <code>docs/medicoes/S8-02-chamada-remota.md</code>.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite (como ficou)</div><b>Dado</b> o jogo de abertura na versão própria, <b>quando</b> o mestre pede um aldeão a dois metros do jogador, <b>então</b> ele aparece e anda na direção do jogador em menos de um segundo, e o jogo segue; com um tipo ausente, o módulo é carregado da ISO e o personagem aparece sem tela de loading. Cumprido em 29/10, com o cliente no controle.</div></div>
 
     <div class="cardi"><div>
-      <div class="t"><span class="id">S8-03</span><b>Ações de mundo no catálogo</b><span class="pill uc">UC-H05 UC-H07</span></div>
-      <p class="why">O mestre passa a mudar o mundo: vida, munição, e o que o perfil permitir, com volta e proibições.</p>
+      <div class="t"><span class="id">S8-03</span><b>Ações de mundo no catálogo</b><span class="pill uc">UC-H05 UC-H07</span><span class="pill" style="background:#fdecea;color:#8a1c12">depende de S9-03</span></div>
+      <p class="why">O mestre passa a mudar o mundo: vida, munição, personagens e itens, com volta e proibições. Entra depois do catálogo de capacidades do S9-03, para que cada ação venha do mapa, não de tentativa e erro.</p>
       <ul><li>Declaração de ações no perfil: operação, faixa por intensidade, duração, volta, proibições; a plataforma recusa ação sem volta ou que possa derrotar sozinha.</li><li>Execução pelo executor: ler antes, escrever, reler, registrar, desfazer no prazo pelo relógio de fim; reversão pelo jogador.</li><li>Primeiras ações do jogo de abertura: tirar e devolver vida dentro de faixa segura, tirar munição; ações sobre entidade (vida de um inimigo) quando a lista estiver validada.</li></ul>
     </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> uma situação de combate, <b>quando</b> o mestre decide baixar a vida do jogador até o mínimo da faixa por 20 s, <b>então</b> o valor cai, é relido igual, volta sozinho no prazo, nunca abaixo do mínimo, e o registro tem antes, depois, motivo e volta.</div></div>
 
@@ -1121,6 +1125,34 @@
       <p class="why">O que o S8-00 fez à mão vira ferramenta repetível para qualquer jogo.</p>
       <ul><li>Roteiro guiado: o que fazer no jogo entre fotos, com pausa e foto pelo canal a cada parada.</li><li>Candidatos mostrados foto a foto, com busca por valor, agrupamento, cadeia de ponteiros e projeção; o mapeador confirma, nomeia e grava.</li><li>Publicar e importar perfil com validação local obrigatória.</li></ul>
     </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> um segundo jogo do cliente, <b>quando</b> o mapeador segue o roteiro, <b>então</b> sai um perfil com pelo menos a câmera e a posição do jogador validados por projeção, sem ninguém editar endereço à mão.</div></div>
+  </div>
+
+  <h3 style="margin-top:18px">Etapa S9 · mapa completo do jogo de abertura <span class="pill" style="background:#fdecea;color:#8a1c12">DC-23 · entra antes de S8-03</span></h3>
+  <p class="lead">Decisão do cliente em 29 de outubro: mapear o jogo inteiro de forma sistemática, não sob demanda. A reversa sob demanda custou um ciclo por pergunta e deixou buracos que travaram o jogo (a ligação de módulos não tinha sido lida antes de usá-la). O mapa é pago uma vez e consultado; as ações de mundo saem dele.</p>
+  <div class="cards">
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S9-01</span><b>Decompilação total do executável e dos módulos da ISO</b><span class="pill uc">UC-H03</span></div>
+      <p class="why">Tudo em C legível, com os nomes do próprio jogo, antes de qualquer pergunta nova.</p>
+      <ul><li>Todas as funções do executável e dos módulos carregados já decompiladas (10.673, sem falhas, fora do repositório).</li><li>Realocador próprio do formato SNR2 em Python, a partir do ligador do jogo lido no S8-02: cada módulo da ISO (todos os inimigos e personagens) realocado para um endereço virtual e decompilado com símbolos, sem precisar do jogo rodando.</li><li>Índice versionado no repositório: endereço, nome, subsistema, tamanho, chamadores, nota; agrupamento por classe e por módulo.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> a ISO e o executável, <b>quando</b> o roteiro roda do zero, <b>então</b> existe um arquivo C por função do executável e de cada módulo da ISO, e o índice lista todas com subsistema; uma função pedida por nome é achada no índice sem abrir o Ghidra.</div></div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S9-02</span><b>Estruturas e tabelas do jogo</b><span class="pill uc">UC-H01 UC-I01</span></div>
+      <p class="why">O que cada deslocamento significa, numa fonte só.</p>
+      <ul><li>Bloco global do jogador, personagem (cEm), item e maleta, tarefas e threads, módulos e ligador, listas de sala (.esl), arquivos do AFS, tabelas de armas e de peças, sistema de cenas (evm, SceAt*).</li><li>Cada estrutura com deslocamentos, tipos, quem escreve e quem lê, e a prova (vigia, decompilado ou foto).</li><li>Entra no perfil de memória do jogo e num documento de estruturas no repositório.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> uma estrutura do documento, <b>quando</b> um campo é lido pelo canal no jogo rodando, <b>então</b> o valor tem o significado descrito; três campos sorteados por estrutura conferidos ao vivo pelo cliente.</div></div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S9-03</span><b>Catálogo de capacidades do jogo</b><span class="pill uc">UC-H05 UC-H07</span></div>
+      <p class="why">O que o mestre pode chamar com segurança, com pré-condições e o que trava. É a matéria-prima do S8-03.</p>
+      <ul><li>Lista das funções chamáveis pela chamada remota: criar personagem, dar item, dinheiro, vida, teleporte, cena, destruir, e as que não podem (dormem pelo escalonador).</li><li>Para cada uma: argumentos, pré-condições (módulo residente, tipo que obedece posição), efeito visível, como desfazer, risco.</li><li>Testes contra o simulador para a forma das chamadas e prova real por capacidade, com o cliente no controle.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> o catálogo, <b>quando</b> o cliente escolhe três capacidades ao acaso, <b>então</b> cada uma funciona ao vivo como descrita e o jogo segue; o que está marcado como "trava" não entra no catálogo de ações.</div></div>
+
+    <div class="cardi"><div>
+      <div class="t"><span class="id">S9-04</span><b>Roteiro reutilizável por jogo</b><span class="pill uc">UC-H06</span></div>
+      <p class="why">O próximo jogo começa pelo que já funcionou, na ordem em que funcionou.</p>
+      <ul><li>Sequência: identificar o jogo, extrair o executável, achar símbolos, foto da memória, projeto do Ghidra, canal, vigia, chamada remota, módulos; o que é universal e o que é do jogo de abertura.</li><li>Cada passo com a ferramenta da bancada que o executa e o que registrar no perfil.</li><li>Primeira execução de ponta a ponta no segundo jogo do cliente.</li></ul>
+    </div><div class="ac"><div class="lbl">Critério de aceite</div><b>Dado</b> um segundo jogo, <b>quando</b> o roteiro é seguido do zero, <b>então</b> em cada passo se sabe o que fazer e o que esperar, e o que não se aplica está dito; o resultado é um perfil inicial e um mapa de funções do segundo jogo.</div></div>
   </div>
 </section>
 
