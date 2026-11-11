@@ -5,6 +5,7 @@ Uso: python gerar_estruturas.py [perfis/memoria/SLUS-21134.json] [docs/Estrutura
 A fonte única é o bloco "estruturas" do perfil; a tabela de cobertura e todos os números são calculados
 daqui, nada é digitado à mão. O teste tests/test_estruturas.py falha quando o documento está desatualizado.
 """
+
 import json
 import sys
 from pathlib import Path
@@ -69,15 +70,23 @@ def gerar(perfil):
     w = linhas.append
     w(f"# Estruturas e tabelas do jogo de abertura ({jogo['titulo']}, {jogo['serial']} {jogo['versao']})")
     w("")
-    w(f"Documento gerado de `perfis/memoria/{jogo['serial']}.json` (bloco `estruturas`, versão {e['versao']}, {e['data']}) por")
-    w("`docs/fonte/gerar_estruturas.py`. Não editar à mão: mudar o perfil e gerar de novo. Entrega do card S9-02.")
+    w(
+        f"Documento gerado de `perfis/memoria/{jogo['serial']}.json` (bloco `estruturas`, versão {e['versao']}, {e['data']}) por"
+    )
+    w(
+        "`docs/fonte/gerar_estruturas.py`. Não editar à mão: mudar o perfil e gerar de novo. Entrega do card S9-02."
+    )
     w("")
     w(e["nota"])
     w("")
     w("## Cobertura")
     w("")
-    w("Uma linha por estrutura: campos descritos, campos com prova no PS2 (não só nome do GameCube), campos com quem")
-    w("escreve e quem lê determinados por prova (células marcadas '(gc)' ou '(inferido)' não contam), o resultado da")
+    w(
+        "Uma linha por estrutura: campos descritos, campos com prova no PS2 (não só nome do GameCube), campos com quem"
+    )
+    w(
+        "escreve e quem lê determinados por prova (células marcadas '(gc)' ou '(inferido)' não contam), o resultado da"
+    )
     w("conferência ao vivo automática e o estado. As estruturas sem campo são as que ninguém leu ainda.")
     w("")
     com_cf = [s for s in e["lista"] if s.get("conferencia")]
@@ -89,13 +98,28 @@ def gerar(perfil):
         datas = sorted({s["conferencia"]["data"] for s in com_cf})
         estados = sorted({est for s in com_cf for est in s["conferencia"]["estados"]})
         pend = sum(1 for s in com_cf if s["conferencia"]["aceite_cliente"] == "pendente")
-        w(f"Conferência ao vivo automática ({', '.join(datas)}; estados {', '.join(map(str, estados))}; uma execução por estado):")
-        w(f"{tot_cf['bate']} campos batem com uma relação independente do perfil, {tot_cf['lido']} foram lidos sem relação")
-        w(f"independente, {tot_cf['diverge']} divergem e {tot_cf['não conferível']} não eram conferíveis nesses estados.")
-        w("'Bate' significa que o valor lido satisfez uma relação que não vem do próprio perfil (outro campo, outra estrutura,")
-        w("a ISO, aritmética); 'lido' é só o valor, sem relação disponível. Os resultados valem para esses estados e essa")
-        w(f"sala, não para o jogo inteiro. O critério de aceite do card (três campos por estrutura conferidos ao vivo pelo")
-        w(f"cliente) continua pendente em {pend} de {len(com_cf)} estruturas: os três campos sorteados por estrutura estão")
+        w(
+            f"Conferência ao vivo automática ({', '.join(datas)}; estados {', '.join(map(str, estados))}; uma execução por estado):"
+        )
+        w(f"{tot_cf['bate']} campos batem com a relação anotada, {tot_cf['lido']} foram lidos sem relação")
+        w(
+            f"independente, {tot_cf['diverge']} divergem e {tot_cf['não conferível']} não eram conferíveis nesses estados."
+        )
+        w(
+            "'Bate' significa que o valor lido satisfez a relação escrita ao lado dele, que pode ser um cruzamento com outra"
+        )
+        w(
+            "estrutura ou com a ISO, uma faixa, ou a constante que o perfil já afirmava; 'lido' é só o valor, sem relação"
+        )
+        w(
+            "disponível. A força de cada 'bate' é a da relação escrita. Os resultados valem para esses estados e essa"
+        )
+        w(
+            f"sala, não para o jogo inteiro. O critério de aceite do card (três campos por estrutura conferidos ao vivo pelo"
+        )
+        w(
+            f"cliente) continua pendente em {pend} de {len(com_cf)} estruturas: os três campos sorteados por estrutura estão"
+        )
         w("listados na seção de cada uma, com o valor lido, para o cliente olhar.")
     else:
         w("Nenhuma conferência ao vivo registrada ainda.")
@@ -108,9 +132,13 @@ def gerar(perfil):
         tot[0] += n
         tot[1] += prova
         tot[2] += fluxo
-        w(f"| [{celula(s['nome'])}](#{s['id'].lower()}) | {celula(s['raiz'])} | {n} | {prova} | {fluxo} | {celula_conferencia(s)} | {STATUS[s['status']]} |")
-    w(f"| **total** | | **{tot[0]}** | **{tot[1]}** | **{tot[2]}** | | {sum(1 for s in e['lista'] if s['status'] == 'lida')} lidas, "
-      f"{sum(1 for s in e['lista'] if s['status'] == 'parcial')} parciais, {sum(1 for s in e['lista'] if s['status'] == 'nao_lida')} não lidas |")
+        w(
+            f"| [{celula(s['nome'])}](#{s['id'].lower()}) | {celula(s['raiz'])} | {n} | {prova} | {fluxo} | {celula_conferencia(s)} | {STATUS[s['status']]} |"
+        )
+    w(
+        f"| **total** | | **{tot[0]}** | **{tot[1]}** | **{tot[2]}** | | {sum(1 for s in e['lista'] if s['status'] == 'lida')} lidas, "
+        f"{sum(1 for s in e['lista'] if s['status'] == 'parcial')} parciais, {sum(1 for s in e['lista'] if s['status'] == 'nao_lida')} não lidas |"
+    )
     w("")
     w("Legenda das provas: " + "; ".join(f"**{k}** = {v}" for k, v in e["provas"].items()) + ".")
     w("")
@@ -129,7 +157,9 @@ def gerar(perfil):
             w("| deslocamento | tipo | campo | significado | quem escreve | quem lê | prova |")
             w("|---|---|---|---|---|---|---|")
             for c in s["campos"]:
-                w(f"| `{celula(c['d'])}` | {celula(c['t'])} | {celula(c['n'])} | {celula(c['s'])} | {celula(c['e'])} | {celula(c['l'])} | {celula(c['p'])} |")
+                w(
+                    f"| `{celula(c['d'])}` | {celula(c['t'])} | {celula(c['n'])} | {celula(c['s'])} | {celula(c['e'])} | {celula(c['l'])} | {celula(c['p'])} |"
+                )
             w("")
         if s["funcoes"]:
             w("Funções:")
@@ -145,20 +175,26 @@ def gerar(perfil):
             w("")
         cf = s.get("conferencia")
         if cf:
-            w(f"Conferência ao vivo ({cf['data']}; estados {', '.join(map(str, cf['estados']))}; sala {cf['sala']}; "
-              f"semente {cf['semente']}; aceite do cliente: {cf['aceite_cliente']}):")
+            w(
+                f"Conferência ao vivo ({cf['data']}; estados {', '.join(map(str, cf['estados']))}; sala {cf['sala']}; "
+                f"semente {cf['semente']}; aceite do cliente: {cf['aceite_cliente']}):"
+            )
             w("")
             if not s["campos"]:
                 w("- sem campos no perfil: nada a conferir")
             for d in cf["sorteados"]:
                 r = cf["campos"].get(d)
                 if r:
-                    w(f"- sorteado `{celula(d)}` (estado {r['estado']}): **{r['resultado']}** — lido {celula(r['lido'])}; relação: {celula(r['relacao'])}")
+                    w(
+                        f"- sorteado `{celula(d)}` (estado {r['estado']}): **{r['resultado']}** — lido {celula(r['lido'])}; relação: {celula(r['relacao'])}"
+                    )
                 else:
                     w(f"- sorteado `{celula(d)}`: sem leitura")
             for d, r in cf["campos"].items():
                 if r["resultado"] == "diverge" and d not in cf["sorteados"]:
-                    w(f"- divergência em `{celula(d)}` (estado {r['estado']}): lido {celula(r['lido'])}; relação: {celula(r['relacao'])}")
+                    w(
+                        f"- divergência em `{celula(d)}` (estado {r['estado']}): lido {celula(r['lido'])}; relação: {celula(r['relacao'])}"
+                    )
             for o in cf["observacoes"]:
                 w(f"- observação: {celula(o)}")
             w("")

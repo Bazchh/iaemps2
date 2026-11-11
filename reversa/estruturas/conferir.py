@@ -395,7 +395,13 @@ def conferir(m_: Leitor, cf: Conferencia, iso: Path) -> dict:
             BATE if abs(m_.f32(b + 0x4A4) - gr) < 1 else DIVERGE,
             f"EM_LIST[{no}]+0x1A × 1000 = {gr:.0f}",
         )
-        cf.anota("cEm", "0x4C0", str(no), BATE, f"EM_LIST[{no}] tem id {e[1]} = cEm+0x11C {m_.u8(b + 0x11C)}")
+        cf.anota(
+            "cEm",
+            "0x4C0",
+            str(no),
+            BATE if e[1] == m_.u8(b + 0x11C) else DIVERGE,
+            f"EM_LIST[{no}] tem id {e[1]} = cEm+0x11C {m_.u8(b + 0x11C)}",
+        )
         lpl = m_.f32(b + 0x498)
         d2 = (epos[0] - pos[0]) ** 2 + (epos[2] - pos[2]) ** 2
         cf.anota(

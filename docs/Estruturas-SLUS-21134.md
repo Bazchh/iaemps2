@@ -12,10 +12,11 @@ escreve e quem lê determinados por prova (células marcadas '(gc)' ou '(inferid
 conferência ao vivo automática e o estado. As estruturas sem campo são as que ninguém leu ainda.
 
 Conferência ao vivo automática (2026-11-11; estados 95, 96; uma execução por estado):
-126 campos batem com uma relação independente do perfil, 34 foram lidos sem relação
+126 campos batem com a relação anotada, 34 foram lidos sem relação
 independente, 2 divergem e 1 não eram conferíveis nesses estados.
-'Bate' significa que o valor lido satisfez uma relação que não vem do próprio perfil (outro campo, outra estrutura,
-a ISO, aritmética); 'lido' é só o valor, sem relação disponível. Os resultados valem para esses estados e essa
+'Bate' significa que o valor lido satisfez a relação escrita ao lado dele, que pode ser um cruzamento com outra
+estrutura ou com a ISO, uma faixa, ou a constante que o perfil já afirmava; 'lido' é só o valor, sem relação
+disponível. A força de cada 'bate' é a da relação escrita. Os resultados valem para esses estados e essa
 sala, não para o jogo inteiro. O critério de aceite do card (três campos por estrutura conferidos ao vivo pelo
 cliente) continua pendente em 21 de 21 estruturas: os três campos sorteados por estrutura estão
 listados na seção de cada uma, com o valor lido, para o cliente olhar.
@@ -70,7 +71,7 @@ Estado global da partida: sala, vida, dificuldade, personagem, lista de inimigos
 | `0x7EE8` | u8 | traje (pl_costume) | 0 a 5 | não lido | escolha da tabela de arquivos por tipo | publica |
 | `0x7EEA` | u8 | personagem (pl_type) | 0 Leon, 1 Ashley, 2 Ada, 3 HUNK, 4 Krauser, 5 Wesker (nomes do GameCube); escolhe a tabela de arquivos de módulo | não lido | LifeDownSet2 (== 1), bancada/modulos.py | decompilado, ao_vivo |
 | `0x7EED` | u8 | não nomeado | LifeDownSet2: com valor 2, o jogador de tipo 1 e a parceira de tipo 3 não perdem vida (reposta ao máximo). Era descrito como 'flags de invencibilidade de 64 bits em +0x7EE8'; o C mostra uma leitura de 8 bytes que testa só +0x7EEA e +0x7EED | não lido | LifeDownSet2 | decompilado |
-| `0x7F60` | u32[12][8] | entradas da lista já usadas (Em_flg) | 32 bytes por lista de inimigos; um bit por entrada (bit 31 − índice da palavra); EmSetFromList2 recusa a entrada com o bit ligado. NÃO confirmado ao vivo: no estado 95, com as entradas 3..14, 18, 19, 29, 38 e 39 criadas, a lista 0 tinha só os bits 3, 4, 5, 16, 17 e 255 ligados (decodificação bit 31 − índice) — a regra de bits é outra ou o campo é outro | não lido (morte do inimigo no GameCube) | EmSetFromList2 | decompilado |
+| `0x7F60` | u32[12][8] | entradas da lista já usadas (Em_flg) | 32 bytes por lista de inimigos; um bit por entrada (bit 31 − índice da palavra); EmSetFromList2 recusa a entrada com o bit ligado. NÃO confirmado ao vivo: no estado 95, com as entradas 3..14, 18, 19, 29, 38 e 39 criadas, a lista 0 tinha só os bits 3, 4, 5, 16, 17 e 255 ligados (decodificação bit 31 − índice) — nem 'entradas criadas' nem 'entradas mortas' (3..8) nem a ordem de bits inversa explicam; relação não confirmada | não lido (morte do inimigo no GameCube) | EmSetFromList2 | decompilado |
 | `0x8344` | EM_LIST[256] | lista de inimigos da sala (Em_list) | = 0x0042DEE4; 0x2000 bytes lidos do arquivo .esl pelo readEmList (cDvd, dorme pelo escalonador); zerada se a leitura falha | readEmList | EmSetFromList2, GetEmPtrFromList, GetEmIdFromList, EmListIsAlive | decompilado, ao_vivo |
 | `0xB3B0` | s32 | não nomeado | readEmList recarrega a lista quando vale 3 | não lido | readEmList | decompilado |
 
@@ -147,7 +148,7 @@ Mesma estrutura para jogador, parceira, inimigos e objetos-inimigo (caixas, port
 | `0x010` | mat4 | matriz de mundo (cCoord) | 4×4 de floats, conferida na foto inimigo1 (S8-00): três linhas unitárias da rotação em y (ang +0xD4 = 1,75 rad) e a linha +0x40 igual a pos; é o que S8-00 chamou de 'posição com cópias' | matUpdate a cada quadro (gc) | desenho, partes (inferido) | foto |
 | `0x0C0` | vec3 | pos | posição dos pés em mm | EmSetEvent (lista ×10), movimento, colisão (encaixe no chão e empurrão de parede), canal (teleporte) | jumpCheck, EmSetEvent (distância ao jogador), tudo o mais (inferido) | decompilado, ao_vivo |
 | `0x0D0` | vec3 | ang | rotação em radianos (lista × π/16384); +0xD4 = eixo y (frente) | EmSetEvent, movimento, canal | desenho, salto (jumpCheck) | decompilado, ao_vivo |
-| `0x110` | ptr | pList (partes) | primeira cParts; em cada parte, +0x40 (4ª linha da matriz) é a posição de mundo, +0x80 o deslocamento local em relação ao pai (jogador: (0, 1076, 0) na raiz), +0x90 e +0xA0 posições de mundo anteriores; +0x110 a próxima parte (conferido ao vivo em 11/11; o teleporte escreve +0x80/+0x90/+0xA0 e o jogo recompõe) | partsWorldCalc a cada quadro (gc) | colisão (varredura anterior→atual), desenho | foto, ao_vivo |
+| `0x110` | ptr | pList (partes) | primeira cParts; em cada parte, +0x40 (4ª linha da matriz) é a posição de mundo, +0x80 o deslocamento local em relação ao pai (jogador: (0, 1076, 0) na raiz), +0x90 e +0xA0 iguais a +0x40 com o jogador parado (o papel de 'anterior' vem só do GameCube); +0x110 a próxima parte (lido ao vivo em 11/11; o teleporte de 30/10 escreveu posição de mundo também em +0x80 e funcionou, sem explicação medida) | partsWorldCalc a cada quadro (gc) | colisão (varredura anterior→atual), desenho | foto, ao_vivo |
 | `0x11C` | u8 | id (tipo) | 0 jogador, 1 a 13 parceira e aliados, ≥ 16 inimigos (ramo da função de dano; tabela por tipo 0x003C8F40) | construtor do tipo (inferido) | LifeDownSet2 | decompilado, ao_vivo |
 | `0x11D` | u8 | type (variante) | byte +2 da EM_LIST | EmSetEvent, EmSetFromList2 | rotinas do tipo (inferido) | decompilado |
 | `0x130` | vec3 | pos_old | posição antes do movimento do quadro; EmSetEvent copia pos para cá | EmSetEvent, updateOldPos (gc) | colisão | decompilado, ao_vivo |
@@ -237,7 +238,7 @@ O roteiro da sala cria a entrada i por EmSetFromList2(i); o mestre grava uma str
 
 | deslocamento | tipo | campo | significado | quem escreve | quem lê | prova |
 |---|---|---|---|---|---|---|
-| `0x00` | u8 | be_flag | bit 0 vivo, bit 1 já criada (EmSetFromList2 recusa), bits 2/3 alternância; EmSetEvent grava 7; ao vivo (estado 96, nenhum cEm vindo da lista) havia entradas com 0x01 e 0x06: os bits não significam 'cEm vivo agora', e sim histórico da entrada | EmSetFromList2, EmSetEvent | EmSetFromList2 | decompilado |
+| `0x00` | u8 | be_flag | bit 0 vivo, bit 1 já criada (EmSetFromList2 recusa), bits 2/3 alternância; EmSetEvent grava 7; ao vivo (estado 96, nenhum cEm vindo da lista) havia entradas com 0x01 e 0x06: bit 0 não significa 'cEm vivo agora'; o que os bits significam não foi confirmado ao vivo | EmSetFromList2, EmSetEvent | EmSetFromList2 | decompilado |
 | `0x01` | u8 | id (tipo) | 0 = vaga vazia; 0x0F e 0x25 nascem nas vagas do fim do vetor (alocador especial) | arquivo .esl | EmSetFromList2, EmSetEvent | decompilado, ao_vivo |
 | `0x02` | u8 | type (variante) | → cEm+0x11D | arquivo | EmSetEvent | decompilado |
 | `0x03` | u8 | set | → cEm+0x4BD | arquivo | EmSetEvent | decompilado |
